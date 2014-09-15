@@ -86,7 +86,6 @@
                   	<overWrite>false</overWrite>
                   	<outputDirectory>${project.build.directory}/lib</outputDirectory>
                 </artifactItem>
-                -->
               </artifactItems>
             </configuration>
             
