@@ -1,0 +1,73 @@
+package com.ucuenca.pentaho.plugin.step.marc21loader.util;
+
+public class MARC21 {
+
+	 	private int recordNumber;
+	    private String field;
+	    private String indicators;
+	    private char subfield;
+	    private String leadersubfields; 
+	    private String value;
+
+	    public MARC21() {
+	        
+	    }
+	    
+	    public MARC21(int recordNumber, String field, String indicators, char subfield, String leaderSubfields, String value) {
+	        this.recordNumber = recordNumber;
+	        this.field = field;
+	        this.indicators = indicators;
+	        this.subfield = subfield;
+	        this.leadersubfields = leaderSubfields;
+	        this.value = value;
+	    }
+
+		public int getRecordNumber() {
+			return recordNumber;
+		}
+
+		public void setRecordNumber(int recordNumber) {
+			this.recordNumber = recordNumber;
+		}
+
+		public String getField() {
+			return field;
+		}
+
+		public void setField(String field) {
+			this.field = field;
+		}
+
+		public String getIndicators() {
+			return indicators;
+		}
+
+		public void setIndicators(String indicators) {
+			this.indicators = indicators;
+		}
+
+		public char getSubfield() {
+			return subfield;
+		}
+
+		public void setSubfield(char subfield) {
+			this.subfield = subfield;
+		}
+
+		public String getLeadersubfields() {
+			return leadersubfields;
+		}
+
+		public void setLeadersubfields(String leadersubfields) {
+			this.leadersubfields = leadersubfields;
+		}
+
+		public String getValue() {
+			return value;
+		}
+
+		public void setValue(String value) {
+			this.value = value;
+		}
+
+}
