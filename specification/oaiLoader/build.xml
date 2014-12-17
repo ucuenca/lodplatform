@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<project name="PdiSdkDemoStepPlugin" default="dist" basedir=".">
+	<description>
+        Build file for a PDI step plugin
+    </description>
+
+	<!-- you can use this file to set the kettle-dir property or change it directly below -->
+	<property file="build/build.properties" />
+
+	<!-- set global properties for this build -->
+	<property name="kettle-local-dir" location="/home/otakusf/data-integration" />
+	<!--
+	<property name="src" location="src" />
+	<property name="classes" location="classes" />
+	-->
+	<property name="dist" location="target" />
+	<property name="pluginname" value="OAIExtraer" />
+	<property name="diststep" location="${dist}/steps/${pluginname}" />
+	
+	<property name="jarfilename" value="OAIExtraer-step.jar" />
+
+	<!-- used to compile code -->
+	<!--
+	<path id="compile.classpath">
+		<fileset dir="${basedir}/lib">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+	
+	<target name="init">
+		<tstamp />
+	</target>
+
+	<target name="compile" depends="init" description="compile the source ">
+		<mkdir dir="${classes}" />
+		<javac target="1.6" srcdir="${src}" destdir="${classes}" debuglevel="lines,vars,source" debug="true">
+			<classpath refid="compile.classpath" />
+
+		</javac>
+	</target>
+	-->
+	<!-- <target name="dist" depends="compile" description="generate the distribution"> -->
+	<target name="dist" description="generate the distribution">
+
+		<mkdir dir="${diststep}" />
+
+		<!-- jar things up, also add the properties files (messages) -->
+		<!--
+		<copy todir="${classes}">
+			<fileset dir="${src}" includes="**/*.properties" />
+		</copy>
+		-->
+
+		<!-- jar class up -->
+		<!--
+		<jar jarfile="${diststep}/${jarfilename}" basedir="${classes}"/>
+		-->
+	
+		<!-- Put the plugin.xml and icon into dist folder -->
+		<copy todir="${diststep}">
+			<fileset dir="src/main/resources/plugin" includes="**/*.*" />
+			<fileset dir="src/main/resources/plugin" includes="**" />
+			<fileset dir="target" includes="**/*.jar" />
+		</copy>
+
+	</target>
+	
+	<target name="install" depends="dist" description="compile and install into local PDI installation">
+		
+		<echo message="Looking for local PDI installation in ${kettle-dir}"/>
+		
+		<!-- change these to adapt to your environment -->
+		<!--
+		<property name="kettle-dir" location="your_kettle_4.x_dir_here" />
+		-->
+		<available file="${kettle-local-dir}" type="dir" property="kettle-dir.present" />
+		
+		<fail unless="kettle-dir.present" message="PDI installation not found. Please specify the right path to your PDI installation in build.xml for property name kettle-local-dir" />
+
+		<!-- remove previous installations -->
+		<delete dir="${kettle-local-dir}/plugins/steps/${pluginname}" />
+
+		<!-- put fresh files in place -->
+		<mkdir dir="${kettle-local-dir}/plugins/steps/${pluginname}" />
+
+		<copy todir="${kettle-local-dir}/plugins/steps/${pluginname}">
+			<fileset dir="${diststep}" includes="**/*.*" />
+			<fileset dir="${diststep}" includes="**" />
+		</copy>
+		
+		
+		<echo message="Installed the plugin in PDI. To test, please restart Spoon."/>
+		
+	</target>
+	<!--
+	<target name="clean" description="clean up">
+		<delete dir="${classes}" />
+		<delete dir="${dist}" />
+	</target>
+	-->
+
+</project>
