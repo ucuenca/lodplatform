@@ -197,7 +197,7 @@ public class OAILoaderDialog extends BaseStepDialog implements
 
 		// add components to grupLayout
 		lbURI = new Label(shell, SWT.MEDIUM);
-		lbURI.setText(" Input URI");
+		lbURI.setText(BaseMessages.getString(PKG, "OAILoader.FieldName.Label"));
 		props.setLook(lbURI);
 		fdlbURI = new FormData();
 		fdlbURI.left = new FormAttachment(0, 0);
@@ -216,7 +216,8 @@ public class OAILoaderDialog extends BaseStepDialog implements
 		txtURI.setLayoutData(fdtxtURI);
 
 		lbPrefijo = new Label(shell, SWT.MEDIUM);
-		lbPrefijo.setText("Prefijo");
+		
+		lbPrefijo.setText(BaseMessages.getString(PKG, "OAILoader.FieldName.Prefix"));
 		props.setLook(lbPrefijo);
 		fdlbPrefijo = new FormData();
 		fdlbPrefijo.left = new FormAttachment(0, 0);
@@ -246,7 +247,8 @@ public class OAILoaderDialog extends BaseStepDialog implements
 
 		Xpath = new Button(shell, SWT.PUSH | SWT.MEDIUM);
 		props.setLook(Xpath);
-		Xpath.setText("Get  Xpath");
+		
+		Xpath.setText(BaseMessages.getString(PKG, "OAILoader.ButtonName.Title"));
 		Xpath.setToolTipText(BaseMessages.getString(PKG,
 				"System.Tooltip.BrowseForFileOrDirAndAdd"));
 		fdXpath = new FormData();
@@ -441,9 +443,9 @@ public class OAILoaderDialog extends BaseStepDialog implements
 		if (list_xpath != null) {
 			EnterSelectionDialog s = new EnterSelectionDialog(shell,
 					list_xpath, BaseMessages.getString(PKG,
-							"GetXMLDataDialog.Dialog.SelectALoopPath.Title"),
+							"OAILoader.Dialog.SelectALoopPath.Title"),
 					BaseMessages.getString(PKG,
-							"GetXMLDataDialog.Dialog.SelectALoopPath.Message"));
+							"OAILoader.Dialog.SelectALoopPath.Message"));
 			xpath = s.open();
 
 			if (xpath != null) {
