@@ -222,18 +222,18 @@ public class OAILoaderMeta extends BaseStepMeta implements StepMetaInterface {
 		 * This implementation appends the outputField to the row-stream
 		 */
 
-		ValueMetaInterface numRegistro = new ValueMeta("# Registro", ValueMetaInterface.TYPE_STRING);
+		ValueMetaInterface numRegistro = new ValueMeta(BaseMessages.getString(PKG, "OAILoader.InputData.IdRecord"), ValueMetaInterface.TYPE_STRING);
 		numRegistro.setOrigin(origin);
 		numRegistro.setLength(5);
 		r.addValueMeta(numRegistro);
 		
-		ValueMetaInterface Campo = new ValueMeta("Campo", ValueMetaInterface.TYPE_STRING);
+		ValueMetaInterface Campo = new ValueMeta(BaseMessages.getString(PKG, "OAILoader.InputData.Field"), ValueMetaInterface.TYPE_STRING);
 		Campo.setOrigin(origin);
 		Campo.setLength(255);
 		r.addValueMeta(Campo);
 		
 
-		ValueMetaInterface Datos = new ValueMeta("Datos", ValueMetaInterface.TYPE_STRING);
+		ValueMetaInterface Datos = new ValueMeta(BaseMessages.getString(PKG, "OAILoader.InputData.Data"), ValueMetaInterface.TYPE_STRING);
 		Datos.setOrigin(origin);
 		Datos.setLength(255);
 		r.addValueMeta(Datos);		
