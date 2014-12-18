@@ -49,21 +49,21 @@ import org.xml.sax.SAXException;
 import com.ucuenca.pentaho.plugin.oai.ListRecords;
 import com.ucuenca.pentaho.plugin.oai.Schema;
 
-public class OAIExtraer extends BaseStep implements StepInterface {
+public class OAILoader extends BaseStep implements StepInterface {
 
 	ArrayList<String> datos;
 	ArrayList<String> nameFields;
 	String numRegistro;
 
-	public OAIExtraer(StepMeta s, StepDataInterface stepDataInterface, int c,
+	public OAILoader(StepMeta s, StepDataInterface stepDataInterface, int c,
 			TransMeta t, Trans dis) {
 		super(s, stepDataInterface, c, t, dis);
 	}
 
 	public boolean init(StepMetaInterface smi, StepDataInterface sdi) {
 		// Casting to step-specific implementation classes is safe
-		OAIExtraerMeta meta = (OAIExtraerMeta) smi;
-		OAIExtraerData data = (OAIExtraerData) sdi;
+		OAILoaderMeta meta = (OAILoaderMeta) smi;
+		OAILoaderData data = (OAILoaderData) sdi;
 
 		return super.init(meta, data);
 	}
@@ -73,8 +73,8 @@ public class OAIExtraer extends BaseStep implements StepInterface {
 
 		// safely cast the step settings (meta) and runtime info (data) to
 		// specific implementations
-		OAIExtraerMeta meta = (OAIExtraerMeta) smi;
-		OAIExtraerData data = (OAIExtraerData) sdi;
+		OAILoaderMeta meta = (OAILoaderMeta) smi;
+		OAILoaderData data = (OAILoaderData) sdi;
 
 		Schema schema = new Schema();
 
@@ -319,8 +319,8 @@ public class OAIExtraer extends BaseStep implements StepInterface {
 	public void dispose(StepMetaInterface smi, StepDataInterface sdi) {
 
 		// Casting to step-specific implementation classes is safe
-		OAIExtraerMeta meta = (OAIExtraerMeta) smi;
-		OAIExtraerData data = (OAIExtraerData) sdi;
+		OAILoaderMeta meta = (OAILoaderMeta) smi;
+		OAILoaderData data = (OAILoaderData) sdi;
 
 		super.dispose(meta, data);
 	}

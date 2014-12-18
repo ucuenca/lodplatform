@@ -6,10 +6,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.ucuenca.pentaho.plugin.step.OAIExtraerMeta;
+import com.ucuenca.pentaho.plugin.step.OAILoaderMeta;
 
 public class GetXPath {
-	OAIExtraerMeta meta;
+	OAILoaderMeta meta;
 	String prefix;
 
 	// methods for get Xpath from the file XLM of the server OAI
@@ -22,7 +22,7 @@ public class GetXPath {
 	public GetXPath(String prefix) {
 		super();
 		this.prefix = prefix;
-		meta = new OAIExtraerMeta();
+		meta = new OAILoaderMeta();
 	}
 
 	public void getPath(Node record) {
@@ -248,11 +248,11 @@ public class GetXPath {
 	}
 	
 	
-	public OAIExtraerMeta getMeta() {
+	public OAILoaderMeta getMeta() {
 		return meta;
 	}
 
-	public void setMeta(OAIExtraerMeta meta) {
+	public void setMeta(OAILoaderMeta meta) {
 		this.meta = meta;
 	}
 

@@ -50,7 +50,7 @@ import com.ucuenca.pentaho.plugin.oai.ListRecords;
  * the data class. 
  *   
  */
-public class OAIExtraerData extends BaseStepData implements StepDataInterface {
+public class OAILoaderData extends BaseStepData implements StepDataInterface {
 
 	public RowMetaInterface outputRowMeta;
 	public ListRecords listRecords;
@@ -60,7 +60,7 @@ public class OAIExtraerData extends BaseStepData implements StepDataInterface {
 	int total;
 
 	
-    public OAIExtraerData()
+    public OAILoaderData()
 	{
 		super();
 		initialResumptionToken = null;

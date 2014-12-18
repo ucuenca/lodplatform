@@ -8,17 +8,17 @@
 	classname:		The step class implementing StepMetaInterface
  -->
 <plugin
-   id="OAIExtraerStep"
+   id="OAILoaderStep"
    iconfile="icon.png"
-   description="OAIExtraer Step"
-   tooltip="OAIExtraer Step Tooltip"
-   category="OtakuRepository"
-   classname="com.ucuenca.pentaho.plugin.step.OAIExtraerMeta">
+   description="OAILoader Step"
+   tooltip="OAILoader Step Tooltip"
+   category="LODPlatform"
+   classname="com.ucuenca.pentaho.plugin.step.OAILoaderMeta">
 		
 		<!-- the list of jar files to include when loading the step -->
 		<libraries>
 			<!-- the classes implementing the step interfaces are in this jar -->
-    		<library name="OAIExtraer-0.0.1-SNAPSHOT.jar"/>
+    		<library name="OAILoader-0.0.1-SNAPSHOT.jar"/>
     		
     		<!-- specify additional jars to be included when loading the step plug-in -->
     		<!--  

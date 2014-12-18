@@ -53,10 +53,10 @@ import org.pentaho.di.trans.step.StepMetaInterface;
 import org.w3c.dom.Node;
 
 
-public class OAIExtraerMeta extends BaseStepMeta implements StepMetaInterface {
+public class OAILoaderMeta extends BaseStepMeta implements StepMetaInterface {
 
 	
-	private static Class<?> PKG = OAIExtraerMeta.class; // for i18n purposes
+	private static Class<?> PKG = OAILoaderMeta.class; // for i18n purposes
 	
 	/**
 	 * Stores the name of the field added to the row-stream. 
@@ -73,7 +73,7 @@ public class OAIExtraerMeta extends BaseStepMeta implements StepMetaInterface {
 	/**
 	 * Constructor should call super() to make sure the base class has a chance to initialize properly.
 	 */
-	public OAIExtraerMeta() {
+	public OAILoaderMeta() {
 		super(); 
 		this.listpath = new ArrayList<String>();
 		prefix=null;
@@ -84,19 +84,19 @@ public class OAIExtraerMeta extends BaseStepMeta implements StepMetaInterface {
 	
 	
 	public StepDialogInterface getDialog(Shell shell, StepMetaInterface meta, TransMeta transMeta, String name) {
-		return new OAIExtraerDialog(shell, meta, transMeta, name);
+		return new OAILoaderDialog(shell, meta, transMeta, name);
 	}
 
 	
 	public StepInterface getStep(StepMeta stepMeta, StepDataInterface stepDataInterface, int cnr, TransMeta transMeta, Trans disp) {
-		return new OAIExtraer(stepMeta, stepDataInterface, cnr, transMeta, disp);
+		return new OAILoader(stepMeta, stepDataInterface, cnr, transMeta, disp);
 	}
 
 	/**
 	 * Called by PDI to get a new instance of the step data class.
 	 */
 	public StepDataInterface getStepData() {
-		return new OAIExtraerData();
+		return new OAILoaderData();
 	}	
 
 	/**
@@ -222,18 +222,18 @@ public class OAIExtraerMeta extends BaseStepMeta implements StepMetaInterface {
 		 * This implementation appends the outputField to the row-stream
 		 */
 
-		ValueMetaInterface numRegistro = new ValueMeta("# Registro", ValueMetaInterface.TYPE_STRING);
+		ValueMetaInterface numRegistro = new ValueMeta(BaseMessages.getString(PKG, "OAILoader.InputData.IdRecord"), ValueMetaInterface.TYPE_STRING);
 		numRegistro.setOrigin(origin);
 		numRegistro.setLength(5);
 		r.addValueMeta(numRegistro);
 		
-		ValueMetaInterface Campo = new ValueMeta("Campo", ValueMetaInterface.TYPE_STRING);
+		ValueMetaInterface Campo = new ValueMeta(BaseMessages.getString(PKG, "OAILoader.InputData.Field"), ValueMetaInterface.TYPE_STRING);
 		Campo.setOrigin(origin);
 		Campo.setLength(255);
 		r.addValueMeta(Campo);
 		
 
-		ValueMetaInterface Datos = new ValueMeta("Datos", ValueMetaInterface.TYPE_STRING);
+		ValueMetaInterface Datos = new ValueMeta(BaseMessages.getString(PKG, "OAILoader.InputData.Data"), ValueMetaInterface.TYPE_STRING);
 		Datos.setOrigin(origin);
 		Datos.setLength(255);
 		r.addValueMeta(Datos);		

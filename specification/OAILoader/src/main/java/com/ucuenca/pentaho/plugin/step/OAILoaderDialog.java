@@ -76,6 +76,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import javax.swing.JOptionPane;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
@@ -87,13 +88,13 @@ import com.ucuenca.pentaho.plugin.oai.ListRecords;
 import com.ucuenca.pentaho.plugin.oai.Schema;
 
 @SuppressWarnings("unused")
-public class OAIExtraerDialog extends BaseStepDialog implements
+public class OAILoaderDialog extends BaseStepDialog implements
 		StepDialogInterface {
 
-	private static Class<?> PKG = OAIExtraerMeta.class; // for i18n purposes
+	private static Class<?> PKG = OAILoaderMeta.class; // for i18n purposes
 
 	// variables globales para uso general
-	private OAIExtraerMeta meta;
+	private OAILoaderMeta meta;
 
 	// componentes de la interface
 
@@ -121,10 +122,10 @@ public class OAIExtraerDialog extends BaseStepDialog implements
 	static Logger logger;
 	int electedItem;
 
-	public OAIExtraerDialog(Shell parent, Object in, TransMeta transMeta,
+	public OAILoaderDialog(Shell parent, Object in, TransMeta transMeta,
 			String sname) {
 		super(parent, (BaseStepMeta) in, transMeta, sname);
-		meta = (OAIExtraerMeta) in;
+		meta = (OAILoaderMeta) in;
 	}
 
 	public String open() {
@@ -148,17 +149,18 @@ public class OAIExtraerDialog extends BaseStepDialog implements
 		};
 		changed = meta.hasChanged();
 
-		//managmed for use of the URI, also for validation URI
+		// managmed for use of the URI, also for validation URI
 		mltxtUri = new ModifyListener() {
 
 			public void modifyText(ModifyEvent e) {
-				
-				
 
-				if (!meta.getInputURI().equals(txtURI.getText())) {
-					listPrefix(txtURI.getText());
+				if (meta.getInputURI().length() > 7) {
 					
+					if (!meta.getInputURI().equals(txtURI.getText())) {
+						listPrefix(txtURI.getText());
+					}
 				}
+
 			}
 		};
 		// ------------------------------------------------------- //
@@ -169,7 +171,7 @@ public class OAIExtraerDialog extends BaseStepDialog implements
 		formLayout.marginHeight = Const.FORM_MARGIN;
 
 		shell.setLayout(formLayout);
-		shell.setText(BaseMessages.getString(PKG, "Demo.Shell.Title"));
+		shell.setText(BaseMessages.getString(PKG, "OAILoader.Shell.Title"));
 
 		int middle = props.getMiddlePct();
 		int margin = Const.MARGIN;
@@ -197,7 +199,7 @@ public class OAIExtraerDialog extends BaseStepDialog implements
 
 		// add components to grupLayout
 		lbURI = new Label(shell, SWT.MEDIUM);
-		lbURI.setText(" Input URI");
+		lbURI.setText(BaseMessages.getString(PKG, "OAILoader.FieldName.Label"));
 		props.setLook(lbURI);
 		fdlbURI = new FormData();
 		fdlbURI.left = new FormAttachment(0, 0);
@@ -216,7 +218,9 @@ public class OAIExtraerDialog extends BaseStepDialog implements
 		txtURI.setLayoutData(fdtxtURI);
 
 		lbPrefijo = new Label(shell, SWT.MEDIUM);
-		lbPrefijo.setText("Prefijo");
+
+		lbPrefijo.setText(BaseMessages.getString(PKG,
+				"OAILoader.FieldName.Prefix"));
 		props.setLook(lbPrefijo);
 		fdlbPrefijo = new FormData();
 		fdlbPrefijo.left = new FormAttachment(0, 0);
@@ -246,7 +250,8 @@ public class OAIExtraerDialog extends BaseStepDialog implements
 
 		Xpath = new Button(shell, SWT.PUSH | SWT.MEDIUM);
 		props.setLook(Xpath);
-		Xpath.setText("Get  Xpath");
+
+		Xpath.setText(BaseMessages.getString(PKG, "OAILoader.ButtonName.Title"));
 		Xpath.setToolTipText(BaseMessages.getString(PKG,
 				"System.Tooltip.BrowseForFileOrDirAndAdd"));
 		fdXpath = new FormData();
@@ -357,26 +362,25 @@ public class OAIExtraerDialog extends BaseStepDialog implements
 		wStepname.selectAll();
 
 		if (!meta.getInputURI().equals("Input URI")) {
-			prefix=meta.getPrefix();
-			listPrefix(meta.getInputURI());	
-			
+			prefix = meta.getPrefix();
+			listPrefix(meta.getInputURI());
+
 			Iterator i = schemas.iterator();
-			int setElement=0;
+			int setElement = 0;
 			while (i.hasNext()) {
 				Schema schema1 = (Schema) i.next();
-				if(schema1.prefix.equals(prefix))
-				{
+				if (schema1.prefix.equals(prefix)) {
 					this.schema = schema1;
-					break;					
+					break;
 				}
-				setElement++;					
+				setElement++;
 			}
 			electedItem = setElement;
-			
+
 			cbmPrefix.setText(meta.getPrefix());
 			cbmPrefix.setEnabled(true);
-			txtXpath.setText(meta.getXpath());		
-			
+			txtXpath.setText(meta.getXpath());
+
 		}
 	}
 
@@ -388,7 +392,7 @@ public class OAIExtraerDialog extends BaseStepDialog implements
 		// method.
 		// Setting to null to indicate that dialog was cancelled.
 		stepname = null;
-       // Restoring original "changed" flag on the met aobject
+		// Restoring original "changed" flag on the met aobject
 		meta.setChanged(changed);
 		// close the SWT dialog window
 		dispose();
@@ -441,9 +445,9 @@ public class OAIExtraerDialog extends BaseStepDialog implements
 		if (list_xpath != null) {
 			EnterSelectionDialog s = new EnterSelectionDialog(shell,
 					list_xpath, BaseMessages.getString(PKG,
-							"GetXMLDataDialog.Dialog.SelectALoopPath.Title"),
+							"OAILoader.Dialog.SelectALoopPath.Title"),
 					BaseMessages.getString(PKG,
-							"GetXMLDataDialog.Dialog.SelectALoopPath.Message"));
+							"OAILoader.Dialog.SelectALoopPath.Message"));
 			xpath = s.open();
 
 			if (xpath != null) {
@@ -452,8 +456,6 @@ public class OAIExtraerDialog extends BaseStepDialog implements
 		}
 
 	}
-
-	
 
 	public void listPrefix(String ruta) {
 
@@ -495,8 +497,10 @@ public class OAIExtraerDialog extends BaseStepDialog implements
 				Uri = ruta;
 
 			} catch (Exception e1) {
-				System.err.println(": " + e1.getMessage());
-				e1.printStackTrace(System.err);
+
+				JOptionPane.showMessageDialog(null,
+						BaseMessages.getString(PKG, "OAILoader.Manager.ERROR"),
+						"Error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 
