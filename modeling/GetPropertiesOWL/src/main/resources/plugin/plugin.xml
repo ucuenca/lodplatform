@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+	id: 			String uniquely identifying the step. Used in serialization. 
+	iconfile:		The step icon used in spoon
+	description: 	The name of the step as it appears in Spoon
+	tooltip:		The tooltip of the step as it appears in Spoon
+	category:		The step category in the tree view in Spoon
+	classname:		The step class implementing StepMetaInterface
+ -->
+<plugin
+   id="GetPropertiesOWL"
+   iconfile="icon.png"
+   description="UC GetPropertiesOWL"
+   tooltip="Get Properties OWL"
+   category="LODPlatform"
+   classname="com.ucuenca.pentaho.plugin.step.GetPropertiesOWLMeta">
+		
+		<!-- the list of jar files to include when loading the step -->
+		<libraries>
+			<!-- the classes implementing the step interfaces are in this jar -->
+    		<library name="GetPropertiesOWL-0.0.1-SNAPSHOT.jar"/>
+    		
+    		<!-- specify additional jars to be included when loading the step plug-in -->
+    		 <artifactId>junit</artifactId>
+				<version>3.8.1</version>
+    			<library name="lib/jena-core-2.12.0.jar"/>
+    		 	<library name="lib/slf4j-api-1.7.6.jar"/>
+    		 	<library name="lib/jena-arq-2.12.0.jar"/>
+    		 	<library name="lib/jena-iri-1.1.0.jar"/>
+    		 	<library name="lib/httpclient-4.2.6.jar"/>
+    		 	<library name="lib/httpclient-cache-4.2.6.jar"/>
+    		 	<library name="lib/httpcore-4.2.5.jar"/>
+    		 	<library name="lib/commons-logging.1.0.4.jar"/>
+    		 	<library name="lib/json-20070829.jar"/>
+		</libraries>
+</plugin>
