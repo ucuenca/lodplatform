@@ -87,6 +87,14 @@
                   	<outputDirectory>${project.build.directory}/lib</outputDirectory>
                 </artifactItem>
                 
+                 <artifactItem>
+               		<groupId>commons-digester</groupId>
+			      	<artifactId>commons-digester</artifactId>
+			      	<version>1.7</version>
+                  	<type>jar</type>
+                  	<overWrite>false</overWrite>
+                  	<outputDirectory>${project.build.directory}/lib</outputDirectory>
+                </artifactItem>
                               
               </artifactItems>
             </configuration>
