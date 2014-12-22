@@ -266,24 +266,7 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 		int margin = Const.MARGIN;
 
 		// Stepname line
-		/**
-		wlStepname = new Label(shell, SWT.RIGHT);
-		wlStepname.setText(BaseMessages.getString(PKG,"PLUGIN TO GET CLASS AND PROPERTIES FROM ONTOLOGYS"));
-		props.setLook(wlStepname);
-		fdlStepname = new FormData();
-		fdlStepname.left = new FormAttachment(0, 0);
-		fdlStepname.right = new FormAttachment(middle, -margin);
-		fdlStepname.top = new FormAttachment(0, margin);
-		wlStepname.setLayoutData(fdlStepname); 
-		*/
-		/**
-		 * wStepname = new Text(shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
-		 * wStepname.setText(stepname); props.setLook(wStepname);
-		 * wStepname.addModifyListener(lsMod); fdStepname = new FormData();
-		 * fdStepname.left = new FormAttachment(middle, 0); fdStepname.top = new
-		 * FormAttachment(0, margin); fdStepname.right = new FormAttachment(100,
-		 * 0); //wStepname.setLayoutData(fdStepname);
-		 */
+
 
 		// output field value
 		Label wlValName = new Label(shell, SWT.RIGHT);
@@ -471,7 +454,7 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 			item.setText(0, String.valueOf(numt));
 			item.setText(1,myList.get(i).toString() );
 //--
-			Pattern pat = Pattern.compile("^http.*");
+			Pattern pat = Pattern.compile("^http://.*");
 			Matcher mat = pat.matcher(myList.get(i).toString());
 			if (mat.matches()) { // entonces es una uri
 				item.setText(2, "from URI");}else{item.setText(2, "from local file");}
