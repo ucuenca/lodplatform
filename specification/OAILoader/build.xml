@@ -17,7 +17,7 @@
 	<property name="pluginname" value="OAILoader" />
 	<property name="diststep" location="${dist}/steps/${pluginname}" />
 	
-	<property name="jarfilename" value="OAILoader-step.jar" />
+	<property name="jarfilename" value="OAILoader.jar" />
 
 	<!-- used to compile code -->
 	<!--
