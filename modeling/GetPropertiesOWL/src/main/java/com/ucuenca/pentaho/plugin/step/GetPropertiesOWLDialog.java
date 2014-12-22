@@ -266,15 +266,16 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 		int margin = Const.MARGIN;
 
 		// Stepname line
+		/**
 		wlStepname = new Label(shell, SWT.RIGHT);
-		wlStepname.setText(BaseMessages.getString(PKG,
-				"PLUGIN TO GET CLASS AND PROPERTIES FROM ONTOLOGYS"));
+		wlStepname.setText(BaseMessages.getString(PKG,"PLUGIN TO GET CLASS AND PROPERTIES FROM ONTOLOGYS"));
 		props.setLook(wlStepname);
 		fdlStepname = new FormData();
 		fdlStepname.left = new FormAttachment(0, 0);
 		fdlStepname.right = new FormAttachment(middle, -margin);
 		fdlStepname.top = new FormAttachment(0, margin);
-		wlStepname.setLayoutData(fdlStepname);
+		wlStepname.setLayoutData(fdlStepname); 
+		*/
 		/**
 		 * wStepname = new Text(shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
 		 * wStepname.setText(stepname); props.setLook(wStepname);
