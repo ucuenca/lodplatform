@@ -75,6 +75,8 @@ import org.xml.sax.SAXException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JOptionPane;
 import javax.xml.parsers.ParserConfigurationException;
@@ -105,14 +107,14 @@ public class OAILoaderDialog extends BaseStepDialog implements
 	private CCombo cbmPrefix;
 	private Text txtXpath;
 	private Button Xpath;
+	private Button getFormats;
 
 	private FormData fdlbURI, fdtxtURI, fdFields, fdlbPrefijo, fdtxtPrefijo,
-			fdbtnGetfield, fbcbmPrefix, fdXpath;
-
-	private ModifyListener mltxtUri;
+			fdbtnGetfield, fbcbmPrefix, fdXpath, fdGetFormats;
 
 	List schemas = null;
 	private String prefix;
+	private String valueUri="Input URI";
 
 	private Schema schema;
 	private String xpath;
@@ -145,24 +147,19 @@ public class OAILoaderDialog extends BaseStepDialog implements
 		ModifyListener lsMod = new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				meta.setChanged();
+				if(!valueUri.equals(txtURI.getText()))
+				{
+					cbmPrefix.setEnabled(false);
+					prefix=null;
+					xpath=null;
+					Xpath.setEnabled(false);
+					electedItem=0;
+					
+				}
 			}
 		};
 		changed = meta.hasChanged();
 
-		// managmed for use of the URI, also for validation URI
-		mltxtUri = new ModifyListener() {
-
-			public void modifyText(ModifyEvent e) {
-
-				if (meta.getInputURI().length() > 7) {
-					
-					if (!meta.getInputURI().equals(txtURI.getText())) {
-						listPrefix(txtURI.getText());
-					}
-				}
-
-			}
-		};
 		// ------------------------------------------------------- //
 		// SWT code for building the actual settings dialog //
 		// ------------------------------------------------------- //
@@ -202,20 +199,59 @@ public class OAILoaderDialog extends BaseStepDialog implements
 		lbURI.setText(BaseMessages.getString(PKG, "OAILoader.FieldName.Label"));
 		props.setLook(lbURI);
 		fdlbURI = new FormData();
-		fdlbURI.left = new FormAttachment(0, 0);
-		fdlbURI.right = new FormAttachment(middle, -2 * margin);
-		fdlbURI.top = new FormAttachment(wlStepname, 15);
+		fdlbURI.left = new FormAttachment(20, 0);
+		fdlbURI.right = new FormAttachment(middle, -margin);
+		fdlbURI.top = new FormAttachment(wlStepname, 20);
 		lbURI.setLayoutData(fdlbURI);
 
 		txtURI = new Text(shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
 		txtURI.setText(meta.getInputURI());
 		props.setLook(txtURI);
-		txtURI.addModifyListener(mltxtUri);
+		txtURI.addModifyListener(lsMod);
 		fdtxtURI = new FormData();
-		fdtxtURI.left = new FormAttachment(lbURI, 0);
-		fdtxtURI.top = new FormAttachment(wStepname, 4);
+		fdtxtURI.left = new FormAttachment(middle, 0);
 		fdtxtURI.right = new FormAttachment(100, 0);
+		fdtxtURI.top = new FormAttachment(wStepname, margin);
 		txtURI.setLayoutData(fdtxtURI);
+
+		// button for get all formats of the server OAI-PHM
+
+		getFormats = new Button(shell, SWT.PUSH | SWT.MEDIUM);
+		props.setLook(getFormats);
+
+		getFormats.setText(BaseMessages.getString(PKG,
+				"OAILoader.InputData.Formats"));
+		getFormats.setToolTipText(BaseMessages.getString(PKG,
+				"System.Tooltip.BrowseForFileOrDirAndAdd"));
+		fdGetFormats = new FormData();
+		fdGetFormats.left = new FormAttachment(middle, 0);
+		fdGetFormats.right = new FormAttachment(60, 20);
+		fdGetFormats.top = new FormAttachment(txtURI, margin);
+		getFormats.setLayoutData(fdGetFormats);
+		getFormats.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+			
+					Pattern pat = Pattern.compile("^http://.*");
+					
+					Matcher mat = pat.matcher(txtURI.getText());
+
+					if (mat.matches()) { // entonces es una uri
+						meta.setInputURI(txtURI.getText());	
+						valueUri=txtURI.getText();
+						cbmPrefix.setText("");
+						txtXpath.setText("");
+						listPrefix(txtURI.getText());
+					} else {
+						JOptionPane.showMessageDialog(null, BaseMessages
+								.getString(PKG, "OAILoader.Manager.ERRORURI"),
+								"Error", JOptionPane.ERROR_MESSAGE);
+					    cbmPrefix.setText("");
+						txtXpath.setText("");
+					}
+
+				}
+			
+		});
 
 		lbPrefijo = new Label(shell, SWT.MEDIUM);
 
@@ -223,9 +259,9 @@ public class OAILoaderDialog extends BaseStepDialog implements
 				"OAILoader.FieldName.Prefix"));
 		props.setLook(lbPrefijo);
 		fdlbPrefijo = new FormData();
-		fdlbPrefijo.left = new FormAttachment(0, 0);
-		fdlbPrefijo.right = new FormAttachment(middle, -2 * margin);
-		fdlbPrefijo.top = new FormAttachment(lbURI, 15);
+		fdlbPrefijo.left = new FormAttachment(20, 0);
+		fdlbPrefijo.right = new FormAttachment(middle, -margin);
+		fdlbPrefijo.top = new FormAttachment(lbURI, 42);
 		lbPrefijo.setLayoutData(fdlbPrefijo);
 
 		cbmPrefix = new CCombo(shell, SWT.BORDER);
@@ -234,7 +270,7 @@ public class OAILoaderDialog extends BaseStepDialog implements
 		cbmPrefix.addModifyListener(lsMod);
 		fbcbmPrefix = new FormData();
 		fbcbmPrefix.left = new FormAttachment(lbPrefijo, 0);
-		fbcbmPrefix.top = new FormAttachment(txtURI, margin);
+		fbcbmPrefix.top = new FormAttachment(getFormats, margin);
 		fbcbmPrefix.right = new FormAttachment(100, 0);
 		cbmPrefix.setLayoutData(fbcbmPrefix);
 		cbmPrefix.setEnabled(false);
@@ -242,6 +278,8 @@ public class OAILoaderDialog extends BaseStepDialog implements
 			public void widgetSelected(SelectionEvent arg0) {
 				prefix = cbmPrefix.getText();
 				electedItem = cbmPrefix.getSelectionIndex();
+				txtXpath.setText("");
+				Xpath.setEnabled(true);
 			}
 
 			public void widgetDefaultSelected(SelectionEvent arg0) {
@@ -255,10 +293,11 @@ public class OAILoaderDialog extends BaseStepDialog implements
 		Xpath.setToolTipText(BaseMessages.getString(PKG,
 				"System.Tooltip.BrowseForFileOrDirAndAdd"));
 		fdXpath = new FormData();
-		fdXpath.right = new FormAttachment(middle, -2 * margin);
-		fdXpath.left = new FormAttachment(0, 0);
-		fdXpath.top = new FormAttachment(lbPrefijo, 25);
+		fdXpath.left = new FormAttachment(20, 0);
+		fdXpath.right = new FormAttachment(middle, -margin);
+		fdXpath.top = new FormAttachment(lbPrefijo, 22);
 		Xpath.setLayoutData(fdXpath);
+		Xpath.setEnabled(false);
 		Xpath.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				try {
@@ -283,10 +322,11 @@ public class OAILoaderDialog extends BaseStepDialog implements
 		props.setLook(txtXpath);
 		txtXpath.addModifyListener(lsMod);
 		fdtxtPrefijo = new FormData();
-		fdtxtPrefijo.left = new FormAttachment(Xpath, 4);
+		fdtxtPrefijo.left = new FormAttachment(middle, 0);
 		fdtxtPrefijo.right = new FormAttachment(100, 0);
 		fdtxtPrefijo.top = new FormAttachment(cbmPrefix, 15);
 		txtXpath.setLayoutData(fdtxtPrefijo);
+		txtXpath.setEnabled(false);
 
 		// OK and cancel buttons
 		wOK = new Button(shell, SWT.PUSH);

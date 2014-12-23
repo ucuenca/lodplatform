@@ -8,10 +8,10 @@
 	classname:		The step class implementing StepMetaInterface
  -->
 <plugin
-   id="OAILoaderStep"
+   id="OAILoader"
    iconfile="icon.png"
-   description="OAILoader Step"
-   tooltip="OAILoader Step Tooltip"
+   description="OAILoader"
+   tooltip="OAILoader Tooltip"
    category="LODPlatform"
    classname="com.ucuenca.pentaho.plugin.step.OAILoaderMeta">
 		

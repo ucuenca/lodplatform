@@ -146,146 +146,117 @@ public class OAILoader extends BaseStep implements StepInterface {
 			}
 		}
 
+		// ********************************* Initial while
+		// ***************************
 		while (data.listRecords != null) {
-			NodeList errors = null;
-			try {
-				errors = data.listRecords.getErrors();
-			} catch (TransformerException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			if (errors != null && errors.getLength() > 0) {
-
-				int length = errors.getLength();
-				for (int j = 0; j < length; j++) {
-					Node item = errors.item(j);
-				}
-
-			}
 
 			outputIndex = 0;
 
 			NodeList records = null;
 			NodeList header = null;
-			numRegistro = "";
-			try {
 
+			try {
 				records = data.listRecords.getNodeList(meta.getXpath());
-				header = data.listRecords
-						.getNodeList("/oai20:OAI-PMH/oai20:ListRecords/oai20:record/oai20:header");
-
-				int batch = records.getLength();
-				data.total += batch;
-
-				for (int temp1 = 0; temp1 < records.getLength(); temp1++) {
-					Node nNode1 = records.item(temp1);
-					Node nNodeHeader = header.item(temp1);
-
-					// inicializacion of arraylist
-					datos = new ArrayList<String>();
-					nameFields = new ArrayList<String>();
-
-					if (nNode1.getNodeType() == Node.ELEMENT_NODE) {
-						Element eElement1 = (Element) nNode1;
-						Element eElementHeader = (Element) nNodeHeader;
-						
-						GetHeader(eElementHeader);
-
-						StringTokenizer strobj = new StringTokenizer(
-								meta.getXpath(), "/");
-
-						// called methods for get data
-						if (schema.prefix.equals("xoai")) {
-							GetDataXOAI(eElement1, strobj.countTokens(), 0, 0);
-						} else if (schema.prefix.equals("uketd_dc")) {
-							GetDataUketd_dc(eElement1);
-						} else if (schema.prefix.equals("qdc")) {
-							GetDataQDC(eElement1);
-						} else if (schema.prefix.equals("ore")) {
-							GetDataUketd_dc(eElement1);
-						} else if (schema.prefix.equals("oai_dc")) {
-							GetDataUketd_dc(eElement1);
-						} else if (schema.prefix.equals("didl")) {
-							GetDataUketd_dc(eElement1);
-						}
-
-						for (int i = 0; i < datos.size(); i++) {
-							outputRow[0] = numRegistro;
-							outputRow[1] = nameFields.get(i);
-							outputRow[2] = datos.get(i);
-							putRow(data.outputRowMeta, outputRow);
-						}
-
-					}
-				}// end two for
-
-				// log progress if it is time to to so
+				if (header == null) {
+					header = data.listRecords
+							.getNodeList("/oai20:OAI-PMH/oai20:ListRecords/oai20:record/oai20:header");
+				}
 			} catch (TransformerException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
-		}
-		// outputStream.close();
-		// para seguir extrayendo datos
-		try {
-			data.resumptionToken = data.listRecords.getResumptionToken();
-		} catch (NoSuchFieldException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (TransformerException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		if (data.resumptionToken == null || data.resumptionToken.length() == 0) {
-			data.listRecords = null;
-		} else {
+			int batch = records.getLength();
+			data.total += batch;
+
+			for (int temp1 = 0; temp1 < records.getLength(); temp1++) {
+				Node nNode1 = records.item(temp1);
+				Node nNodeHeader = header.item(temp1);
+
+				// inicializacion of arraylist
+				datos = new ArrayList<String>();
+				nameFields = new ArrayList<String>();
+
+				if (nNode1.getNodeType() == Node.ELEMENT_NODE) {
+					Element eElement1 = (Element) nNode1;
+					Element eElementHeader = (Element) nNodeHeader;
+
+					GetHeader(eElementHeader);
+
+					StringTokenizer strobj = new StringTokenizer(
+							meta.getXpath(), "/");
+
+					// called methods for get data
+					if (schema.prefix.equals("xoai")) {
+						GetDataXOAI(eElement1, strobj.countTokens(), 0, 0);
+					} else if (schema.prefix.equals("uketd_dc")) {
+						GetDataUketd_dc(eElement1);
+					} else if (schema.prefix.equals("qdc")) {
+						GetDataQDC(eElement1);
+					} else if (schema.prefix.equals("ore")) {
+						GetDataUketd_dc(eElement1);
+					} else if (schema.prefix.equals("oai_dc")) {
+						GetDataUketd_dc(eElement1);
+					} else if (schema.prefix.equals("didl")) {
+						GetDataUketd_dc(eElement1);
+					}
+
+					for (int i = 0; i < datos.size(); i++) {
+						outputRow[0] = numRegistro;
+						outputRow[1] = nameFields.get(i);
+						outputRow[2] = datos.get(i);
+						putRow(data.outputRowMeta, outputRow);
+					}
+
+				}
+
+			}// end two for
 
 			try {
-				data.listRecords = new ListRecords(meta.getInputURI(),
-						data.resumptionToken);
-			} catch (IOException e) {
-				try {
-					data.listRecords = new ListRecords(meta.getInputURI(),
-							data.resumptionToken);
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (ParserConfigurationException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (SAXException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (TransformerException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			} catch (SAXException e) {
-				try {
-					data.listRecords = new ListRecords(meta.getInputURI(),
-							data.resumptionToken);
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (ParserConfigurationException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (SAXException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (TransformerException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			} catch (ParserConfigurationException e) {
+				data.resumptionToken = data.listRecords.getResumptionToken();
+				System.out.println(data.resumptionToken);
+			} catch (NoSuchFieldException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (TransformerException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}
+
+			if (data.resumptionToken == null
+					|| data.resumptionToken.length() == 0) {
+
+				data.listRecords = null;
+
+				setOutputDone();
+				return false;
+
+			} else {
+
+				try {
+					data.listRecords = new ListRecords(meta.getInputURI(),
+							data.resumptionToken);
+					data.listRecords = new ListRecords(meta.getInputURI(),
+							data.resumptionToken);
+
+					data.listRecords = new ListRecords(meta.getInputURI(),
+							data.resumptionToken);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ParserConfigurationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (SAXException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (TransformerException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
+		}// end while
 
 		if (checkFeedback(getLinesRead())) {
 			logBasic("Linenr " + getLinesRead()); // Some basic logging
@@ -504,21 +475,20 @@ public class OAILoader extends BaseStep implements StepInterface {
 			}
 		}
 	}
-	
+
 	// for extraction of the header
-	
+
 	public void GetHeader(Element prueba) {
 
 		String tag = null;
 
 		if (prueba.getChildNodes().getLength() == 1) {
-			
-			datos.add(prueba.getTextContent());			
+
+			datos.add(prueba.getTextContent());
 			tag = prueba.getTagName();
 			nameFields.add(tag);
-			if(prueba.getTagName().equals("identifier"))
-			{				
-				numRegistro=prueba.getTextContent();
+			if (prueba.getTagName().equals("identifier")) {
+				numRegistro = prueba.getTextContent();
 			}
 
 		} else {
@@ -527,7 +497,7 @@ public class OAILoader extends BaseStep implements StepInterface {
 
 			for (int temp = 0; temp < datosnodo.getLength(); temp++) {
 				Node nNode = datosnodo.item(temp);
-				
+
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 					Element eElement1 = (Element) nNode;
 					GetHeader(eElement1);
@@ -536,9 +506,5 @@ public class OAILoader extends BaseStep implements StepInterface {
 			}
 		}
 	}
-	
-	
-	
-	
 
 }
