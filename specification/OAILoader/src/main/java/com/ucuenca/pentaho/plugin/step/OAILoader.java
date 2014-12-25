@@ -148,12 +148,13 @@ public class OAILoader extends BaseStep implements StepInterface {
 
 		// ********************************* Initial while
 		// ***************************
+		NodeList header = null;
 		while (data.listRecords != null) {
 
 			outputIndex = 0;
 
 			NodeList records = null;
-			NodeList header = null;
+			
 
 			try {
 				records = data.listRecords.getNodeList(meta.getXpath());
