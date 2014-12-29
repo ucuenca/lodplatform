@@ -116,13 +116,16 @@ public class OAILoaderDialog extends BaseStepDialog implements
 	private String prefix;
 	private String valueUri="Input URI";
 
-	private Schema schema;
+	private Schema schema = new Schema();
 	private String xpath;
 	private String Uri;
 	GetXPath getPathOai;
 
 	static Logger logger;
 	int electedItem;
+	
+	private int middle;
+	private int margin;
 
 	public OAILoaderDialog(Shell parent, Object in, TransMeta transMeta,
 			String sname) {
@@ -147,15 +150,16 @@ public class OAILoaderDialog extends BaseStepDialog implements
 		ModifyListener lsMod = new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				meta.setChanged();
-				if(!valueUri.equals(txtURI.getText()))
-				{
-					cbmPrefix.setEnabled(false);
+				
+								
+				if(!valueUri.equals(txtURI.getText()) )
+				{					
 					prefix=null;
 					xpath=null;
-					Xpath.setEnabled(false);
-					electedItem=0;
-					
+					Xpath.setEnabled(false);				
+					cbmPrefix.setEnabled(false);
 				}
+				
 			}
 		};
 		changed = meta.hasChanged();
@@ -170,8 +174,8 @@ public class OAILoaderDialog extends BaseStepDialog implements
 		shell.setLayout(formLayout);
 		shell.setText(BaseMessages.getString(PKG, "OAILoader.Shell.Title"));
 
-		int middle = props.getMiddlePct();
-		int margin = Const.MARGIN;
+		middle = props.getMiddlePct();
+		margin = Const.MARGIN;
 
 		// Stepname line
 		wlStepname = new Label(shell, SWT.RIGHT);
@@ -179,9 +183,9 @@ public class OAILoaderDialog extends BaseStepDialog implements
 				.setText(BaseMessages.getString(PKG, "System.Label.StepName"));
 		props.setLook(wlStepname);
 		fdlStepname = new FormData();
-		fdlStepname.left = new FormAttachment(0, 0);
-		fdlStepname.right = new FormAttachment(middle, -margin);
+		fdlStepname.left = new FormAttachment(0, 0);		
 		fdlStepname.top = new FormAttachment(0, margin);
+		fdlStepname.right = new FormAttachment(middle, -margin);
 		wlStepname.setLayoutData(fdlStepname);
 
 		wStepname = new Text(shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
@@ -195,7 +199,7 @@ public class OAILoaderDialog extends BaseStepDialog implements
 		wStepname.setLayoutData(fdStepname);
 
 		// add components to grupLayout
-		lbURI = new Label(shell, SWT.MEDIUM);
+		lbURI = new Label(shell, SWT.RIGHT);
 		lbURI.setText(BaseMessages.getString(PKG, "OAILoader.FieldName.Label"));
 		props.setLook(lbURI);
 		fdlbURI = new FormData();
@@ -216,7 +220,41 @@ public class OAILoaderDialog extends BaseStepDialog implements
 
 		// button for get all formats of the server OAI-PHM
 
-		getFormats = new Button(shell, SWT.PUSH | SWT.MEDIUM);
+		
+		lbPrefijo = new Label(shell, SWT.RIGHT);
+
+		lbPrefijo.setText(BaseMessages.getString(PKG,
+				"OAILoader.FieldName.Prefix"));
+		props.setLook(lbPrefijo);
+		fdlbPrefijo = new FormData();
+		fdlbPrefijo.left = new FormAttachment(20, 0);
+		fdlbPrefijo.right = new FormAttachment(middle, -margin);
+		fdlbPrefijo.top = new FormAttachment(lbURI, 10);
+		lbPrefijo.setLayoutData(fdlbPrefijo);
+
+		cbmPrefix = new CCombo(shell, SWT.SINGLE | SWT.LEFT |  SWT.BORDER);
+		cbmPrefix.setEditable(true);
+		props.setLook(cbmPrefix);
+		cbmPrefix.addModifyListener(lsMod);
+		fbcbmPrefix = new FormData();
+		fbcbmPrefix.left = new FormAttachment(middle, 0);
+		fbcbmPrefix.top = new FormAttachment(txtURI, margin);
+		fbcbmPrefix.right = new FormAttachment(60, 10);
+		cbmPrefix.setLayoutData(fbcbmPrefix);
+		cbmPrefix.setEnabled(false);
+		cbmPrefix.addSelectionListener(new SelectionListener() {
+			public void widgetSelected(SelectionEvent arg0) {
+				prefix = cbmPrefix.getText();
+				electedItem = cbmPrefix.getSelectionIndex();
+				txtXpath.setText("");
+				Xpath.setEnabled(true);
+			}
+
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+			}
+		});
+
+		getFormats = new Button(shell, SWT.PUSH | SWT.SINGLE | SWT.MEDIUM | SWT.BORDER);
 		props.setLook(getFormats);
 
 		getFormats.setText(BaseMessages.getString(PKG,
@@ -224,8 +262,8 @@ public class OAILoaderDialog extends BaseStepDialog implements
 		getFormats.setToolTipText(BaseMessages.getString(PKG,
 				"System.Tooltip.BrowseForFileOrDirAndAdd"));
 		fdGetFormats = new FormData();
-		fdGetFormats.left = new FormAttachment(middle, 0);
-		fdGetFormats.right = new FormAttachment(60, 20);
+		fdGetFormats.left = new FormAttachment(cbmPrefix, 0);
+		fdGetFormats.right = new FormAttachment(100, 0);
 		fdGetFormats.top = new FormAttachment(txtURI, margin);
 		getFormats.setLayoutData(fdGetFormats);
 		getFormats.addSelectionListener(new SelectionAdapter() {
@@ -245,6 +283,7 @@ public class OAILoaderDialog extends BaseStepDialog implements
 						JOptionPane.showMessageDialog(null, BaseMessages
 								.getString(PKG, "OAILoader.Manager.ERRORURI"),
 								"Error", JOptionPane.ERROR_MESSAGE);
+						cbmPrefix.setEnabled(false);
 					    cbmPrefix.setText("");
 						txtXpath.setText("");
 					}
@@ -253,40 +292,9 @@ public class OAILoaderDialog extends BaseStepDialog implements
 			
 		});
 
-		lbPrefijo = new Label(shell, SWT.MEDIUM);
-
-		lbPrefijo.setText(BaseMessages.getString(PKG,
-				"OAILoader.FieldName.Prefix"));
-		props.setLook(lbPrefijo);
-		fdlbPrefijo = new FormData();
-		fdlbPrefijo.left = new FormAttachment(20, 0);
-		fdlbPrefijo.right = new FormAttachment(middle, -margin);
-		fdlbPrefijo.top = new FormAttachment(lbURI, 42);
-		lbPrefijo.setLayoutData(fdlbPrefijo);
-
-		cbmPrefix = new CCombo(shell, SWT.BORDER);
-		cbmPrefix.setEditable(true);
-		props.setLook(cbmPrefix);
-		cbmPrefix.addModifyListener(lsMod);
-		fbcbmPrefix = new FormData();
-		fbcbmPrefix.left = new FormAttachment(lbPrefijo, 0);
-		fbcbmPrefix.top = new FormAttachment(getFormats, margin);
-		fbcbmPrefix.right = new FormAttachment(100, 0);
-		cbmPrefix.setLayoutData(fbcbmPrefix);
-		cbmPrefix.setEnabled(false);
-		cbmPrefix.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent arg0) {
-				prefix = cbmPrefix.getText();
-				electedItem = cbmPrefix.getSelectionIndex();
-				txtXpath.setText("");
-				Xpath.setEnabled(true);
-			}
-
-			public void widgetDefaultSelected(SelectionEvent arg0) {
-			}
-		});
-
-		Xpath = new Button(shell, SWT.PUSH | SWT.MEDIUM);
+		
+		
+		Xpath = new Button(shell, SWT.PUSH | SWT.RIGHT);
 		props.setLook(Xpath);
 
 		Xpath.setText(BaseMessages.getString(PKG, "OAILoader.ButtonName.Title"));
@@ -295,7 +303,7 @@ public class OAILoaderDialog extends BaseStepDialog implements
 		fdXpath = new FormData();
 		fdXpath.left = new FormAttachment(20, 0);
 		fdXpath.right = new FormAttachment(middle, -margin);
-		fdXpath.top = new FormAttachment(lbPrefijo, 22);
+		fdXpath.top = new FormAttachment(lbPrefijo, 20);
 		Xpath.setLayoutData(fdXpath);
 		Xpath.setEnabled(false);
 		Xpath.addSelectionListener(new SelectionAdapter() {
@@ -324,7 +332,7 @@ public class OAILoaderDialog extends BaseStepDialog implements
 		fdtxtPrefijo = new FormData();
 		fdtxtPrefijo.left = new FormAttachment(middle, 0);
 		fdtxtPrefijo.right = new FormAttachment(100, 0);
-		fdtxtPrefijo.top = new FormAttachment(cbmPrefix, 15);
+		fdtxtPrefijo.top = new FormAttachment(cbmPrefix, 13);
 		txtXpath.setLayoutData(fdtxtPrefijo);
 		txtXpath.setEnabled(false);
 
@@ -404,7 +412,7 @@ public class OAILoaderDialog extends BaseStepDialog implements
 		if (!meta.getInputURI().equals("Input URI")) {
 			prefix = meta.getPrefix();
 			listPrefix(meta.getInputURI());
-
+            valueUri=meta.getInputURI();
 			Iterator i = schemas.iterator();
 			int setElement = 0;
 			while (i.hasNext()) {
@@ -417,9 +425,10 @@ public class OAILoaderDialog extends BaseStepDialog implements
 			}
 			electedItem = setElement;
 
-			cbmPrefix.setText(meta.getPrefix());
-			cbmPrefix.setEnabled(true);
+			cbmPrefix.setText(meta.getPrefix());			
 			txtXpath.setText(meta.getXpath());
+			cbmPrefix.setEnabled(true);
+			
 
 		}
 	}
@@ -442,9 +451,8 @@ public class OAILoaderDialog extends BaseStepDialog implements
 	 * Called when the user confirms the dialog
 	 */
 	private void ok() {
-		// The "stepname" variable will be the return value for the open()
-		// method.outprefix
-		// Setting to step name from the dialog control
+		
+		
 		stepname = wStepname.getText();
 		meta.setInputURI(txtURI.getText());
 		meta.setPrefix(cbmPrefix.getText());
@@ -459,7 +467,7 @@ public class OAILoaderDialog extends BaseStepDialog implements
 			ParserConfigurationException, SAXException, TransformerException {
 
 		getPathOai = new GetXPath(prefix);
-
+		getPathOai.getMeta().getListpath().clear();
 		String[] list_xpath = null;
 
 		schema = (Schema) schemas.get(electedItem);
@@ -489,7 +497,6 @@ public class OAILoaderDialog extends BaseStepDialog implements
 					BaseMessages.getString(PKG,
 							"OAILoader.Dialog.SelectALoopPath.Message"));
 			xpath = s.open();
-
 			if (xpath != null) {
 				txtXpath.setText(xpath);
 			}
@@ -528,6 +535,7 @@ public class OAILoaderDialog extends BaseStepDialog implements
 						.toString()));
 
 				Iterator i = schemas.iterator();
+				cbmPrefix.removeAll();
 
 				while (i.hasNext()) {
 					Schema schema = (Schema) i.next();
