@@ -29,8 +29,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
+
+
 
 import org.apache.jena.atlas.json.JSON;
 import org.apache.jena.atlas.json.JsonObject;
@@ -48,6 +48,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
@@ -117,9 +118,10 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.logging.Level;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-
+import java.util.logging.*;
 /**
  * This class is part of the demo step plug-in implementation. It demonstrates
  * the basics of developing a plug-in step for PDI.
@@ -151,6 +153,7 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 	// the dialog reads the settings from it when opening
 	// the dialog writes the settings to it when confirmed
 	private GetPropertiesOWLMeta meta;
+	private static final Logger log = Logger.getLogger( GetPropertiesOWL.class.getName() );
 
 	// text field holding the name of the field to add to the row stream
 	private Text wHelloFieldName;
@@ -297,11 +300,15 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 		wCancel = new Button(shell, SWT.PUSH);
 		wCancel.setText(BaseMessages.getString(PKG, "System.Button.Cancel"));
 		wLoadFile = new Button(shell, SWT.PUSH);
-		wLoadFile.setText("Load OWL File");
+		wLoadFile.setText(BaseMessages.getString(PKG,
+				"GetPropertiesOWL.FieldName.LoadFile"));
 		wAddUri = new Button(shell, SWT.PUSH);
-		wAddUri.setText("Add URI");
+		wAddUri.setText(BaseMessages.getString(PKG,
+				"GetPropertiesOWL.FieldName.AddUri"));
 		wbEraseRecord = new Button(shell, SWT.PUSH);
-		wbEraseRecord.setText("Erase Record from table");
+		
+		wbEraseRecord.setText(BaseMessages.getString(PKG,
+				"GetPropertiesOWL.FieldName.delete"));
 		// BaseStepDialog.positionBottomButtons(shell, new Button[] { wOK,
 		// wCancel, wLoadFile }, margin, wHelloFieldName);
 		BaseStepDialog.positionBottomButtons(shell, new Button[] {
@@ -507,13 +514,20 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 			System.out.println(miti.getText(1));// es uno para tomar la columna adecuada
 			ListSource.add(miti.getText(1));
 			System.out.println(ListSource.get(i));
-			JOptionPane.showMessageDialog(null, ListSource.get(i));
+			 final Shell dialog = new Shell(shell, SWT.APPLICATION_MODAL
+				        | SWT.DIALOG_TRIM);
+				    dialog.setText(ListSource.get(i).toString());
+				    dialog.setSize(250, 150);
 			
-			
+			//JOptionPane.showMessageDialog(null, ListSource.get(i));
+				    System.out.println("entro"+i+ListSource.get(i).toString());
+				   // meta.setOutputField(ListSource.get(i).toString()); //para que tome solo la seleccionada
+					
 			
 		}
+		meta.setOutputField(ListSource.toString()); 
 		meta.setListSourcetoProcess(ListSource);
-		meta.setOutputField(ListSource.toString()); //para que tome solo la seleccionada
+		//meta.setOutputField(ListSource.get(i)); //para que tome solo la seleccionada
 		
 		//-----------------------
 		// close the SWT dialog window
@@ -521,7 +535,20 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 	}
 
 	private void LoadFile() {
-		JFileChooser chooser = new JFileChooser();
+		   
+		   try{
+			   FileDialog dialog = new FileDialog(shell, SWT.OPEN);
+			   dialog.setText("Choose the file .owl in your computer");
+			   String result = dialog.open();
+		   TableItem item = new TableItem(table, SWT.NONE, numt++);
+			item.setText(0, String.valueOf(numt));
+			item.setText(1, dialog.getFilterPath() +"/"+ dialog.getFileName());
+			item.setText(2, "from file");
+		   }catch(Exception e){
+			   log.log( Level.SEVERE, e.toString(), e );
+		   }
+		//JFileChooser chooser = new JFileChooser();
+		   /**
 		chooser.setCurrentDirectory(new java.io.File("."));
 		chooser.setDialogTitle("Choose the file .owl in your computer");
 		chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
@@ -544,7 +571,7 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 			JOptionPane.showMessageDialog(null,
 					"Please first you have to do almost any Selection ");
 		}
-
+		*/
 		// The "stepname" variable will be the return value for the open()
 		// method.
 		// Setting to step name from the dialog control
@@ -558,7 +585,11 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 	private void AddUri() {
 
 		if (wHelloFieldName.getText().compareTo("Input URI of OWL or File") == 0) {
-			JOptionPane.showMessageDialog(null, "please enter the URI");
+			 final Shell dialog = new Shell(shell, SWT.APPLICATION_MODAL
+				        | SWT.DIALOG_TRIM);
+				    dialog.setText("please enter the URI");
+				    dialog.setSize(250, 150);
+			//JOptionPane.showMessageDialog(null, "please enter the URI");
 		} else {
 			Pattern pat = Pattern.compile("^http.*");
 			Matcher mat = pat.matcher(wHelloFieldName.getText());
@@ -578,7 +609,11 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 					item.setText(1, myresult);
 					item.setText(2, "from URI");
 				} else {
-					JOptionPane.showMessageDialog(null, " URI Not Found ,please write again");
+					//JOptionPane.showMessageDialog(null, " URI Not Found ,please write again");
+					final Shell dialog = new Shell(shell, SWT.APPLICATION_MODAL
+					        | SWT.DIALOG_TRIM);
+					    dialog.setText(" URI Not Found ,please write again");
+					    dialog.setSize(250, 150);
 					wHelloFieldName.setText("Input URI of OWL or File");
 				}
 			}
@@ -667,10 +702,20 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 
 	private void BorrarFila() {
 		// TODO
+		int bandera=0;
+		for (int i=0;i<table.getItemCount();i++){
+			if (table.isSelected(i)){
+				bandera=1;
+			}
+			
+		}
+		if(bandera==1){
+		System.out.println(table.getSelection());
 		String string = "";
 		TableItem[] selection = table.getSelection();
 		table.remove(NumRowSelected);
 		numt--;
+		}
 	}
 
 }
