@@ -118,9 +118,10 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.logging.Level;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-
+import java.util.logging.*;
 /**
  * This class is part of the demo step plug-in implementation. It demonstrates
  * the basics of developing a plug-in step for PDI.
@@ -152,6 +153,7 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 	// the dialog reads the settings from it when opening
 	// the dialog writes the settings to it when confirmed
 	private GetPropertiesOWLMeta meta;
+	private static final Logger log = Logger.getLogger( GetPropertiesOWL.class.getName() );
 
 	// text field holding the name of the field to add to the row stream
 	private Text wHelloFieldName;
@@ -298,11 +300,15 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 		wCancel = new Button(shell, SWT.PUSH);
 		wCancel.setText(BaseMessages.getString(PKG, "System.Button.Cancel"));
 		wLoadFile = new Button(shell, SWT.PUSH);
-		wLoadFile.setText("Load OWL File");
+		wLoadFile.setText(BaseMessages.getString(PKG,
+				"GetPropertiesOWL.FieldName.LoadFile"));
 		wAddUri = new Button(shell, SWT.PUSH);
-		wAddUri.setText("Add URI");
+		wAddUri.setText(BaseMessages.getString(PKG,
+				"GetPropertiesOWL.FieldName.AddUri"));
 		wbEraseRecord = new Button(shell, SWT.PUSH);
-		wbEraseRecord.setText("Erase Record from table");
+		
+		wbEraseRecord.setText(BaseMessages.getString(PKG,
+				"GetPropertiesOWL.FieldName.delete"));
 		// BaseStepDialog.positionBottomButtons(shell, new Button[] { wOK,
 		// wCancel, wLoadFile }, margin, wHelloFieldName);
 		BaseStepDialog.positionBottomButtons(shell, new Button[] {
@@ -529,14 +535,18 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 	}
 
 	private void LoadFile() {
-		   FileDialog dialog = new FileDialog(shell, SWT.OPEN);
-		   dialog.setText("Choose the file .owl in your computer");
-		   String result = dialog.open();
+		   
+		   try{
+			   FileDialog dialog = new FileDialog(shell, SWT.OPEN);
+			   dialog.setText("Choose the file .owl in your computer");
+			   String result = dialog.open();
 		   TableItem item = new TableItem(table, SWT.NONE, numt++);
 			item.setText(0, String.valueOf(numt));
 			item.setText(1, dialog.getFilterPath() +"/"+ dialog.getFileName());
 			item.setText(2, "from file");
-			
+		   }catch(Exception e){
+			   log.log( Level.SEVERE, e.toString(), e );
+		   }
 		//JFileChooser chooser = new JFileChooser();
 		   /**
 		chooser.setCurrentDirectory(new java.io.File("."));
@@ -692,10 +702,20 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 
 	private void BorrarFila() {
 		// TODO
+		int bandera=0;
+		for (int i=0;i<table.getItemCount();i++){
+			if (table.isSelected(i)){
+				bandera=1;
+			}
+			
+		}
+		if(bandera==1){
+		System.out.println(table.getSelection());
 		String string = "";
 		TableItem[] selection = table.getSelection();
 		table.remove(NumRowSelected);
 		numt--;
+		}
 	}
 
 }

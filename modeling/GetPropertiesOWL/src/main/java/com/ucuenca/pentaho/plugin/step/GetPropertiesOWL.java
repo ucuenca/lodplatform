@@ -132,7 +132,7 @@ public class GetPropertiesOWL extends BaseStep implements StepInterface {
 
 			try {
 				// LinkedList miListSource = new LinkedList<String>();
-				System.out.println("you can do it");
+				
 				/**
 				 * String replace = meta.getOutputField().replace("[", "");
 				 * System.out.println(replace); String replace1 =
