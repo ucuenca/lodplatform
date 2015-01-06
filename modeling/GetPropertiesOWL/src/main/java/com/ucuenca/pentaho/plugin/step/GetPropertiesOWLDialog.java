@@ -29,8 +29,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
+
+
 
 import org.apache.jena.atlas.json.JSON;
 import org.apache.jena.atlas.json.JsonObject;
@@ -48,6 +48,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
@@ -507,13 +508,20 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 			System.out.println(miti.getText(1));// es uno para tomar la columna adecuada
 			ListSource.add(miti.getText(1));
 			System.out.println(ListSource.get(i));
-			JOptionPane.showMessageDialog(null, ListSource.get(i));
+			 final Shell dialog = new Shell(shell, SWT.APPLICATION_MODAL
+				        | SWT.DIALOG_TRIM);
+				    dialog.setText(ListSource.get(i).toString());
+				    dialog.setSize(250, 150);
 			
-			
+			//JOptionPane.showMessageDialog(null, ListSource.get(i));
+				    System.out.println("entro"+i+ListSource.get(i).toString());
+				   // meta.setOutputField(ListSource.get(i).toString()); //para que tome solo la seleccionada
+					
 			
 		}
+		meta.setOutputField(ListSource.toString()); 
 		meta.setListSourcetoProcess(ListSource);
-		meta.setOutputField(ListSource.toString()); //para que tome solo la seleccionada
+		//meta.setOutputField(ListSource.get(i)); //para que tome solo la seleccionada
 		
 		//-----------------------
 		// close the SWT dialog window
@@ -521,7 +529,16 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 	}
 
 	private void LoadFile() {
-		JFileChooser chooser = new JFileChooser();
+		   FileDialog dialog = new FileDialog(shell, SWT.OPEN);
+		   dialog.setText("Choose the file .owl in your computer");
+		   String result = dialog.open();
+		   TableItem item = new TableItem(table, SWT.NONE, numt++);
+			item.setText(0, String.valueOf(numt));
+			item.setText(1, dialog.getFilterPath() +"/"+ dialog.getFileName());
+			item.setText(2, "from file");
+			
+		//JFileChooser chooser = new JFileChooser();
+		   /**
 		chooser.setCurrentDirectory(new java.io.File("."));
 		chooser.setDialogTitle("Choose the file .owl in your computer");
 		chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
@@ -544,7 +561,7 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 			JOptionPane.showMessageDialog(null,
 					"Please first you have to do almost any Selection ");
 		}
-
+		*/
 		// The "stepname" variable will be the return value for the open()
 		// method.
 		// Setting to step name from the dialog control
@@ -558,7 +575,11 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 	private void AddUri() {
 
 		if (wHelloFieldName.getText().compareTo("Input URI of OWL or File") == 0) {
-			JOptionPane.showMessageDialog(null, "please enter the URI");
+			 final Shell dialog = new Shell(shell, SWT.APPLICATION_MODAL
+				        | SWT.DIALOG_TRIM);
+				    dialog.setText("please enter the URI");
+				    dialog.setSize(250, 150);
+			//JOptionPane.showMessageDialog(null, "please enter the URI");
 		} else {
 			Pattern pat = Pattern.compile("^http.*");
 			Matcher mat = pat.matcher(wHelloFieldName.getText());
@@ -578,7 +599,11 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 					item.setText(1, myresult);
 					item.setText(2, "from URI");
 				} else {
-					JOptionPane.showMessageDialog(null, " URI Not Found ,please write again");
+					//JOptionPane.showMessageDialog(null, " URI Not Found ,please write again");
+					final Shell dialog = new Shell(shell, SWT.APPLICATION_MODAL
+					        | SWT.DIALOG_TRIM);
+					    dialog.setText(" URI Not Found ,please write again");
+					    dialog.setSize(250, 150);
 					wHelloFieldName.setText("Input URI of OWL or File");
 				}
 			}

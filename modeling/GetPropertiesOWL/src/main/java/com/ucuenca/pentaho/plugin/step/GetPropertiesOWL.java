@@ -203,7 +203,10 @@ public class GetPropertiesOWL extends BaseStep implements StepInterface {
 		System.out.println(replace);
 		String replace1 = replace.replace("]", "");
 		System.out.println(replace1);
-		List<String> myList = new ArrayList<String>(Arrays.asList(replace1
+		//para quitar espacios en blanco
+		String replace2=replace1.replaceAll("\\s+","");
+		
+		List<String> myList = new ArrayList<String>(Arrays.asList(replace2
 				.split(",")));
 		System.out.println(myList.toString());
 
@@ -211,6 +214,7 @@ public class GetPropertiesOWL extends BaseStep implements StepInterface {
 		
 		StringTokenizer st2 = new StringTokenizer(myList.get(ii).toString(), "/");
 		int nutok=st2.countTokens();int cont=0;
+		
 		while (st2.hasMoreTokens()) {
 			
 			nameontology=st2.nextToken();
@@ -228,6 +232,7 @@ public class GetPropertiesOWL extends BaseStep implements StepInterface {
 		// data.model.removeAll();
 		System.out.println(myList.get(ii));
 		try {
+			
 			data.model.read(myList.get(ii));
 
 		} catch (Exception eox) {
@@ -236,7 +241,7 @@ public class GetPropertiesOWL extends BaseStep implements StepInterface {
 
 		// if no more rows are expected, indicate step is finished and
 		// processRow() should not be called again
-		if (data.model.isEmpty()) { // para ver si esta cargado el modelo
+		if (data.model.isEmpty()) { // par	a ver si esta cargado el modelo
 			setOutputDone();
 			return false;
 		}
