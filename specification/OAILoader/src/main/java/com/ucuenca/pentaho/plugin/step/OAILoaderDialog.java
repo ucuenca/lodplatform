@@ -205,7 +205,7 @@ public class OAILoaderDialog extends BaseStepDialog implements
 		fdlbURI = new FormData();
 		fdlbURI.left = new FormAttachment(20, 0);
 		fdlbURI.right = new FormAttachment(middle, -margin);
-		fdlbURI.top = new FormAttachment(wlStepname, 20);
+		fdlbURI.top = new FormAttachment(wlStepname, margin);
 		lbURI.setLayoutData(fdlbURI);
 
 		txtURI = new Text(shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
@@ -229,7 +229,7 @@ public class OAILoaderDialog extends BaseStepDialog implements
 		fdlbPrefijo = new FormData();
 		fdlbPrefijo.left = new FormAttachment(20, 0);
 		fdlbPrefijo.right = new FormAttachment(middle, -margin);
-		fdlbPrefijo.top = new FormAttachment(lbURI, 10);
+		fdlbPrefijo.top = new FormAttachment(lbURI, margin);
 		lbPrefijo.setLayoutData(fdlbPrefijo);
 
 		cbmPrefix = new CCombo(shell, SWT.SINGLE | SWT.LEFT |  SWT.BORDER);
@@ -303,7 +303,7 @@ public class OAILoaderDialog extends BaseStepDialog implements
 		fdXpath = new FormData();
 		fdXpath.left = new FormAttachment(20, 0);
 		fdXpath.right = new FormAttachment(middle, -margin);
-		fdXpath.top = new FormAttachment(lbPrefijo, 20);
+		fdXpath.top = new FormAttachment(lbPrefijo, margin);
 		Xpath.setLayoutData(fdXpath);
 		Xpath.setEnabled(false);
 		Xpath.addSelectionListener(new SelectionAdapter() {
@@ -332,7 +332,7 @@ public class OAILoaderDialog extends BaseStepDialog implements
 		fdtxtPrefijo = new FormData();
 		fdtxtPrefijo.left = new FormAttachment(middle, 0);
 		fdtxtPrefijo.right = new FormAttachment(100, 0);
-		fdtxtPrefijo.top = new FormAttachment(cbmPrefix, 13);
+		fdtxtPrefijo.top = new FormAttachment(cbmPrefix, margin);
 		txtXpath.setLayoutData(fdtxtPrefijo);
 		txtXpath.setEnabled(false);
 
