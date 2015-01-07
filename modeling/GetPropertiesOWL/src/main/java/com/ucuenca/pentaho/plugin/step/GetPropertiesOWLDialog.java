@@ -324,7 +324,7 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 		for (int i = 0; i < titles.length; i++) {
 			TableColumn column = new TableColumn(table, SWT.NONE);
 			column.setText(titles[i]);
-			column.setWidth(350);
+			column.setWidth(355);
 		}
 
 		for (int i = 0; i < titles.length; i++) {
