@@ -319,11 +319,12 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 		table = new Table(shell, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);
-		String[] titles = { "	Num	", " 	 				Source 	 				", "	Description" };
+		
+		String[] titles = { BaseMessages.getString(PKG,"GetPropertiesOWL.FieldName.col1"), BaseMessages.getString(PKG,"GetPropertiesOWL.FieldName.col2"),BaseMessages.getString(PKG,"GetPropertiesOWL.FieldName.col3")};
 		for (int i = 0; i < titles.length; i++) {
 			TableColumn column = new TableColumn(table, SWT.NONE);
 			column.setText(titles[i]);
-			column.setWidth(250);
+			column.setWidth(355);
 		}
 
 		for (int i = 0; i < titles.length; i++) {
@@ -333,8 +334,9 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 		table.setItemCount(6);// para ver las filas por defecto
 		// parametrizando el forma data
 		fdmitabla = new FormData();
-		fdmitabla.left = new FormAttachment(middle, 0);
-		fdmitabla.right = new FormAttachment(100, 0);
+		//fdmitabla.left = new FormAttachment(middle, 0);
+		fdmitabla.left = new FormAttachment(1, 0);
+		fdmitabla.right = new FormAttachment(100, 1);
 		fdmitabla.top = new FormAttachment(wLoadFile, margin);
 
 		// boton ok y cancel al ultimo
@@ -440,19 +442,16 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 	 */
 	private void populateDialog() {
 		// wStepname.selectAll();
-		if(meta.getOutputField().compareTo("Input URI of OWL or File")!=0){
+		if(meta.getOutputField().compareTo(BaseMessages.getString(PKG, "GetPropertiesOWL.FieldName.MensajeInicio"))!=0){
 		
 		
 		
 		
 		
-		String replace = meta.getOutputField().replace("[", "");
-		System.out.println(replace);
+		String replace = meta.getOutputField().replace("[", "");		
 		String replace1 = replace.replace("]", "");
-		System.out.println(replace1);
 		 ArrayList<String> myList = new ArrayList<String>(Arrays.asList(replace1
 				.split(",")));
-		System.out.println(myList.toString());
 		
 		//ListSource = meta.getListSourcetoProcess();
 		
@@ -464,13 +463,13 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 			Pattern pat = Pattern.compile("^http://.*");
 			Matcher mat = pat.matcher(myList.get(i).toString());
 			if (mat.matches()) { // entonces es una uri
-				item.setText(2, "from URI");}else{item.setText(2, "from local file");}
+				item.setText(2, BaseMessages.getString(PKG, "GetPropertiesOWL.FieldName.mt2"));}else{item.setText(2,BaseMessages.getString(PKG, "GetPropertiesOWL.FieldName.mt2"));}
 			//--
 			
 			wHelloFieldName.setText(myList.get(i).toString() );
 		}
 		}else{
-			wHelloFieldName.setText("Input URI of OWL or File");
+			wHelloFieldName.setText(BaseMessages.getString(PKG, "GetPropertiesOWL.FieldName.MensajeInicio"));
 		}//fin if 
 	
 	}
@@ -509,19 +508,16 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 		for (int i=0;i<this.numt;i++)
 		{
 			
-			System.out.println(table.getItemCount());
+			
 			TableItem miti = table.getItem(i);
-			System.out.println(miti.getText(1));// es uno para tomar la columna adecuada
 			ListSource.add(miti.getText(1));
-			System.out.println(ListSource.get(i));
-			 final Shell dialog = new Shell(shell, SWT.APPLICATION_MODAL
+		 final Shell dialog = new Shell(shell, SWT.APPLICATION_MODAL
 				        | SWT.DIALOG_TRIM);
 				    dialog.setText(ListSource.get(i).toString());
 				    dialog.setSize(250, 150);
 			
 			//JOptionPane.showMessageDialog(null, ListSource.get(i));
-				    System.out.println("entro"+i+ListSource.get(i).toString());
-				   // meta.setOutputField(ListSource.get(i).toString()); //para que tome solo la seleccionada
+				  // meta.setOutputField(ListSource.get(i).toString()); //para que tome solo la seleccionada
 					
 			
 		}
@@ -584,10 +580,11 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 
 	private void AddUri() {
 
-		if (wHelloFieldName.getText().compareTo("Input URI of OWL or File") == 0) {
+		if (wHelloFieldName.getText().compareTo(BaseMessages.getString(PKG,
+				"GetPropertiesOWL.FieldName.MensajeInicio")) == 0) {
 			 final Shell dialog = new Shell(shell, SWT.APPLICATION_MODAL
 				        | SWT.DIALOG_TRIM);
-				    dialog.setText("please enter the URI");
+				    dialog.setText(BaseMessages.getString(PKG,"GetPropertiesOWL.FieldName.IngUri"));
 				    dialog.setSize(250, 150);
 			//JOptionPane.showMessageDialog(null, "please enter the URI");
 		} else {
@@ -595,26 +592,25 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 			Matcher mat = pat.matcher(wHelloFieldName.getText());
 			TableItem item = new TableItem(table, SWT.NONE, numt++);
 			if (mat.matches()) { // entonces es una uri
-				System.out.println("Válido");
+			
 				item.setText(0, String.valueOf(numt));
 				item.setText(1, wHelloFieldName.getText());
-				item.setText(2, "from URI");
+				item.setText(2, BaseMessages.getString(PKG, "GetPropertiesOWL.FieldName.mt2"));
 			} else {
 				String myresult = ConsultUri(wHelloFieldName.getText());// search
-																		// in
-																		// prefix.cc
-				System.out.println("No Válido http busco en prefixx");
+																// in
+
 				if (myresult != null) {
 					item.setText(0, String.valueOf(numt));
 					item.setText(1, myresult);
-					item.setText(2, "from URI");
+					item.setText(2, BaseMessages.getString(PKG, "GetPropertiesOWL.FieldName.mt2"));
 				} else {
 					//JOptionPane.showMessageDialog(null, " URI Not Found ,please write again");
 					final Shell dialog = new Shell(shell, SWT.APPLICATION_MODAL
 					        | SWT.DIALOG_TRIM);
 					    dialog.setText(" URI Not Found ,please write again");
 					    dialog.setSize(250, 150);
-					wHelloFieldName.setText("Input URI of OWL or File");
+					wHelloFieldName.setText(BaseMessages.getString(PKG, "GetPropertiesOWL.FieldName.MensajeInicio"));
 				}
 			}
 
@@ -639,8 +635,7 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 			con.setRequestProperty("User-Agent", USER_AGENT);
 
 			int responseCode = con.getResponseCode();
-			System.out.println("\nSending 'GET' request to URL : " + url);
-			System.out.println("Response Code : " + responseCode);
+		
 
 			BufferedReader in = new BufferedReader(new InputStreamReader(
 					con.getInputStream()));
@@ -653,7 +648,7 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 			in.close();
 
 			// print result
-			System.out.println(response.toString());
+		
 
 			// ---------------
 
@@ -665,7 +660,7 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 				loudScreaming = jsonRoot.getJSONObject("@context").getString(
 						mysearching);
 
-				System.out.println(loudScreaming);
+				
 
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
@@ -687,10 +682,10 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 		String string = "";
 		TableItem[] selection = table.getSelection();
 		TableItem miti = selection[0];
-		System.out.println(miti.getText(1));
+		
 		//SourcetoProcess = miti.getText(1);
 		this.NumRowSelected = table.getSelectionIndex();
-		System.out.println(NumRowSelected);
+		
 		/**
 		 * for (int i = 0; i < selection.length; i++) { TableItem miti =
 		 * selection[0];
@@ -710,7 +705,7 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 			
 		}
 		if(bandera==1){
-		System.out.println(table.getSelection());
+	
 		String string = "";
 		TableItem[] selection = table.getSelection();
 		table.remove(NumRowSelected);

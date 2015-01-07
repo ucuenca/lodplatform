@@ -10,7 +10,7 @@
 <plugin
    id="GetPropertiesOWL"
    iconfile="icon.png"
-   description="GetPropertiesOWL"
+   description="Get Properties OWL"
    tooltip="Get Properties OWL"
    category="LODPlatform"
    classname="com.ucuenca.pentaho.plugin.step.GetPropertiesOWLMeta">

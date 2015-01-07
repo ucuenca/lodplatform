@@ -287,7 +287,7 @@ public class GetPropertiesOWLMeta extends BaseStepMeta implements StepMetaInterf
 		// The filename...
 		ValueMetaInterface NombreOntologiaOWL = new ValueMeta("Nombre Ontologia", ValueMetaInterface.TYPE_STRING);
 		NombreOntologiaOWL.setOrigin(origin);
-		NombreOntologiaOWL.setLength(50);
+		NombreOntologiaOWL.setLength(40);
 		row.addValueMeta(NombreOntologiaOWL);
 		// The filename...
 		ValueMetaInterface URInameOWL = new ValueMeta("URInameOWL(Subjet)", ValueMetaInterface.TYPE_STRING);
