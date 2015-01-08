@@ -207,9 +207,9 @@ public class OAILoaderDialog extends BaseStepDialog implements
 		lbURI.setText(BaseMessages.getString(PKG, "OAILoader.FieldName.Label"));
 		props.setLook(lbURI);
 		fdlbURI = new FormData();
-		fdlbURI.left = new FormAttachment(20, 0);
+		fdlbURI.left = new FormAttachment(0, 0);
 		fdlbURI.right = new FormAttachment(middle, -margin);
-		fdlbURI.top = new FormAttachment(wlStepname, margin);
+		fdlbURI.top = new FormAttachment(wStepname, margin);
 		lbURI.setLayoutData(fdlbURI);
 
 		txtURI = new Text(shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
@@ -231,9 +231,9 @@ public class OAILoaderDialog extends BaseStepDialog implements
 				"OAILoader.FieldName.Prefix"));
 		props.setLook(lbPrefijo);
 		fdlbPrefijo = new FormData();
-		fdlbPrefijo.left = new FormAttachment(20, 0);
+		fdlbPrefijo.left = new FormAttachment(0, 0);
 		fdlbPrefijo.right = new FormAttachment(middle, -margin);
-		fdlbPrefijo.top = new FormAttachment(lbURI, margin);
+		fdlbPrefijo.top = new FormAttachment(txtURI, margin);
 		lbPrefijo.setLayoutData(fdlbPrefijo);
 
 		cbmPrefix = new CCombo(shell, SWT.SINGLE | SWT.LEFT |  SWT.BORDER);
@@ -243,8 +243,7 @@ public class OAILoaderDialog extends BaseStepDialog implements
 		fbcbmPrefix = new FormData();
 		fbcbmPrefix.left = new FormAttachment(middle, 0);
 		fbcbmPrefix.top = new FormAttachment(txtURI, margin);
-		fbcbmPrefix.right = new FormAttachment(60, 10);
-		cbmPrefix.setLayoutData(fbcbmPrefix);
+		fbcbmPrefix.height = 23;
 		cbmPrefix.setEnabled(false);
 		cbmPrefix.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent arg0) {
@@ -266,10 +265,13 @@ public class OAILoaderDialog extends BaseStepDialog implements
 		getFormats.setToolTipText(BaseMessages.getString(PKG,
 				"System.Tooltip.BrowseForFileOrDirAndAdd"));
 		fdGetFormats = new FormData();
-		fdGetFormats.left = new FormAttachment(cbmPrefix, 0);
 		fdGetFormats.right = new FormAttachment(100, 0);
 		fdGetFormats.top = new FormAttachment(txtURI, margin);
 		getFormats.setLayoutData(fdGetFormats);
+
+		fbcbmPrefix.right = new FormAttachment(getFormats, -margin);
+		cbmPrefix.setLayoutData(fbcbmPrefix);
+
 		getFormats.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 			
@@ -310,9 +312,9 @@ public class OAILoaderDialog extends BaseStepDialog implements
 		Xpath.setToolTipText(BaseMessages.getString(PKG,
 				"System.Tooltip.BrowseForFileOrDirAndAdd"));
 		fdXpath = new FormData();
-		fdXpath.left = new FormAttachment(20, 0);
-		fdXpath.right = new FormAttachment(middle, -margin);
-		fdXpath.top = new FormAttachment(lbPrefijo, margin);
+		fdXpath.left = new FormAttachment(middle, 0);
+		fdXpath.right = new FormAttachment(50, 0);
+		fdXpath.top = new FormAttachment(cbmPrefix, margin);
 		Xpath.setLayoutData(fdXpath);
 		Xpath.setEnabled(false);
 		Xpath.addSelectionListener(new SelectionAdapter() {
@@ -339,9 +341,9 @@ public class OAILoaderDialog extends BaseStepDialog implements
 		props.setLook(txtXpath);
 		txtXpath.addModifyListener(lsMod);
 		fdtxtPrefijo = new FormData();
-		fdtxtPrefijo.left = new FormAttachment(middle, 0);
+		fdtxtPrefijo.left = new FormAttachment(Xpath, 0);
 		fdtxtPrefijo.right = new FormAttachment(100, 0);
-		fdtxtPrefijo.top = new FormAttachment(cbmPrefix, margin);
+		fdtxtPrefijo.top = new FormAttachment(getFormats, margin);
 		txtXpath.setLayoutData(fdtxtPrefijo);
 		txtXpath.setEnabled(false);
 

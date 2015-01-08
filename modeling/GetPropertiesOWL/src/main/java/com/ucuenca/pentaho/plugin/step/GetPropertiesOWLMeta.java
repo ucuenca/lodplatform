@@ -135,7 +135,7 @@ public class GetPropertiesOWLMeta extends BaseStepMeta implements StepMetaInterf
 	 * to sensible defaults. The values set here will be used by Spoon when a new step is created.    
 	 */
 	public void setDefault() {
-		outputField = "Input URI of OWL or File";
+		outputField = " ";
 	}
 	
 	/**
@@ -287,7 +287,7 @@ public class GetPropertiesOWLMeta extends BaseStepMeta implements StepMetaInterf
 		// The filename...
 		ValueMetaInterface NombreOntologiaOWL = new ValueMeta("Nombre Ontologia", ValueMetaInterface.TYPE_STRING);
 		NombreOntologiaOWL.setOrigin(origin);
-		NombreOntologiaOWL.setLength(50);
+		NombreOntologiaOWL.setLength(40);
 		row.addValueMeta(NombreOntologiaOWL);
 		// The filename...
 		ValueMetaInterface URInameOWL = new ValueMeta("URInameOWL(Subjet)", ValueMetaInterface.TYPE_STRING);

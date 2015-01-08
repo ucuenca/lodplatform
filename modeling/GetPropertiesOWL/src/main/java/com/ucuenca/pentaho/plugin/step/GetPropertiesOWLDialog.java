@@ -29,9 +29,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-
 import org.apache.jena.atlas.json.JSON;
 import org.apache.jena.atlas.json.JsonObject;
 import org.eclipse.swt.SWT;
@@ -48,6 +45,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
@@ -117,8 +115,10 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.logging.Level;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.logging.*;
 
 /**
  * This class is part of the demo step plug-in implementation. It demonstrates
@@ -145,12 +145,14 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 	 * of the class specified}/messages/messages_{locale}.properties
 	 */
 	private static Class<?> PKG = GetPropertiesOWLMeta.class; // for purposes
-	
+
 	private final static String USER_AGENT = "Mozilla/5.0";
 	// this is the object the stores the step's settings
 	// the dialog reads the settings from it when opening
 	// the dialog writes the settings to it when confirmed
 	private GetPropertiesOWLMeta meta;
+	private static final Logger log = Logger.getLogger(GetPropertiesOWL.class
+			.getName());
 
 	// text field holding the name of the field to add to the row stream
 	private Text wHelloFieldName;
@@ -185,9 +187,10 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 	private ColumnInfo fieldColumn = null;
 	private Table table;
 	private int numt = 0;
-	
+
 	private int NumRowSelected;
-	private LinkedList ListSource =  new LinkedList<String>();
+	private LinkedList ListSource = new LinkedList<String>();
+
 	/**
 	 * The constructor should simply invoke super() and save the incoming meta
 	 * object to a local variable, so it can conveniently read and write
@@ -266,23 +269,6 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 		int margin = Const.MARGIN;
 
 		// Stepname line
-		wlStepname = new Label(shell, SWT.RIGHT);
-		wlStepname.setText(BaseMessages.getString(PKG,
-				"PLUGIN TO GET CLASS AND PROPERTIES FROM ONTOLOGYS"));
-		props.setLook(wlStepname);
-		fdlStepname = new FormData();
-		fdlStepname.left = new FormAttachment(0, 0);
-		fdlStepname.right = new FormAttachment(middle, -margin);
-		fdlStepname.top = new FormAttachment(0, margin);
-		wlStepname.setLayoutData(fdlStepname);
-		/**
-		 * wStepname = new Text(shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
-		 * wStepname.setText(stepname); props.setLook(wStepname);
-		 * wStepname.addModifyListener(lsMod); fdStepname = new FormData();
-		 * fdStepname.left = new FormAttachment(middle, 0); fdStepname.top = new
-		 * FormAttachment(0, margin); fdStepname.right = new FormAttachment(100,
-		 * 0); //wStepname.setLayoutData(fdStepname);
-		 */
 
 		// output field value
 		Label wlValName = new Label(shell, SWT.RIGHT);
@@ -313,11 +299,15 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 		wCancel = new Button(shell, SWT.PUSH);
 		wCancel.setText(BaseMessages.getString(PKG, "System.Button.Cancel"));
 		wLoadFile = new Button(shell, SWT.PUSH);
-		wLoadFile.setText("Load OWL File");
+		wLoadFile.setText(BaseMessages.getString(PKG,
+				"GetPropertiesOWL.FieldName.LoadFile"));
 		wAddUri = new Button(shell, SWT.PUSH);
-		wAddUri.setText("Add URI");
+		wAddUri.setText(BaseMessages.getString(PKG,
+				"GetPropertiesOWL.FieldName.AddUri"));
 		wbEraseRecord = new Button(shell, SWT.PUSH);
-		wbEraseRecord.setText("Erase Record from table");
+
+		wbEraseRecord.setText(BaseMessages.getString(PKG,
+				"GetPropertiesOWL.FieldName.delete"));
 		// BaseStepDialog.positionBottomButtons(shell, new Button[] { wOK,
 		// wCancel, wLoadFile }, margin, wHelloFieldName);
 		BaseStepDialog.positionBottomButtons(shell, new Button[] {
@@ -328,11 +318,15 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 		table = new Table(shell, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);
-		String[] titles = { "	Num	", " 	 				Source 	 				", "	Description" };
+
+		String[] titles = {
+				BaseMessages.getString(PKG, "GetPropertiesOWL.FieldName.col1"),
+				BaseMessages.getString(PKG, "GetPropertiesOWL.FieldName.col2"),
+				BaseMessages.getString(PKG, "GetPropertiesOWL.FieldName.col3") };
 		for (int i = 0; i < titles.length; i++) {
 			TableColumn column = new TableColumn(table, SWT.NONE);
 			column.setText(titles[i]);
-			column.setWidth(250);
+			column.setWidth(355);
 		}
 
 		for (int i = 0; i < titles.length; i++) {
@@ -342,8 +336,9 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 		table.setItemCount(6);// para ver las filas por defecto
 		// parametrizando el forma data
 		fdmitabla = new FormData();
-		fdmitabla.left = new FormAttachment(middle, 0);
-		fdmitabla.right = new FormAttachment(100, 0);
+		// fdmitabla.left = new FormAttachment(middle, 0);
+		fdmitabla.left = new FormAttachment(1, 0);
+		fdmitabla.right = new FormAttachment(100, 1);
 		fdmitabla.top = new FormAttachment(wLoadFile, margin);
 
 		// boton ok y cancel al ultimo
@@ -448,40 +443,41 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 	 * and puts it into the dialog controls.
 	 */
 	private void populateDialog() {
-		// wStepname.selectAll();
-		if(meta.getOutputField().compareTo("Input URI of OWL or File")!=0){
-		
-		
-		
-		
-		
-		String replace = meta.getOutputField().replace("[", "");
-		System.out.println(replace);
-		String replace1 = replace.replace("]", "");
-		System.out.println(replace1);
-		 ArrayList<String> myList = new ArrayList<String>(Arrays.asList(replace1
-				.split(",")));
-		System.out.println(myList.toString());
-		
-		//ListSource = meta.getListSourcetoProcess();
-		
-			for (int i=0;i<myList.size();i++){
+
+		String data = meta.getOutputField().trim();// read contents of text area
+													// into 'data'
+		if (!data.equals("")) {
+
+			String replace = meta.getOutputField().replace("[", "");
+			String replace1 = replace.replace("]", "");
+			ArrayList<String> myList = new ArrayList<String>(
+					Arrays.asList(replace1.split(",")));
+
+			// ListSource = meta.getListSourcetoProcess();
+
+			for (int i = 0; i < myList.size(); i++) {
 				TableItem item = new TableItem(table, SWT.NONE, numt++);
-			item.setText(0, String.valueOf(numt));
-			item.setText(1,myList.get(i).toString() );
-//--
-			Pattern pat = Pattern.compile("^http.*");
-			Matcher mat = pat.matcher(myList.get(i).toString());
-			if (mat.matches()) { // entonces es una uri
-				item.setText(2, "from URI");}else{item.setText(2, "from local file");}
-			//--
-			
-			wHelloFieldName.setText(myList.get(i).toString() );
-		}
-		}else{
-			wHelloFieldName.setText("Input URI of OWL or File");
-		}//fin if 
-	
+				item.setText(0, String.valueOf(numt));
+				item.setText(1, myList.get(i).toString());
+				// --
+				Pattern pat = Pattern.compile("^http://.*");
+				Matcher mat = pat.matcher(myList.get(i).toString());
+				if (mat.matches()) { // entonces es una uri
+					item.setText(2, BaseMessages.getString(PKG,
+							"GetPropertiesOWL.FieldName.mt2"));
+				} else {
+					item.setText(2, BaseMessages.getString(PKG,
+							"GetPropertiesOWL.FieldName.mt3"));
+				}
+				// --
+
+				wHelloFieldName.setText(myList.get(i).toString());
+			}// fin for
+		}// fin if
+			// } else {
+			// wHelloFieldName.setText(BaseMessages.getString(PKG,
+			// "GetPropertiesOWL.FieldName.MensajeInicio"));
+
 	}
 
 	/**
@@ -502,65 +498,65 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 	 * Called when the user confirms the dialog
 	 */
 	private void ok() {
-		// The "stepname" variable will be the return value for the open()
-		// method.
-		// Setting to step name from the dialog control
-		// stepname = wStepname.getText();
-		stepname = "Get properties Owl ";
-		// Setting the settings to the meta object
-		
-		// meta.setOutputField(this.table.getSelection().toString());
-		
-		//recorrer todas las filas
-		
-		
-		
-		for (int i=0;i<this.numt;i++)
-		{
-			
-			System.out.println(table.getItemCount());
+	
+		if (numt>0){ //validacion
+		for (int i = 0; i < this.numt; i++) {
+
 			TableItem miti = table.getItem(i);
-			System.out.println(miti.getText(1));// es uno para tomar la columna adecuada
 			ListSource.add(miti.getText(1));
-			System.out.println(ListSource.get(i));
-			JOptionPane.showMessageDialog(null, ListSource.get(i));
-			
-			
-			
+			final Shell dialog = new Shell(shell, SWT.APPLICATION_MODAL
+					| SWT.DIALOG_TRIM);
+			dialog.setText(ListSource.get(i).toString());
+			dialog.setSize(250, 150);
+
+			// JOptionPane.showMessageDialog(null, ListSource.get(i));
+			// meta.setOutputField(ListSource.get(i).toString()); //para que
+			// tome solo la seleccionada
+
 		}
+		meta.setOutputField(ListSource.toString());
 		meta.setListSourcetoProcess(ListSource);
-		meta.setOutputField(ListSource.toString()); //para que tome solo la seleccionada
+		// meta.setOutputField(ListSource.get(i)); //para que tome solo la
+		// seleccionada
+
 		
-		//-----------------------
-		// close the SWT dialog window
+		}//fin if
 		dispose();
 	}
 
 	private void LoadFile() {
-		JFileChooser chooser = new JFileChooser();
-		chooser.setCurrentDirectory(new java.io.File("."));
-		chooser.setDialogTitle("Choose the file .owl in your computer");
-		chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-		chooser.setAcceptAllFileFilterUsed(false);
 
-		if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-			// System.out.println("getCurrentDirectory(): " +
-			// chooser.getCurrentDirectory());
-			JOptionPane.showMessageDialog(null, "getSelectedFile() : "
-					+ chooser.getSelectedFile());
-			// this.wHelloFieldName.setText(chooser.getSelectedFile().toString());
-			// para agregar a la tabla swt
-			// this.table
-
+		try {
+			FileDialog dialog = new FileDialog(shell, SWT.OPEN);
+			dialog.setText("Choose the file .owl in your computer");
+			String result = dialog.open();
 			TableItem item = new TableItem(table, SWT.NONE, numt++);
 			item.setText(0, String.valueOf(numt));
-			item.setText(1, chooser.getSelectedFile().toString());
+			item.setText(1, dialog.getFilterPath() + "/" + dialog.getFileName());
 			item.setText(2, "from file");
-		} else {
-			JOptionPane.showMessageDialog(null,
-					"Please first you have to do almost any Selection ");
+		} catch (Exception e) {
+			log.log(Level.SEVERE, e.toString(), e);
 		}
-
+		// JFileChooser chooser = new JFileChooser();
+		/**
+		 * chooser.setCurrentDirectory(new java.io.File("."));
+		 * chooser.setDialogTitle("Choose the file .owl in your computer");
+		 * chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+		 * chooser.setAcceptAllFileFilterUsed(false);
+		 * 
+		 * if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) { //
+		 * System.out.println("getCurrentDirectory(): " + //
+		 * chooser.getCurrentDirectory()); JOptionPane.showMessageDialog(null,
+		 * "getSelectedFile() : " + chooser.getSelectedFile()); //
+		 * this.wHelloFieldName.setText(chooser.getSelectedFile().toString());
+		 * // para agregar a la tabla swt // this.table
+		 * 
+		 * TableItem item = new TableItem(table, SWT.NONE, numt++);
+		 * item.setText(0, String.valueOf(numt)); item.setText(1,
+		 * chooser.getSelectedFile().toString()); item.setText(2, "from file");
+		 * } else { JOptionPane.showMessageDialog(null,
+		 * "Please first you have to do almost any Selection "); }
+		 */
 		// The "stepname" variable will be the return value for the open()
 		// method.
 		// Setting to step name from the dialog control
@@ -572,30 +568,46 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 	}
 
 	private void AddUri() {
-
-		if (wHelloFieldName.getText().compareTo("Input URI of OWL or File") == 0) {
-			JOptionPane.showMessageDialog(null, "please enter the URI");
+		String data = wHelloFieldName.getText().trim();// read contents of text
+		if (data.equals("")) {
+			final Shell dialog = new Shell(shell, SWT.APPLICATION_MODAL
+					| SWT.DIALOG_TRIM);
+			dialog.setText(BaseMessages.getString(PKG,
+					"GetPropertiesOWL.FieldName.AddUri"));
+			dialog.setToolTipText(BaseMessages.getString(PKG,
+					"GetPropertiesOWL.FieldName.AddUri"));
+			dialog.setSize(250, 150);
+			dialog.open();
+			// JOptionPane.showMessageDialog(null, "please enter the URI");
 		} else {
 			Pattern pat = Pattern.compile("^http.*");
 			Matcher mat = pat.matcher(wHelloFieldName.getText());
 			TableItem item = new TableItem(table, SWT.NONE, numt++);
 			if (mat.matches()) { // entonces es una uri
-				System.out.println("Válido");
+
 				item.setText(0, String.valueOf(numt));
 				item.setText(1, wHelloFieldName.getText());
-				item.setText(2, "from URI");
+				item.setText(2, BaseMessages.getString(PKG,
+						"GetPropertiesOWL.FieldName.mt2"));
 			} else {
 				String myresult = ConsultUri(wHelloFieldName.getText());// search
-																		// in
-																		// prefix.cc
-				System.out.println("No Válido http busco en prefixx");
+				// in
+
 				if (myresult != null) {
 					item.setText(0, String.valueOf(numt));
 					item.setText(1, myresult);
-					item.setText(2, "from URI");
+					item.setText(2, BaseMessages.getString(PKG,
+							"GetPropertiesOWL.FieldName.mt2"));
 				} else {
-					JOptionPane.showMessageDialog(null, " URI Not Found ,please write again");
-					wHelloFieldName.setText("Input URI of OWL or File");
+					// JOptionPane.showMessageDialog(null,
+					// " URI Not Found ,please write again");
+					final Shell dialog = new Shell(shell, SWT.APPLICATION_MODAL
+							| SWT.DIALOG_TRIM);
+					dialog.setText(BaseMessages.getString(PKG,
+							"GetPropertiesOWL.FieldName.NoUri"));
+					dialog.setSize(250, 150);
+					// wHelloFieldName.setText(BaseMessages.getString(PKG,
+					// "GetPropertiesOWL.FieldName.MensajeInicio"));
 				}
 			}
 
@@ -620,8 +632,6 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 			con.setRequestProperty("User-Agent", USER_AGENT);
 
 			int responseCode = con.getResponseCode();
-			System.out.println("\nSending 'GET' request to URL : " + url);
-			System.out.println("Response Code : " + responseCode);
 
 			BufferedReader in = new BufferedReader(new InputStreamReader(
 					con.getInputStream()));
@@ -634,7 +644,6 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 			in.close();
 
 			// print result
-			System.out.println(response.toString());
 
 			// ---------------
 
@@ -645,8 +654,6 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 				JSONObject jsonRoot = new JSONObject(response.toString());
 				loudScreaming = jsonRoot.getJSONObject("@context").getString(
 						mysearching);
-
-				System.out.println(loudScreaming);
 
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
@@ -668,10 +675,10 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 		String string = "";
 		TableItem[] selection = table.getSelection();
 		TableItem miti = selection[0];
-		System.out.println(miti.getText(1));
-		//SourcetoProcess = miti.getText(1);
+
+		// SourcetoProcess = miti.getText(1);
 		this.NumRowSelected = table.getSelectionIndex();
-		System.out.println(NumRowSelected);
+
 		/**
 		 * for (int i = 0; i < selection.length; i++) { TableItem miti =
 		 * selection[0];
@@ -683,10 +690,20 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 
 	private void BorrarFila() {
 		// TODO
-		String string = "";
-		TableItem[] selection = table.getSelection();
-		table.remove(NumRowSelected);
-		numt--;
+		int bandera = 0;
+		for (int i = 0; i < table.getItemCount(); i++) {
+			if (table.isSelected(i)) {
+				bandera = 1;
+			}
+
+		}
+		if (bandera == 1) {
+
+			String string = "";
+			TableItem[] selection = table.getSelection();
+			table.remove(NumRowSelected);
+			numt--;
+		}
 	}
 
 }
