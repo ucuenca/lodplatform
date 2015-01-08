@@ -135,7 +135,7 @@ public class GetPropertiesOWLMeta extends BaseStepMeta implements StepMetaInterf
 	 * to sensible defaults. The values set here will be used by Spoon when a new step is created.    
 	 */
 	public void setDefault() {
-		outputField = "Input URI of OWL or File";
+		outputField = " ";
 	}
 	
 	/**
