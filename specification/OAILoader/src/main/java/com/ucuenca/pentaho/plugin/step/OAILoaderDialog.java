@@ -78,6 +78,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
 import javax.swing.JOptionPane;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -121,11 +122,14 @@ public class OAILoaderDialog extends BaseStepDialog implements
 	private String Uri;
 	GetXPath getPathOai;
 
-	static Logger logger;
+	
 	int electedItem;
 	
 	private int middle;
 	private int margin;
+	
+	
+	   
 
 	public OAILoaderDialog(Shell parent, Object in, TransMeta transMeta,
 			String sname) {
@@ -141,7 +145,7 @@ public class OAILoaderDialog extends BaseStepDialog implements
 
 		// SWT code for preparing the dialog
 		shell = new Shell(parent, SWT.DIALOG_TRIM | SWT.RESIZE | SWT.MIN
-				| SWT.MAX);
+				| SWT.MAX );
 		props.setLook(shell);
 		setShellImage(shell, meta);
 
@@ -274,15 +278,20 @@ public class OAILoaderDialog extends BaseStepDialog implements
 					Matcher mat = pat.matcher(txtURI.getText());
 
 					if (mat.matches()) { // entonces es una uri
-						meta.setInputURI(txtURI.getText());	
+						//meta.setInputURI(txtURI.getText());	
 						valueUri=txtURI.getText();
 						cbmPrefix.setText("");
 						txtXpath.setText("");
 						listPrefix(txtURI.getText());
 					} else {
-						JOptionPane.showMessageDialog(null, BaseMessages
-								.getString(PKG, "OAILoader.Manager.ERRORURI"),
-								"Error", JOptionPane.ERROR_MESSAGE);
+															    
+						 
+						    MessageBox dialog = 
+									  new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
+									dialog.setText("ERROR");						
+							dialog.setMessage(BaseMessages.getString(PKG, "OAILoader.Manager.ERRORURI"));
+						    		    
+						    dialog.open();
 						cbmPrefix.setEnabled(false);
 					    cbmPrefix.setText("");
 						txtXpath.setText("");
@@ -545,10 +554,12 @@ public class OAILoaderDialog extends BaseStepDialog implements
 				Uri = ruta;
 
 			} catch (Exception e1) {
-
-				JOptionPane.showMessageDialog(null,
-						BaseMessages.getString(PKG, "OAILoader.Manager.ERROR"),
-						"Error", JOptionPane.ERROR_MESSAGE);
+				MessageBox dialog = 
+						  new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
+						dialog.setText("ERROR");						
+				dialog.setMessage(BaseMessages.getString(PKG, "OAILoader.Manager.ERROR"));
+			    		    
+			    dialog.open();
 			}
 		}
 

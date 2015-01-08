@@ -29,6 +29,7 @@ import java.util.StringTokenizer;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.apache.log4j.Logger;
 import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.core.row.RowDataUtil;
 import org.pentaho.di.core.row.RowMeta;
@@ -54,7 +55,7 @@ public class OAILoader extends BaseStep implements StepInterface {
 	ArrayList<String> datos;
 	ArrayList<String> nameFields;
 	String numRegistro;
-
+	
 	public OAILoader(StepMeta s, StepDataInterface stepDataInterface, int c,
 			TransMeta t, Trans dis) {
 		super(s, stepDataInterface, c, t, dis);
@@ -101,25 +102,32 @@ public class OAILoader extends BaseStep implements StepInterface {
 		Object[] outputRow = RowDataUtil.allocateRowData(data.outputRowMeta
 				.size());
 		int outputIndex;
+		try{
 
 		if ((data.initialResumptionToken != null)
 				&& schema.prefix.equals(meta.getPrefix())) {
 			data.resumptionToken = data.initialResumptionToken;
 
-			// sgonzalez parametro schema
+			logBasic("Resuming harvesting from "
+					+ data.resumptionToken); // Some basic logging			
+			
 			try {
 				data.listRecords = new ListRecords(meta.getInputURI(),
 						data.resumptionToken, schema);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logBasic(e.getMessage());
+						e.printStackTrace();
 			} catch (ParserConfigurationException e) {
 				// TODO Auto-generated catch block
+				logBasic(e.getMessage());
 				e.printStackTrace();
 			} catch (SAXException e) {
 				// TODO Auto-generated catch block
+				logBasic(e.getMessage());
 				e.printStackTrace();
 			} catch (TransformerException e) {
+				logBasic(e.getMessage());
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -133,14 +141,10 @@ public class OAILoader extends BaseStep implements StepInterface {
 						meta.getPrefix(), schema);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ParserConfigurationException e) {
-				// TODO Auto-generated catch block
+				logBasic(e.getMessage());
 				e.printStackTrace();
 			} catch (SAXException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (TransformerException e) {
+				logBasic(e.getMessage());
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -148,13 +152,13 @@ public class OAILoader extends BaseStep implements StepInterface {
 
 		// ********************************* Initial while
 		// ***************************
+		
 		NodeList header = null;
 		while (data.listRecords != null) {
 
 			outputIndex = 0;
 
-			NodeList records = null;
-			
+			NodeList records = null;		
 
 			try {
 				records = data.listRecords.getNodeList(meta.getXpath());
@@ -169,6 +173,10 @@ public class OAILoader extends BaseStep implements StepInterface {
 
 			int batch = records.getLength();
 			data.total += batch;
+			
+			logBasic("Harvested Records: batch "
+					+ records.getLength() + ", total " +data.total);			
+	
 
 			for (int temp1 = 0; temp1 < records.getLength(); temp1++) {
 				Node nNode1 = records.item(temp1);
@@ -213,27 +221,22 @@ public class OAILoader extends BaseStep implements StepInterface {
 
 			}// end two for
 
-			try {
 				data.resumptionToken = data.listRecords.getResumptionToken();
 				System.out.println(data.resumptionToken);
-			} catch (NoSuchFieldException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (TransformerException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		
 
 			if (data.resumptionToken == null
 					|| data.resumptionToken.length() == 0) {
 
 				data.listRecords = null;
+				logBasic("No more resumption token found, end was reached.");
 
 				setOutputDone();
 				return false;
 
 			} else {
-
+                 logBasic("Resuming harvesting from "
+							+ data.resumptionToken);
 				try {
 					data.listRecords = new ListRecords(meta.getInputURI(),
 							data.resumptionToken);
@@ -244,23 +247,34 @@ public class OAILoader extends BaseStep implements StepInterface {
 							data.resumptionToken);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (ParserConfigurationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logBasic("IOException while trying to resume from "
+							+ data.resumptionToken + ", trying again.");
+					
+						data.listRecords = new ListRecords(meta.getInputURI(),
+								data.resumptionToken);
+								
+				
 				} catch (SAXException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (TransformerException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+					logBasic("SAXException while trying to resume from "
+							+ data.resumptionToken + ", trying again.");
+					
+						data.listRecords = new ListRecords(meta.getInputURI(),
+								data.resumptionToken);					
+					
+				} 
 			}
 
 		}// end while
 
+		}catch(Exception e)
+		{
+			
+			logBasic("Error: "+e.toString());
+			
+		}
 		if (checkFeedback(getLinesRead())) {
 			logBasic("Linenr " + getLinesRead()); // Some basic logging
+			
 		}
 		return true;
 
