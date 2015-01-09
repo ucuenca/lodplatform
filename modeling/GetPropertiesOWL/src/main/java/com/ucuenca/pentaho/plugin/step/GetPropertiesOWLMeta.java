@@ -129,7 +129,7 @@ public class GetPropertiesOWLMeta extends BaseStepMeta implements StepMetaInterf
 	public StepDataInterface getStepData() {
 		return new GetPropertiesOWLData();
 	}	
-
+	
 	/**
 	 * This method is called every time a new step is created and should allocate/set the step configuration
 	 * to sensible defaults. The values set here will be used by Spoon when a new step is created.    
@@ -302,11 +302,11 @@ public class GetPropertiesOWLMeta extends BaseStepMeta implements StepMetaInterf
 				row.addValueMeta(TypeOWL);
 				
 				// The filename...
-				ValueMetaInterface ObjectOWL = new ValueMeta("ObjectOWL", ValueMetaInterface.TYPE_STRING);
+			/**	ValueMetaInterface ObjectOWL = new ValueMeta("ObjectOWL", ValueMetaInterface.TYPE_STRING);
 				ObjectOWL.setOrigin(origin);
 				ObjectOWL.setLength(125);
 				row.addValueMeta(ObjectOWL);
-				
+				*/
 
 	}
 

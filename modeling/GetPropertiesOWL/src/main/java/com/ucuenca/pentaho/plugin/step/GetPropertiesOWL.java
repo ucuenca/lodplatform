@@ -285,7 +285,7 @@ public class GetPropertiesOWL extends BaseStep implements StepInterface {
 					outputRow[0] = this.nameontology;
 					outputRow[1] = cls.getURI();
 					outputRow[2] = "rdf:type";
-					outputRow[3] = "rdfs:class";
+					//outputRow[3] = "rdfs:class";
 					// put the row to the output row stream
 					putRow(data.outputRowMeta, outputRow);
 					// System.out.print(cls.getURI()+" "+cls.getLocalName()+" rdf:type  rdfs:class");
@@ -313,7 +313,7 @@ public class GetPropertiesOWL extends BaseStep implements StepInterface {
 						outputRow[0] = this.nameontology;
 						outputRow[1] = property;
 						outputRow[2] = "rdf:type";
-						outputRow[3] = "rdfs:property";
+						//outputRow[3] = "rdfs:property";
 						// System.out.println("property  "+ property);
 						putRow(data.outputRowMeta, outputRow);
 					}
@@ -339,7 +339,7 @@ public class GetPropertiesOWL extends BaseStep implements StepInterface {
 							outputRow[2] = s.getObject();
 							// System.out.println( s.getObject() );
 						}
-						outputRow[3] = "rdfs:property";
+						//outputRow[3] = "rdfs:property";
 						putRow(data.outputRowMeta, outputRow);
 					}
 
