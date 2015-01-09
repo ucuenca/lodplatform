@@ -50,6 +50,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -504,10 +505,7 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 
 			TableItem miti = table.getItem(i);
 			ListSource.add(miti.getText(1));
-			final Shell dialog = new Shell(shell, SWT.APPLICATION_MODAL
-					| SWT.DIALOG_TRIM);
-			dialog.setText(ListSource.get(i).toString());
-			dialog.setSize(250, 150);
+
 
 			// JOptionPane.showMessageDialog(null, ListSource.get(i));
 			// meta.setOutputField(ListSource.get(i).toString()); //para que
@@ -528,12 +526,12 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 
 		try {
 			FileDialog dialog = new FileDialog(shell, SWT.OPEN);
-			dialog.setText("Choose the file .owl in your computer");
+			dialog.setText(BaseMessages.getString(PKG, "GetPropertiesOWL.FieldName.Choose"));
 			String result = dialog.open();
 			TableItem item = new TableItem(table, SWT.NONE, numt++);
 			item.setText(0, String.valueOf(numt));
 			item.setText(1, dialog.getFilterPath() + "/" + dialog.getFileName());
-			item.setText(2, "from file");
+			item.setText(2, BaseMessages.getString(PKG, "GetPropertiesOWL.FieldName.mt3"));
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.toString(), e);
 		}
@@ -570,15 +568,25 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 	private void AddUri() {
 		String data = wHelloFieldName.getText().trim();// read contents of text
 		if (data.equals("")) {
-			final Shell dialog = new Shell(shell, SWT.APPLICATION_MODAL
+			
+		/**	final Shell dialog = new Shell(shell, SWT.APPLICATION_MODAL
 					| SWT.DIALOG_TRIM);
 			dialog.setText(BaseMessages.getString(PKG,
 					"GetPropertiesOWL.FieldName.AddUri"));
 			dialog.setToolTipText(BaseMessages.getString(PKG,
 					"GetPropertiesOWL.FieldName.AddUri"));
 			dialog.setSize(250, 150);
-			dialog.open();
+			dialog.open();*/
 			// JOptionPane.showMessageDialog(null, "please enter the URI");
+			MessageBox dialog = 
+					  new MessageBox(shell, SWT.ICON_QUESTION | SWT.OK| SWT.CANCEL);
+					dialog.setText(BaseMessages.getString(PKG,"GetPropertiesOWL.FieldName.AddUri"));
+					dialog.setMessage(BaseMessages.getString(PKG,
+					"GetPropertiesOWL.FieldName.NoUri"));
+
+					// open dialog and await user selection
+					int returnCode = dialog.open(); 
+			//
 		} else {
 			Pattern pat = Pattern.compile("^http.*");
 			Matcher mat = pat.matcher(wHelloFieldName.getText());
