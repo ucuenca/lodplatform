@@ -68,6 +68,11 @@ public class OAILoaderMeta extends BaseStepMeta implements StepMetaInterface {
 	private String xpath;	
 	private String namespace;
 	private String schema;
+	private String initialResumptionToken;
+	
+	//must be included for DataBase Data Loading
+	private TransMeta transMeta;
+	private String stepName;
 
 
 	/**
@@ -80,14 +85,37 @@ public class OAILoaderMeta extends BaseStepMeta implements StepMetaInterface {
 		xpath=null;
 		schema=null;
 		namespace=null;
+		initialResumptionToken = null;
 	}
 	
 	
 	public StepDialogInterface getDialog(Shell shell, StepMetaInterface meta, TransMeta transMeta, String name) {
+		//must be included for DataBase Data Loading
+		this.setTransMeta(transMeta);
+		this.setStepName(name);
+		
 		return new OAILoaderDialog(shell, meta, transMeta, name);
 	}
 
-	
+	public TransMeta getTransMeta() {
+		return transMeta;
+	}
+
+
+	public void setTransMeta(TransMeta transMeta) {
+		this.transMeta = transMeta;
+	}
+
+
+	public String getStepName() {
+		return stepName;
+	}
+
+
+	public void setStepName(String stepName) {
+		this.stepName = stepName;
+	}
+
 	public StepInterface getStep(StepMeta stepMeta, StepDataInterface stepDataInterface, int cnr, TransMeta transMeta, Trans disp) {
 		return new OAILoader(stepMeta, stepDataInterface, cnr, transMeta, disp);
 	}
@@ -109,6 +137,7 @@ public class OAILoaderMeta extends BaseStepMeta implements StepMetaInterface {
 		prefix="";
 		namespace="";
 		schema="";
+		initialResumptionToken = null;
 	}
 	
 
@@ -128,7 +157,7 @@ public class OAILoaderMeta extends BaseStepMeta implements StepMetaInterface {
 	public String getXML() throws KettleValueException {
 		
 		// only one field to serialize
-		String xml = XMLHandler.addTagValue("outputfield", inputURI);
+		//String xml = XMLHandler.addTagValue("outputfield", inputURI);
 		
 	    StringBuffer retval = new StringBuffer( 400 );
 
@@ -137,6 +166,7 @@ public class OAILoaderMeta extends BaseStepMeta implements StepMetaInterface {
 	    retval.append( "    " ).append( XMLHandler.addTagValue( "xpath", xpath ) );
 	    retval.append( "    " ).append( XMLHandler.addTagValue( "namespace", namespace ) );
 	    retval.append( "    " ).append( XMLHandler.addTagValue( "schema", schema ) );
+	    retval.append( "    " ).append( XMLHandler.addTagValue( "initialResumptionToken", initialResumptionToken ) );
 	    
 		return retval.toString();
 	}
@@ -159,6 +189,7 @@ public class OAILoaderMeta extends BaseStepMeta implements StepMetaInterface {
 			setXpath(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "xpath")));
 			setNamespace(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "namespace")));
 			setSchema(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "schema")));
+			setInitialResumptionToken(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "initialResumptionToken")));
 		} catch (Exception e) {
 			throw new KettleXMLException("Demo plugin unable to read step info from XML node", e);
 		}
@@ -222,21 +253,21 @@ public class OAILoaderMeta extends BaseStepMeta implements StepMetaInterface {
 		 * This implementation appends the outputField to the row-stream
 		 */
 
-		ValueMetaInterface numRegistro = new ValueMeta(BaseMessages.getString(PKG, "OAILoader.InputData.IdRecord"), ValueMetaInterface.TYPE_STRING);
-		numRegistro.setOrigin(origin);
-		numRegistro.setLength(5);
-		r.addValueMeta(numRegistro);
+		ValueMetaInterface id = new ValueMeta(BaseMessages.getString(PKG, "OAILoader.InputData.IdRecord"), ValueMetaInterface.TYPE_STRING);
+		id.setOrigin(origin);
+		id.setLength(100);
+		r.addValueMeta(id);
 		
-		ValueMetaInterface Campo = new ValueMeta(BaseMessages.getString(PKG, "OAILoader.InputData.Field"), ValueMetaInterface.TYPE_STRING);
-		Campo.setOrigin(origin);
-		Campo.setLength(255);
-		r.addValueMeta(Campo);
+		ValueMetaInterface field = new ValueMeta(BaseMessages.getString(PKG, "OAILoader.InputData.Field"), ValueMetaInterface.TYPE_STRING);
+		field.setOrigin(origin);
+		field.setLength(255);
+		r.addValueMeta(field);
 		
 
-		ValueMetaInterface Datos = new ValueMeta(BaseMessages.getString(PKG, "OAILoader.InputData.Data"), ValueMetaInterface.TYPE_STRING);
-		Datos.setOrigin(origin);
-		Datos.setLength(255);
-		r.addValueMeta(Datos);		
+		ValueMetaInterface data = new ValueMeta(BaseMessages.getString(PKG, "OAILoader.InputData.Data"), ValueMetaInterface.TYPE_STRING);
+		data.setOrigin(origin);
+		data.setLength(10000);
+		r.addValueMeta(data);		
 		
 	}
 
@@ -262,13 +293,15 @@ public class OAILoaderMeta extends BaseStepMeta implements StepMetaInterface {
 	public void check(List<CheckResultInterface> remarks, TransMeta transmeta, StepMeta stepMeta, RowMetaInterface prev, String input[], String output[], RowMetaInterface info) {
 		
 		CheckResult cr;
-
-		// See if there are input streams leading to this step!
-		if (input.length > 0) {
-			cr = new CheckResult(CheckResult.TYPE_RESULT_OK, BaseMessages.getString(PKG, "Demo.CheckResult.ReceivingRows.OK"), stepMeta);
+		
+		if (input.length>0)
+		{		
+			cr = new CheckResult(CheckResult.TYPE_RESULT_ERROR, "This step is not expecting any input", stepMeta);
 			remarks.add(cr);
-		} else {
-			cr = new CheckResult(CheckResult.TYPE_RESULT_ERROR, BaseMessages.getString(PKG, "Demo.CheckResult.ReceivingRows.ERROR"), stepMeta);
+		}
+		else
+		{
+			cr = new CheckResult(CheckResult.TYPE_RESULT_OK, "Not receiving any input from other steps.", stepMeta);
 			remarks.add(cr);
 		}	
     	
@@ -334,9 +367,14 @@ public class OAILoaderMeta extends BaseStepMeta implements StepMetaInterface {
 	}
 
 
-	
-	
-	
+	public String getInitialResumptionToken() {
+		return initialResumptionToken;
+	}
 
+
+	public void setInitialResumptionToken(String initialResumptionToken) {
+		this.initialResumptionToken = initialResumptionToken;
+	}
+	
 }
 
