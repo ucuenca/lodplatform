@@ -32,5 +32,9 @@
     		 	<library name="lib/httpcore-4.2.5.jar"/>
     		 	<library name="lib/commons-logging.1.0.4.jar"/>
     		 	<library name="lib/json-20070829.jar"/>
+    		 	<library name="lib/jsonld-java-0.5.1.jar"/>
+    		 	<library name="lib/jackson-core-2.5.0.jar"/>
+    		 	<library name="lib/jackson-databind-2.5.0.jar"/>
+    		 	<library name="lib/jackson-annotations-2.5.0.jar"/>
 		</libraries>
 </plugin>

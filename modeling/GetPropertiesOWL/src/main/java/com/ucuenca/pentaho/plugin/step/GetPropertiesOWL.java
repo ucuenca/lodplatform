@@ -200,15 +200,15 @@ public class GetPropertiesOWL extends BaseStep implements StepInterface {
 		// returns null if no more rows expected
 		Object[] r = getRow();
 		String replace = meta.getOutputField().replace("[", "");
-		System.out.println(replace);
+		//System.out.println(replace);
 		String replace1 = replace.replace("]", "");
-		System.out.println(replace1);
+		//System.out.println(replace1);
 		//para quitar espacios en blanco
 		String replace2=replace1.replaceAll("\\s+","");
 		
 		List<String> myList = new ArrayList<String>(Arrays.asList(replace2
 				.split(",")));
-		System.out.println(myList.toString());
+		//System.out.println(myList.toString());
 
 		//get name onlogy
 		
@@ -230,13 +230,15 @@ public class GetPropertiesOWL extends BaseStep implements StepInterface {
 		// data.model.read(meta.getOutputField().toString()); // here i load
 		// model from ontology
 		// data.model.removeAll();
-		System.out.println(myList.get(ii));
+		//System.out.println(myList.get(ii));
 		try {
 			
 			data.model.read(myList.get(ii));
 
 		} catch (Exception eox) {
-			System.out.println(eox);
+			logError("Unload model from URI [" + eox.getMessage()
+					+ "] because of an error: " + eox.toString());
+			
 		}
 
 		// if no more rows are expected, indicate step is finished and
@@ -280,7 +282,7 @@ public class GetPropertiesOWL extends BaseStep implements StepInterface {
 
 					// outputRow[0]=cls.getURI()+" "+cls.getLocalName();//para
 					// que salgan los nombres
-					System.out.println(cls.getNameSpace());
+		//			System.out.println(cls.getNameSpace());
 					//outputRow[0] = "Ontologia" + myList.get(ii);
 					outputRow[0] = this.nameontology;
 					outputRow[1] = cls.getURI();
@@ -305,6 +307,7 @@ public class GetPropertiesOWL extends BaseStep implements StepInterface {
 					// show the properties of this individual
 
 					// System.out.println( "  " + cls.getURI());
+					try {
 					ExtendedIterator itq = cls.listDeclaredProperties();
 
 					while (itq.hasNext()) {
@@ -342,14 +345,18 @@ public class GetPropertiesOWL extends BaseStep implements StepInterface {
 						outputRow[3] = "rdfs:property";
 						putRow(data.outputRowMeta, outputRow);
 					}
-
+					}catch (Exception eox1){
+						
+						logError("Unload model from URI [" + eox1.getMessage()
+								+ "] because of an error: " + eox1.toString());
+					}
 					// ------------------------------
 					// }
 					// obtener las clases de las propiedades
 
 					// }//end for
 				}// fin for quita nulos
-				System.out.println();
+			//	System.out.println();
 			}
 		}// fin comprobacion
 
