@@ -50,6 +50,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -326,12 +327,14 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 		for (int i = 0; i < titles.length; i++) {
 			TableColumn column = new TableColumn(table, SWT.NONE);
 			column.setText(titles[i]);
-			column.setWidth(355);
+			column.setWidth(400);
+			if (i==0){column.setWidth(100);}
+			
 		}
-
+/**
 		for (int i = 0; i < titles.length; i++) {
 			table.getColumn(i).pack();
-		}
+		}*/
 		table.setSize(table.computeSize(SWT.DEFAULT, 200));
 		table.setItemCount(6);// para ver las filas por defecto
 		// parametrizando el forma data
@@ -504,10 +507,7 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 
 			TableItem miti = table.getItem(i);
 			ListSource.add(miti.getText(1));
-			final Shell dialog = new Shell(shell, SWT.APPLICATION_MODAL
-					| SWT.DIALOG_TRIM);
-			dialog.setText(ListSource.get(i).toString());
-			dialog.setSize(250, 150);
+
 
 			// JOptionPane.showMessageDialog(null, ListSource.get(i));
 			// meta.setOutputField(ListSource.get(i).toString()); //para que
@@ -528,12 +528,12 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 
 		try {
 			FileDialog dialog = new FileDialog(shell, SWT.OPEN);
-			dialog.setText("Choose the file .owl in your computer");
+			dialog.setText(BaseMessages.getString(PKG, "GetPropertiesOWL.FieldName.Choose"));
 			String result = dialog.open();
 			TableItem item = new TableItem(table, SWT.NONE, numt++);
 			item.setText(0, String.valueOf(numt));
 			item.setText(1, dialog.getFilterPath() + "/" + dialog.getFileName());
-			item.setText(2, "from file");
+			item.setText(2, BaseMessages.getString(PKG, "GetPropertiesOWL.FieldName.mt3"));
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.toString(), e);
 		}
@@ -568,57 +568,70 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 	}
 
 	private void AddUri() {
+		 
 		String data = wHelloFieldName.getText().trim();// read contents of text
-		if (data.equals("")) {
-			final Shell dialog = new Shell(shell, SWT.APPLICATION_MODAL
-					| SWT.DIALOG_TRIM);
-			dialog.setText(BaseMessages.getString(PKG,
-					"GetPropertiesOWL.FieldName.AddUri"));
-			dialog.setToolTipText(BaseMessages.getString(PKG,
-					"GetPropertiesOWL.FieldName.AddUri"));
-			dialog.setSize(250, 150);
-			dialog.open();
-			// JOptionPane.showMessageDialog(null, "please enter the URI");
+		wHelloFieldName.setText(data);// to save without spaces
+		if (data.equals("")) {  // si est vacio presente un error y no ejecuta nada
+
+			MessageBox dialog = 
+					  new MessageBox(shell, SWT.ICON_QUESTION | SWT.OK);
+					dialog.setText(BaseMessages.getString(PKG,"GetPropertiesOWL.FieldName.AddUri"));
+					dialog.setMessage(BaseMessages.getString(PKG,
+					"GetPropertiesOWL.FieldName.NoUri"));
+
+					// open dialog and await user selection
+					int returnCode = dialog.open(); 
+			//
 		} else {
 			Pattern pat = Pattern.compile("^http.*");
 			Matcher mat = pat.matcher(wHelloFieldName.getText());
-			TableItem item = new TableItem(table, SWT.NONE, numt++);
-			if (mat.matches()) { // entonces es una uri
-
-				item.setText(0, String.valueOf(numt));
-				item.setText(1, wHelloFieldName.getText());
-				item.setText(2, BaseMessages.getString(PKG,
-						"GetPropertiesOWL.FieldName.mt2"));
-			} else {
+			
+			if (mat.matches()) { // entonces es una uri completa directa , no necesito usar prefix ej  http://iflastandards.info/ns/fr/frbr/frbrer/
+				
+                
+				
+				TableItem item = new TableItem(table, SWT.NONE, numt++);
+					item.setText(0, String.valueOf(numt));
+					item.setText(1, wHelloFieldName.getText());
+					item.setText(2, BaseMessages.getString(PKG,
+							"GetPropertiesOWL.FieldName.mt2"));
+	
+			} else {  // NO ES UNA URI completa por ejemplo solo bibo 
+		
 				String myresult = ConsultUri(wHelloFieldName.getText());// search
 				// in
 
 				if (myresult != null) {
+					TableItem item = new TableItem(table, SWT.NONE, numt++);
 					item.setText(0, String.valueOf(numt));
 					item.setText(1, myresult);
 					item.setText(2, BaseMessages.getString(PKG,
 							"GetPropertiesOWL.FieldName.mt2"));
-				} else {
-					// JOptionPane.showMessageDialog(null,
-					// " URI Not Found ,please write again");
-					final Shell dialog = new Shell(shell, SWT.APPLICATION_MODAL
-							| SWT.DIALOG_TRIM);
-					dialog.setText(BaseMessages.getString(PKG,
+				}else { // solo aqui es el error pues si es una noUri como bibo que no se valida
+					
+					MessageBox dialog = 
+							  new MessageBox(shell, SWT.ICON_QUESTION | SWT.OK);
+							dialog.setText(BaseMessages.getString(PKG,"GetPropertiesOWL.FieldName.AddUri"));
+							dialog.setMessage(BaseMessages.getString(PKG,
 							"GetPropertiesOWL.FieldName.NoUri"));
-					dialog.setSize(250, 150);
-					// wHelloFieldName.setText(BaseMessages.getString(PKG,
-					// "GetPropertiesOWL.FieldName.MensajeInicio"));
+
+							// open dialog and await user selection
+							int returnCode = dialog.open(); 
+					
+
 				}
-			}
+				
+				
+
+			}// fin si no es una uri
 
 		}
-	}
+	}// fin add URI
 
 	/** to load URI from Web */
 	private String ConsultUri(String mysearching) {
 
 		String url = "http://prefix.cc/context";
-
 		URL obj;
 		String loudScreaming = null;
 		try {
@@ -653,11 +666,11 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 			try {
 				JSONObject jsonRoot = new JSONObject(response.toString());
 				loudScreaming = jsonRoot.getJSONObject("@context").getString(
-						mysearching);
+						mysearching.trim());
 
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 
 			// System.out.println(var.get(key) === "bibo" );
@@ -665,7 +678,7 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return loudScreaming;
 	}
