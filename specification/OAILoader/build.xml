@@ -14,10 +14,10 @@
 	<property name="classes" location="classes" />
 	-->
 	<property name="dist" location="target" />
-	<property name="pluginname" value="OAIExtraer" />
+	<property name="pluginname" value="OAILoader" />
 	<property name="diststep" location="${dist}/steps/${pluginname}" />
 	
-	<property name="jarfilename" value="OAIExtraer-step.jar" />
+	<property name="jarfilename" value="OAILoader.jar" />
 
 	<!-- used to compile code -->
 	<!--

@@ -27,73 +27,58 @@ import java.io.StringReader;
 import java.util.ArrayList;
 
 import org.apache.commons.digester.Digester;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
-import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
-import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.pentaho.di.core.Const;
 import org.pentaho.di.core.exception.KettleException;
-import org.pentaho.di.core.vfs.KettleVFS;
 import org.pentaho.di.i18n.BaseMessages;
 import org.pentaho.di.trans.TransMeta;
 import org.pentaho.di.ui.core.dialog.EnterSelectionDialog;
-import org.pentaho.di.ui.core.widget.ColumnInfo;
-import org.pentaho.di.ui.core.widget.TableView;
 import org.pentaho.di.ui.trans.step.BaseStepDialog;
 import org.pentaho.di.trans.step.BaseStepMeta;
 import org.pentaho.di.trans.step.StepDialogInterface;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-
-import bsh.XThis;
 
 import com.ucuenca.pentaho.plugin.auxiliary.GetXPath;
 import com.ucuenca.pentaho.plugin.oai.ListMetadataFormats;
 import com.ucuenca.pentaho.plugin.oai.ListRecords;
 import com.ucuenca.pentaho.plugin.oai.Schema;
 
-@SuppressWarnings("unused")
-public class OAIExtraerDialog extends BaseStepDialog implements
+public class OAILoaderDialog extends BaseStepDialog implements
 		StepDialogInterface {
 
-	private static Class<?> PKG = OAIExtraerMeta.class; // for i18n purposes
+	private static Class<?> PKG = OAILoaderMeta.class; // for i18n purposes
 
 	// variables globales para uso general
-	private OAIExtraerMeta meta;
+	private OAILoaderMeta meta;
 
 	// componentes de la interface
 
@@ -104,27 +89,33 @@ public class OAIExtraerDialog extends BaseStepDialog implements
 	private CCombo cbmPrefix;
 	private Text txtXpath;
 	private Button Xpath;
+	private Button getFormats;
+	//must be included for DataBase Data Loading
+	private Button precatchDataButton;
 
-	private FormData fdlbURI, fdtxtURI, fdFields, fdlbPrefijo, fdtxtPrefijo,
-			fdbtnGetfield, fbcbmPrefix, fdXpath;
+	private FormData fdlbURI, fdtxtURI, fdlbPrefijo, fdtxtPrefijo,
+			fbcbmPrefix, fdXpath, fdGetFormats;
 
-	private ModifyListener mltxtUri;
-
-	List schemas = null;
+	List<Schema> schemas = null;
 	private String prefix;
+	private String valueUri="Input URI";
 
-	private Schema schema;
+	private Schema schema = new Schema();
 	private String xpath;
 	private String Uri;
 	GetXPath getPathOai;
 
-	static Logger logger;
 	int electedItem;
-
-	public OAIExtraerDialog(Shell parent, Object in, TransMeta transMeta,
+	
+	private int middle;
+	private int margin;
+	
+	public OAILoaderDialog(Shell parent, Object in, TransMeta transMeta,
 			String sname) {
 		super(parent, (BaseStepMeta) in, transMeta, sname);
-		meta = (OAIExtraerMeta) in;
+		meta = (OAILoaderMeta) in;
+		//must be included for DataBase Data Loading
+		meta.setTransMeta(transMeta);
 	}
 
 	public String open() {
@@ -135,7 +126,7 @@ public class OAIExtraerDialog extends BaseStepDialog implements
 
 		// SWT code for preparing the dialog
 		shell = new Shell(parent, SWT.DIALOG_TRIM | SWT.RESIZE | SWT.MIN
-				| SWT.MAX);
+				| SWT.MAX );
 		props.setLook(shell);
 		setShellImage(shell, meta);
 
@@ -144,23 +135,20 @@ public class OAIExtraerDialog extends BaseStepDialog implements
 		ModifyListener lsMod = new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				meta.setChanged();
-			}
-		};
-		changed = meta.hasChanged();
-
-		//managmed for use of the URI, also for validation URI
-		mltxtUri = new ModifyListener() {
-
-			public void modifyText(ModifyEvent e) {
 				
-				
-
-				if (!meta.getInputURI().equals(txtURI.getText())) {
-					listPrefix(txtURI.getText());
-					
+								
+				if(!valueUri.equals(txtURI.getText()) )
+				{					
+					prefix=null;
+					xpath=null;
+					Xpath.setEnabled(false);				
+					cbmPrefix.setEnabled(false);
 				}
+				
 			}
 		};
+		//changed = meta.hasChanged();
+
 		// ------------------------------------------------------- //
 		// SWT code for building the actual settings dialog //
 		// ------------------------------------------------------- //
@@ -169,10 +157,10 @@ public class OAIExtraerDialog extends BaseStepDialog implements
 		formLayout.marginHeight = Const.FORM_MARGIN;
 
 		shell.setLayout(formLayout);
-		shell.setText(BaseMessages.getString(PKG, "Demo.Shell.Title"));
+		shell.setText(BaseMessages.getString(PKG, "OAILoader.Shell.Title"));
 
-		int middle = props.getMiddlePct();
-		int margin = Const.MARGIN;
+		middle = props.getMiddlePct();
+		margin = Const.MARGIN;
 
 		// Stepname line
 		wlStepname = new Label(shell, SWT.RIGHT);
@@ -180,9 +168,9 @@ public class OAIExtraerDialog extends BaseStepDialog implements
 				.setText(BaseMessages.getString(PKG, "System.Label.StepName"));
 		props.setLook(wlStepname);
 		fdlStepname = new FormData();
-		fdlStepname.left = new FormAttachment(0, 0);
-		fdlStepname.right = new FormAttachment(middle, -margin);
+		fdlStepname.left = new FormAttachment(0, 0);		
 		fdlStepname.top = new FormAttachment(0, margin);
+		fdlStepname.right = new FormAttachment(middle, -margin);
 		wlStepname.setLayoutData(fdlStepname);
 
 		wStepname = new Text(shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
@@ -196,64 +184,121 @@ public class OAIExtraerDialog extends BaseStepDialog implements
 		wStepname.setLayoutData(fdStepname);
 
 		// add components to grupLayout
-		lbURI = new Label(shell, SWT.MEDIUM);
-		lbURI.setText(" Input URI");
+		lbURI = new Label(shell, SWT.RIGHT);
+		lbURI.setText(BaseMessages.getString(PKG, "OAILoader.FieldName.Label"));
 		props.setLook(lbURI);
 		fdlbURI = new FormData();
 		fdlbURI.left = new FormAttachment(0, 0);
-		fdlbURI.right = new FormAttachment(middle, -2 * margin);
-		fdlbURI.top = new FormAttachment(wlStepname, 15);
+		fdlbURI.right = new FormAttachment(middle, -margin);
+		fdlbURI.top = new FormAttachment(wStepname, margin);
 		lbURI.setLayoutData(fdlbURI);
 
 		txtURI = new Text(shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
 		txtURI.setText(meta.getInputURI());
 		props.setLook(txtURI);
-		txtURI.addModifyListener(mltxtUri);
+		txtURI.addModifyListener(lsMod);
 		fdtxtURI = new FormData();
-		fdtxtURI.left = new FormAttachment(lbURI, 0);
-		fdtxtURI.top = new FormAttachment(wStepname, 4);
+		fdtxtURI.left = new FormAttachment(middle, 0);
 		fdtxtURI.right = new FormAttachment(100, 0);
+		fdtxtURI.top = new FormAttachment(wStepname, margin);
 		txtURI.setLayoutData(fdtxtURI);
 
-		lbPrefijo = new Label(shell, SWT.MEDIUM);
-		lbPrefijo.setText("Prefijo");
+		// button for get all formats of the server OAI-PHM
+
+		
+		lbPrefijo = new Label(shell, SWT.RIGHT);
+
+		lbPrefijo.setText(BaseMessages.getString(PKG,
+				"OAILoader.FieldName.Prefix"));
 		props.setLook(lbPrefijo);
 		fdlbPrefijo = new FormData();
 		fdlbPrefijo.left = new FormAttachment(0, 0);
-		fdlbPrefijo.right = new FormAttachment(middle, -2 * margin);
-		fdlbPrefijo.top = new FormAttachment(lbURI, 15);
+		fdlbPrefijo.right = new FormAttachment(middle, -margin);
+		fdlbPrefijo.top = new FormAttachment(txtURI, margin);
 		lbPrefijo.setLayoutData(fdlbPrefijo);
 
-		cbmPrefix = new CCombo(shell, SWT.BORDER);
+		cbmPrefix = new CCombo(shell, SWT.SINGLE | SWT.LEFT |  SWT.BORDER);
 		cbmPrefix.setEditable(true);
 		props.setLook(cbmPrefix);
 		cbmPrefix.addModifyListener(lsMod);
 		fbcbmPrefix = new FormData();
-		fbcbmPrefix.left = new FormAttachment(lbPrefijo, 0);
+		fbcbmPrefix.left = new FormAttachment(middle, 0);
 		fbcbmPrefix.top = new FormAttachment(txtURI, margin);
-		fbcbmPrefix.right = new FormAttachment(100, 0);
-		cbmPrefix.setLayoutData(fbcbmPrefix);
+		fbcbmPrefix.height = 23;
 		cbmPrefix.setEnabled(false);
 		cbmPrefix.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent arg0) {
 				prefix = cbmPrefix.getText();
 				electedItem = cbmPrefix.getSelectionIndex();
+				schema = (Schema)schemas.get(cbmPrefix.getSelectionIndex());
+				txtXpath.setText("");
+				Xpath.setEnabled(true);
 			}
 
 			public void widgetDefaultSelected(SelectionEvent arg0) {
 			}
 		});
 
-		Xpath = new Button(shell, SWT.PUSH | SWT.MEDIUM);
+		getFormats = new Button(shell, SWT.PUSH | SWT.SINGLE | SWT.MEDIUM | SWT.BORDER);
+		props.setLook(getFormats);
+
+		getFormats.setText(BaseMessages.getString(PKG,
+				"OAILoader.InputData.Formats"));
+		getFormats.setToolTipText(BaseMessages.getString(PKG,
+				"System.Tooltip.BrowseForFileOrDirAndAdd"));
+		fdGetFormats = new FormData();
+		fdGetFormats.right = new FormAttachment(100, 0);
+		fdGetFormats.top = new FormAttachment(txtURI, margin);
+		getFormats.setLayoutData(fdGetFormats);
+
+		fbcbmPrefix.right = new FormAttachment(getFormats, -margin);
+		cbmPrefix.setLayoutData(fbcbmPrefix);
+
+		getFormats.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+			
+					Pattern pat = Pattern.compile("^http://.*");
+					
+					Matcher mat = pat.matcher(txtURI.getText());
+
+					if (mat.matches()) { // entonces es una uri
+						//meta.setInputURI(txtURI.getText());	
+						valueUri=txtURI.getText();
+						cbmPrefix.setText("");
+						txtXpath.setText("");
+						listPrefix(txtURI.getText());
+					} else {
+															    
+						 
+						    MessageBox dialog = 
+									  new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
+									dialog.setText("ERROR");						
+							dialog.setMessage(BaseMessages.getString(PKG, "OAILoader.Manager.ERRORURI"));
+						    		    
+						    dialog.open();
+						cbmPrefix.setEnabled(false);
+					    cbmPrefix.setText("");
+						txtXpath.setText("");
+					}
+
+				}
+			
+		});
+
+		
+		
+		Xpath = new Button(shell, SWT.PUSH);
 		props.setLook(Xpath);
-		Xpath.setText("Get  Xpath");
+
+		Xpath.setText(BaseMessages.getString(PKG, "OAILoader.ButtonName.Title"));
 		Xpath.setToolTipText(BaseMessages.getString(PKG,
 				"System.Tooltip.BrowseForFileOrDirAndAdd"));
 		fdXpath = new FormData();
-		fdXpath.right = new FormAttachment(middle, -2 * margin);
-		fdXpath.left = new FormAttachment(0, 0);
-		fdXpath.top = new FormAttachment(lbPrefijo, 25);
+		fdXpath.left = new FormAttachment(middle, 0);
+		fdXpath.right = new FormAttachment(50, 0);
+		fdXpath.top = new FormAttachment(cbmPrefix, margin);
 		Xpath.setLayoutData(fdXpath);
+		Xpath.setEnabled(false);
 		Xpath.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				try {
@@ -278,10 +323,26 @@ public class OAIExtraerDialog extends BaseStepDialog implements
 		props.setLook(txtXpath);
 		txtXpath.addModifyListener(lsMod);
 		fdtxtPrefijo = new FormData();
-		fdtxtPrefijo.left = new FormAttachment(Xpath, 4);
+		fdtxtPrefijo.left = new FormAttachment(Xpath, 0);
 		fdtxtPrefijo.right = new FormAttachment(100, 0);
-		fdtxtPrefijo.top = new FormAttachment(cbmPrefix, 15);
+		fdtxtPrefijo.top = new FormAttachment(getFormats, margin);
 		txtXpath.setLayoutData(fdtxtPrefijo);
+		txtXpath.setEnabled(false);
+		
+		//must be included for DataBase Data Loading
+		precatchDataButton = new Button(shell, SWT.PUSH);
+		props.setLook(precatchDataButton);
+		precatchDataButton.setText(BaseMessages.getString(PKG, "OAILoader.PrecatchButton.Title"));
+		precatchDataButton.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				OAILoaderData data = (OAILoaderData)meta.getStepData();
+				setDialogMetadata();
+				data.getDataLoader().setStepName(meta.getStepName());
+				data.getDataLoader().setDatabaseLoad(Boolean.TRUE);
+				data.initOAIHarvester(meta, data);
+				new Thread(new DBLoader(data)).start();
+			}
+		});
 
 		// OK and cancel buttons
 		wOK = new Button(shell, SWT.PUSH);
@@ -289,8 +350,9 @@ public class OAIExtraerDialog extends BaseStepDialog implements
 		wCancel = new Button(shell, SWT.PUSH);
 		wCancel.setText(BaseMessages.getString(PKG, "System.Button.Cancel"));
 
+		//must be included for DataBase Data Loading
 		BaseStepDialog.positionBottomButtons(shell,
-				new Button[] { wOK, wCancel }, margin, txtXpath);
+				new Button[] { wOK, wCancel, precatchDataButton }, margin, txtXpath);
 
 		// Add listeners for cancel and OK
 		lsCancel = new Listener() {
@@ -348,6 +410,38 @@ public class OAIExtraerDialog extends BaseStepDialog implements
 		// The "stepname" variable is inherited from BaseStepDialog
 		return stepname;
 	}
+	
+	//must be included for DataBase Data Loading
+	/**
+	 * Thread in charge to execute Database data loading
+	 * @author depcc
+	 *
+	 */
+	private class DBLoader implements Runnable {
+
+		private OAILoaderData data;
+		
+		private DBLoader(OAILoaderData data) {
+			this.data = data;
+		}
+		public void run() {
+			try {
+				int x = 0;
+				while(data.getData(meta, data, true)) {
+					x++;
+				}
+				data.getDataLoader().logBasic(BaseMessages.getString(PKG,
+						"OAILoader.Dialog.TotalRequests.Label") + x);
+			}catch(KettleException ex) {
+				ex.printStackTrace();
+				MessageBox dialog = 
+						  new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
+						dialog.setText("ERROR");						
+				dialog.setMessage(ex.getMessage());   		    
+			    dialog.open();
+			}
+		}
+	}
 
 	/**
 	 * This helper method puts the step configuration stored in the meta object
@@ -357,26 +451,26 @@ public class OAIExtraerDialog extends BaseStepDialog implements
 		wStepname.selectAll();
 
 		if (!meta.getInputURI().equals("Input URI")) {
-			prefix=meta.getPrefix();
-			listPrefix(meta.getInputURI());	
-			
-			Iterator i = schemas.iterator();
-			int setElement=0;
+			prefix = meta.getPrefix();
+			listPrefix(meta.getInputURI());
+            valueUri=meta.getInputURI();
+			Iterator<Schema> i = schemas.iterator();
+			int setElement = 0;
 			while (i.hasNext()) {
-				Schema schema1 = (Schema) i.next();
-				if(schema1.prefix.equals(prefix))
-				{
+				Schema schema1 = i.next();
+				if (schema1.prefix.equals(prefix)) {
 					this.schema = schema1;
-					break;					
+					break;
 				}
-				setElement++;					
+				setElement++;
 			}
 			electedItem = setElement;
-			
-			cbmPrefix.setText(meta.getPrefix());
+
+			cbmPrefix.setText(meta.getPrefix());			
+			txtXpath.setText(meta.getXpath());
 			cbmPrefix.setEnabled(true);
-			txtXpath.setText(meta.getXpath());		
 			
+
 		}
 	}
 
@@ -388,7 +482,7 @@ public class OAIExtraerDialog extends BaseStepDialog implements
 		// method.
 		// Setting to null to indicate that dialog was cancelled.
 		stepname = null;
-       // Restoring original "changed" flag on the met aobject
+		// Restoring original "changed" flag on the met aobject
 		meta.setChanged(changed);
 		// close the SWT dialog window
 		dispose();
@@ -398,16 +492,27 @@ public class OAIExtraerDialog extends BaseStepDialog implements
 	 * Called when the user confirms the dialog
 	 */
 	private void ok() {
-		// The "stepname" variable will be the return value for the open()
-		// method.outprefix
-		// Setting to step name from the dialog control
+		//must be included for DataBase Data Loading
+		this.setDialogMetadata();
+		
+		dispose();
+	}
+	
+	//must be included for DataBase Data Loading
+	/**
+	 * Method in charge to set the metadata obtained on the dialog
+	 * 
+	 */
+	private void setDialogMetadata() {
 		stepname = wStepname.getText();
+		meta.setStepName(stepname);
 		meta.setInputURI(txtURI.getText());
 		meta.setPrefix(cbmPrefix.getText());
+		schema = (Schema)schemas.get(cbmPrefix.getSelectionIndex());
 		meta.setSchema(schema.schema);
 		meta.setNamespace(schema.namespace);
 		meta.setXpath(txtXpath.getText());
-		dispose();
+		meta.setChanged(true);
 	}
 
 	// my proccess
@@ -415,7 +520,7 @@ public class OAIExtraerDialog extends BaseStepDialog implements
 			ParserConfigurationException, SAXException, TransformerException {
 
 		getPathOai = new GetXPath(prefix);
-
+		getPathOai.getMeta().getListpath().clear();
 		String[] list_xpath = null;
 
 		schema = (Schema) schemas.get(electedItem);
@@ -441,19 +546,16 @@ public class OAIExtraerDialog extends BaseStepDialog implements
 		if (list_xpath != null) {
 			EnterSelectionDialog s = new EnterSelectionDialog(shell,
 					list_xpath, BaseMessages.getString(PKG,
-							"GetXMLDataDialog.Dialog.SelectALoopPath.Title"),
+							"OAILoader.Dialog.SelectALoopPath.Title"),
 					BaseMessages.getString(PKG,
-							"GetXMLDataDialog.Dialog.SelectALoopPath.Message"));
+							"OAILoader.Dialog.SelectALoopPath.Message"));
 			xpath = s.open();
-
 			if (xpath != null) {
 				txtXpath.setText(xpath);
 			}
 		}
 
 	}
-
-	
 
 	public void listPrefix(String ruta) {
 
@@ -485,18 +587,23 @@ public class OAIExtraerDialog extends BaseStepDialog implements
 				schemas = (List) digester.parse(new StringReader(metadata
 						.toString()));
 
-				Iterator i = schemas.iterator();
+				Iterator<Schema> i = schemas.iterator();
+				cbmPrefix.removeAll();
 
 				while (i.hasNext()) {
-					Schema schema = (Schema) i.next();
+					Schema schema = i.next();
 					cbmPrefix.add(schema.prefix);
 				}
 				cbmPrefix.setEnabled(true);
 				Uri = ruta;
 
 			} catch (Exception e1) {
-				System.err.println(": " + e1.getMessage());
-				e1.printStackTrace(System.err);
+				MessageBox dialog = 
+						  new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
+						dialog.setText("ERROR");						
+				dialog.setMessage(BaseMessages.getString(PKG, "OAILoader.Manager.ERROR"));
+			    		    
+			    dialog.open();
 			}
 		}
 
