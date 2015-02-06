@@ -36,5 +36,6 @@
     		 	<library name="lib/jackson-core-2.5.0.jar"/>
     		 	<library name="lib/jackson-databind-2.5.0.jar"/>
     		 	<library name="lib/jackson-annotations-2.5.0.jar"/>
+    		 	<library name="lib/misctools-0.0.1-SNAPSHOT.jar"/>
 		</libraries>
 </plugin>

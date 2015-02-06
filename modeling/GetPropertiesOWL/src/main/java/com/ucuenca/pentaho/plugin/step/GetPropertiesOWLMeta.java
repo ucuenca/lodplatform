@@ -84,6 +84,18 @@ public class GetPropertiesOWLMeta extends BaseStepMeta implements StepMetaInterf
 	
 	private String outputField;
 	private LinkedList ListSourcetoProcess =  new LinkedList<String>();
+	//must be included for DataBase Data Loading
+	private String stepName;
+	private TransMeta transMeta;
+	private String nameOntology;
+
+	public String getNameOntology() {
+		return nameOntology;
+	}
+
+	public void setNameOntology(String nameOntology) {
+		this.nameOntology = nameOntology;
+	}
 
 	/**
 	 * Constructor should call super() to make sure the base class has a chance to initialize properly.
@@ -94,6 +106,21 @@ public class GetPropertiesOWLMeta extends BaseStepMeta implements StepMetaInterf
 		
 	}
 	
+	public String getStepName() {
+		return stepName;
+	}
+
+	public void setStepName(String stepName) {
+		this.stepName = stepName;
+	}
+
+	public TransMeta getTransMeta() {
+		return transMeta;
+	}
+
+	public void setTransMeta(TransMeta transMeta) {
+		this.transMeta = transMeta;
+	}
 	/**
 	 * Called by Spoon to get a new instance of the SWT dialog for the step.
 	 * A standard implementation passing the arguments to the constructor of the step dialog is recommended.
@@ -105,6 +132,9 @@ public class GetPropertiesOWLMeta extends BaseStepMeta implements StepMetaInterf
 	 * @return 			new instance of a dialog for this step 
 	 */
 	public StepDialogInterface getDialog(Shell shell, StepMetaInterface meta, TransMeta transMeta, String name) {
+		//must be included for DataBase Data Loading
+		this.setTransMeta(transMeta);
+		this.setStepName(name);
 		return new GetPropertiesOWLDialog(shell, meta, transMeta, name);
 	}
 
@@ -136,6 +166,7 @@ public class GetPropertiesOWLMeta extends BaseStepMeta implements StepMetaInterf
 	 */
 	public void setDefault() {
 		outputField = " ";
+		nameOntology = " ";
 	}
 	
 	/**
@@ -188,9 +219,16 @@ public class GetPropertiesOWLMeta extends BaseStepMeta implements StepMetaInterf
 	public String getXML() throws KettleValueException {
 		
 		// only one field to serialize
-		//String xml = XMLHandler.addTagValue("ListSourcetoProcess",ListSourcetoProcess.t);
-		 String xml = XMLHandler.addTagValue("outputfield", outputField);
-		return xml;
+		/** 
+		String xml = XMLHandler.addTagValue("outputfield", outputField);
+		 XMLHandler.addTagValue("nameOntology", nameOntology);
+		return xml;*/
+		StringBuffer retval = new StringBuffer( 400 );
+
+	    retval.append( "    " ).append( XMLHandler.addTagValue("outputfield", outputField));
+	    retval.append( "    " ).append( XMLHandler.addTagValue( "nameontology", nameOntology));
+
+		return retval.toString();
 	}
 
 	/**
@@ -207,8 +245,11 @@ public class GetPropertiesOWLMeta extends BaseStepMeta implements StepMetaInterf
 
 		try {
 			setOutputField(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "outputfield")));
+			setNameOntology(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "nameontology")));
+		
+			
 		} catch (Exception e) {
-			throw new KettleXMLException("Demo plugin unable to read step info from XML node", e);
+			throw new KettleXMLException("GetPropertiesOWL unable to read step info from XML node", e);
 		}
 
 	}	
@@ -223,6 +264,7 @@ public class GetPropertiesOWLMeta extends BaseStepMeta implements StepMetaInterf
 	public void saveRep(Repository rep, ObjectId id_transformation, ObjectId id_step) throws KettleException
 	{
 		try{
+			rep.saveStepAttribute(id_transformation, id_step, "nameontology", nameOntology); //$NON-NLS-1$
 			rep.saveStepAttribute(id_transformation, id_step, "outputfield", outputField); //$NON-NLS-1$
 			
 		}
@@ -243,6 +285,7 @@ public class GetPropertiesOWLMeta extends BaseStepMeta implements StepMetaInterf
 	public void readRep(Repository rep, ObjectId id_step, List<DatabaseMeta> databases, Map<String, Counter> counters) throws KettleException {
 		try{
 			outputField  = rep.getStepAttributeString(id_step, "outputfield"); //$NON-NLS-1$
+			nameOntology  = rep.getStepAttributeString(id_step, "nameontology"); //$NON-NLS-1$
 		}
 		catch(Exception e){
 			throw new KettleException("Unable to load step from repository", e);
@@ -285,18 +328,18 @@ public class GetPropertiesOWLMeta extends BaseStepMeta implements StepMetaInterf
 		// modify the row structure and add the field this step generates  
 		row.addValueMeta(v);*/
 		// The filename...
-		ValueMetaInterface NombreOntologiaOWL = new ValueMeta("Nombre Ontologia", ValueMetaInterface.TYPE_STRING);
+		ValueMetaInterface NombreOntologiaOWL = new ValueMeta("Nombre_Ontologia", ValueMetaInterface.TYPE_STRING);
 		NombreOntologiaOWL.setOrigin(origin);
 		NombreOntologiaOWL.setLength(30);
 		row.addValueMeta(NombreOntologiaOWL);
 		// The filename...
-		ValueMetaInterface URInameOWL = new ValueMeta("URInameOWL(Subjet)", ValueMetaInterface.TYPE_STRING);
+		ValueMetaInterface URInameOWL = new ValueMeta("URInameOWL_Subjet", ValueMetaInterface.TYPE_STRING);
 		URInameOWL.setOrigin(origin);
 		URInameOWL.setLength(190);
 		row.addValueMeta(URInameOWL);
 		
 		// The filename...
-				ValueMetaInterface TypeOWL = new ValueMeta("TypeOWL(Predicade)", ValueMetaInterface.TYPE_STRING);
+				ValueMetaInterface TypeOWL = new ValueMeta("TypeOWL_Predicade", ValueMetaInterface.TYPE_STRING);
 				TypeOWL.setOrigin(origin);
 				TypeOWL.setLength(165);
 				row.addValueMeta(TypeOWL);
@@ -306,7 +349,6 @@ public class GetPropertiesOWLMeta extends BaseStepMeta implements StepMetaInterf
 				ObjectOWL.setOrigin(origin);
 				ObjectOWL.setLength(110);
 				row.addValueMeta(ObjectOWL);
-				
 
 	}
 

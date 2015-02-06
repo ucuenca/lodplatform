@@ -115,6 +115,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
@@ -188,9 +189,11 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 	private ColumnInfo fieldColumn = null;
 	private Table table;
 	private int numt = 0;
-
+	//must be included for DataBase Data Loading
+		private Button precatchDataButton;
 	private int NumRowSelected;
 	private LinkedList ListSource = new LinkedList<String>();
+	private LinkedList ListNames = new LinkedList<String>();
 
 	/**
 	 * The constructor should simply invoke super() and save the incoming meta
@@ -210,6 +213,9 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 			String sname) {
 		super(parent, (BaseStepMeta) in, transMeta, sname);
 		meta = (GetPropertiesOWLMeta) in;
+		
+		//must be included for DataBase Data Loading
+				meta.setTransMeta(transMeta);
 	}
 
 	/**
@@ -294,6 +300,46 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 		fdValName.top = new FormAttachment(wlStepname, margin);
 		wHelloFieldName.setLayoutData(fdValName);
 
+		//------------
+		
+		//must be included for DataBase Data Loading
+		precatchDataButton = new Button(shell, SWT.PUSH);
+		props.setLook(precatchDataButton);
+		precatchDataButton.setText(BaseMessages.getString(PKG, "GetPropertiesOWL.PrecatchButton.Title"));
+		precatchDataButton.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				GetPropertiesOWLData data = (GetPropertiesOWLData)meta.getStepData();
+				setDialogMetadata();
+				data.getDataLoader().setStepName("GetPropertiesOWl");
+				data.getDataLoader().setDatabaseLoad(Boolean.TRUE);
+				
+				
+		
+			
+				//data.initOAIHarvester(meta, data);
+				new Thread(new DBLoader(data)).start();
+				
+				//// timer wait to tread precatch
+				
+				long startTime = System.currentTimeMillis();
+				long elapsedTime = 0;
+
+				while (elapsedTime < 60*1000) {
+				    //perform db poll/check
+				    elapsedTime = (new Date()).getTime() - startTime;
+				}//----------------------------------
+				MessageBox dialog = 
+						  new MessageBox(shell, SWT.ICON_INFORMATION | SWT.OK);
+						dialog.setText("OK");						
+				dialog.setMessage(BaseMessages.getString(PKG,
+						"GetPropertiesOWL.PrecatchButton.Title.Ok"));   		    
+			    dialog.open();
+				dispose();
+			}
+		});
+		
+		//--------------
+		
 		// OK and cancel buttons
 		wOK = new Button(shell, SWT.PUSH);
 		wOK.setText(BaseMessages.getString(PKG, "System.Button.OK"));
@@ -349,7 +395,7 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 		table.setLayoutData(fdmitabla);
 
 		BaseStepDialog.positionBottomButtons(shell,
-				new Button[] { wOK, wCancel }, margin, table);
+				new Button[] { wOK, wCancel,precatchDataButton }, margin, table);
 		/**
 		 * fdok = new FormData(); fdok.left = new FormAttachment(wCancel,
 		 * middle); //fdok.right = new FormAttachment(100, 0);
@@ -441,6 +487,33 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 		return stepname;
 	}
 
+	
+	private class DBLoader implements Runnable {
+
+		private GetPropertiesOWLData data;
+		
+		private DBLoader(GetPropertiesOWLData data) {
+			this.data = data;
+		}
+		
+		public void run() {
+			try {
+				int x = 0;
+				while(data.getData(meta, data, true)) {
+					x++;
+				}
+				data.getDataLoader().logBasic(BaseMessages.getString(PKG,
+						"GetPropertiesOWL.Dialog.TotalRequests.Label") + x);
+			}catch(KettleException ex) {
+				ex.printStackTrace();
+				MessageBox dialog = 
+						  new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
+						dialog.setText("ERROR");						
+				dialog.setMessage(ex.getMessage());   		    
+			    dialog.open();
+			}
+		}
+	}
 	/**
 	 * This helper method puts the step configuration stored in the meta object
 	 * and puts it into the dialog controls.
@@ -451,7 +524,7 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 													// into 'data'
 		if (!data.equals("")) {
 
-			String replace = meta.getOutputField().replace("[", "");
+			String replace = data.replace("[", "");
 			String replace1 = replace.replace("]", "");
 			ArrayList<String> myList = new ArrayList<String>(
 					Arrays.asList(replace1.split(",")));
@@ -464,7 +537,7 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 				item.setText(1, myList.get(i).toString());
 				// --
 				Pattern pat = Pattern.compile("^http://.*");
-				Matcher mat = pat.matcher(myList.get(i).toString());
+				Matcher mat = pat.matcher(myList.get(i).toString().trim());
 				if (mat.matches()) { // entonces es una uri
 					item.setText(2, BaseMessages.getString(PKG,
 							"GetPropertiesOWL.FieldName.mt2"));
@@ -474,7 +547,7 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 				}
 				// --
 
-				wHelloFieldName.setText(myList.get(i).toString());
+				//wHelloFieldName.setText(myList.get(i).toString());
 			}// fin for
 		}// fin if
 			// } else {
@@ -501,26 +574,9 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 	 * Called when the user confirms the dialog
 	 */
 	private void ok() {
-	
-		if (numt>0){ //validacion
-		for (int i = 0; i < this.numt; i++) {
-
-			TableItem miti = table.getItem(i);
-			ListSource.add(miti.getText(1));
-
-
-			// JOptionPane.showMessageDialog(null, ListSource.get(i));
-			// meta.setOutputField(ListSource.get(i).toString()); //para que
-			// tome solo la seleccionada
-
-		}
-		meta.setOutputField(ListSource.toString());
-		meta.setListSourcetoProcess(ListSource);
-		// meta.setOutputField(ListSource.get(i)); //para que tome solo la
-		// seleccionada
-
-		
-		}//fin if
+	if (numt>0){ //validar exitan datos
+		this.setDialogMetadata();
+	}
 		dispose();
 	}
 
@@ -534,6 +590,7 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 			item.setText(0, String.valueOf(numt));
 			item.setText(1, dialog.getFilterPath() + "/" + dialog.getFileName());
 			item.setText(2, BaseMessages.getString(PKG, "GetPropertiesOWL.FieldName.mt3"));
+			setNameOnto(dialog.getFilterPath() + "/" + dialog.getFileName(),numt);
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.toString(), e);
 		}
@@ -595,7 +652,7 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 					item.setText(1, wHelloFieldName.getText());
 					item.setText(2, BaseMessages.getString(PKG,
 							"GetPropertiesOWL.FieldName.mt2"));
-	
+					setNameOnto(wHelloFieldName.getText(),numt); //para guardar el nombre y no la busqueda
 			} else {  // NO ES UNA URI completa por ejemplo solo bibo 
 		
 				String myresult = ConsultUri(wHelloFieldName.getText());// search
@@ -607,6 +664,7 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 					item.setText(1, myresult);
 					item.setText(2, BaseMessages.getString(PKG,
 							"GetPropertiesOWL.FieldName.mt2"));
+					setNameOnto(wHelloFieldName.getText(),numt); //para guardar el nombre y no la busqueda
 				}else { // solo aqui es el error pues si es una noUri como bibo que no se valida
 					
 					MessageBox dialog = 
@@ -622,11 +680,18 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 				}
 				
 				
+				
 
 			}// fin si no es una uri
 
 		}
 	}// fin add URI
+
+	private void setNameOnto(String myresult,int numt) {
+		ListNames.add(numt);
+		ListNames.add(myresult);
+		
+	}
 
 	/** to load URI from Web */
 	private String ConsultUri(String mysearching) {
@@ -717,6 +782,33 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 			table.remove(NumRowSelected);
 			numt--;
 		}
+	}
+	private void setDialogMetadata() {
+		LinkedList ListFinal = new LinkedList<String>();
+
+		meta.setStepName("GetPropertiesOWl");
+		for (int i = 0; i < this.numt; i++) {
+
+			TableItem miti = table.getItem(i);
+			ListSource.add(miti.getText(1));
+
+
+		}
+		meta.setOutputField(ListSource.toString());
+		ListFinal=ListSource; //reemplazmos solos los nombres donde de ontologias es necesario
+		int k=0;
+		for (int i = 0; i < ListNames.size(); i=i+2) { //si es cero no hay nada que reemplazar
+			k=(Integer)ListNames.get(i);
+				//remplaza posicion valor
+				
+				ListFinal.set((Integer)ListNames.get(i)-1,ListNames.get(i+1)) ;
+				
+
+
+		}
+		
+		
+		meta.setNameOntology(ListFinal.toString());
 	}
 
 }

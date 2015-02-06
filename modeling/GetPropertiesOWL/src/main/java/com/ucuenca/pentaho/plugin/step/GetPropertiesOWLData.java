@@ -22,9 +22,13 @@
 
 package com.ucuenca.pentaho.plugin.step;
 
+import org.pentaho.di.core.exception.KettleException;
+import org.pentaho.di.core.logging.LogChannelInterface;
 import org.pentaho.di.core.row.RowMetaInterface;
+import org.pentaho.di.i18n.BaseMessages;
 import org.pentaho.di.trans.step.BaseStepData;
 import org.pentaho.di.trans.step.StepDataInterface;
+import org.pentaho.di.trans.step.StepMetaInterface;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
@@ -42,7 +46,11 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
+import java.util.StringTokenizer;
 
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntClass;
@@ -59,6 +67,8 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 
 
+import com.ucuenca.misctools.StepDataLoader;
+import com.ucuenca.misctools.DatabaseLoader;
 
 /**
  * This class is part of the demo step plug-in implementation.
@@ -83,12 +93,251 @@ import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 public class GetPropertiesOWLData extends BaseStepData implements StepDataInterface {
 
 	public RowMetaInterface outputRowMeta;
+	
+	
 	//public OntModel model;
 	public OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+	// must be included for DataBase Data Loading
+		public static final String DBTABLE = "GetProperDATA";
+		private static Class<?> PKG = GetPropertiesOWLMeta.class; 
+		private final StepDataLoader dataLoader = new StepDataLoader(DBTABLE);
+		// End Database Data Loading attributes
+		
+		protected LogChannelInterface log;
+		public boolean first;
+		int ii = 0;
+		
+	public StepDataLoader getDataLoader() {
+		return this.dataLoader;
+	}
 	
     public GetPropertiesOWLData()
 	{
 		super();
 	}
+    public void logError(String message) {
+		log.logError(message);
+	}
+    
+	public boolean getData(StepMetaInterface smi, StepDataInterface sdi,
+			Boolean databaseLoad) throws KettleException  {
+
+		// safely cast the step settings (meta) and runtime info (data) to
+		// specific implementations
+		GetPropertiesOWLMeta meta = (GetPropertiesOWLMeta) smi;
+		GetPropertiesOWLData data = (GetPropertiesOWLData) sdi;
+		
+		//validacion lleguen los datos 
+		if(meta.getOutputField()==null||meta.getOutputField()=="[]"){
+			dataLoader.logBasic(BaseMessages.getString(PKG,"GetPropertiesOWL.FieldName.Label"));
+			
+			return false;
+		}else{
+		dataLoader.logBasic("input are  "+ meta.getOutputField());
+		}
+		// must be included for DataBase Data Loading
+		//data.outputRowMeta = data.outputRowMeta == null ? 
+		//dataLoader.getMetaFieldsDef(smi):data.outputRowMeta;
+		data.outputRowMeta = data.outputRowMeta == null ? 
+		dataLoader.getMetaFieldsDef(smi):data.outputRowMeta;
+		
+		Object[] outputRow = new Object[data.outputRowMeta.size() + 3];
+				
+				
+		if (databaseLoad){
+			try {
+				DatabaseLoader.getConnection();
+			} catch (Exception e) {
+				
+				logError("Error in Database Loader "+e.getMessage());
+			}
+		}	
+		
+		boolean repetir = true;
+
+
+		List<String> myList;
+		List<String> myListNames;
+		myList = cleanspaces(meta.getOutputField());
+		myListNames = cleanspaces(meta.getNameOntology());
+		String nameontology = cleanSlash(myListNames.get(ii).toString());
+		// JOptionPane.showMessageDialog(null, myList.size());
+		// for (int ii = 0; ii < myList.size(); ii++) {
+		// data.model.read(meta.getOutputField().toString()); // here i load
+		// model from ontology
+		// data.model.removeAll();
+		// System.out.println(myList.get(ii));
+		
+		try {
+
+			data.model.read(myList.get(ii));
+			dataLoader.logBasic("the load model is ok");
+		} catch (Exception eox) {
+			logError("Unload model from URI [" + eox.getMessage()
+					+ "] because of an error: " + eox.toString());
+
+		}
+
+		
+		if (data.model.isEmpty()) { // par a ver si esta cargado el modelo
+			// setOutputDone();
+			return false;
+			// the "first" flag is inherited from the base step implementation
+		}
+
+
+		if (first) { // all ok for the momento
+			first = false;
+		}
+
+		
+		if (!data.model.isEmpty()) {
+			for (Iterator<OntClass> i = data.model.listClasses(); i.hasNext();) {
+				OntClass cls = i.next();
+				if(!i.hasNext()){dataLoader.logBasic("there are clases");}
+				if (cls.getLocalName() != null) { // Para que no se recorran
+													// clases vacias
+
+					// outputRow[0]=cls.getURI()+" "+cls.getLocalName();//para
+					// que salgan los nombres
+					// System.out.println(cls.getNameSpace());
+					// outputRow[0] = "Ontologia" + myList.get(ii);
+
+					dataLoader.sequence++;
+					int dataIndex = databaseLoad ? 3:0; 
+					outputRow[dataIndex] = nameontology;
+					outputRow[dataIndex+1] = cls.getURI();
+					outputRow[dataIndex+2] = "rdf:type";
+					outputRow[dataIndex+3] = "rdfs:class";
+/**
+					outputRow[0] = nameontology;
+					outputRow[1] = cls.getURI();
+					outputRow[2] = "rdf:type";
+					outputRow[3] = "rdfs:class";
+*/
+					if (databaseLoad) {
+						if(!i.hasNext()){dataLoader.logBasic("to database is true");}
+						
+						outputRow[0] = meta.getTransMeta().getName().toUpperCase();
+						outputRow[1] = meta.getStepName().toUpperCase();
+						outputRow[2] = Integer.valueOf(dataLoader.sequence);
+						
+						try {
+							dataLoader.insertTableRow(smi, outputRow);
+						} catch (Exception e) {
+							
+							logError("Error in dataLoader.insertTableRow" + e.getMessage()) ;
+						}
+					} else {
+						
+						dataLoader.getBaseStep().putRow(data.outputRowMeta,outputRow);
+						// // put the row to the output row stream
+						// putRow(data.outputRowMeta, outputRow);
+					}
+
+				}
+			}// end for to search classes
+
+			// to search properties
+			for (Iterator<OntProperty> j = data.model.listAllOntProperties(); j
+					.hasNext();) {
+				if(!j.hasNext()){dataLoader.logBasic("there are properties");}
+				OntProperty proper = j.next();
+				if (proper.getLocalName() != null) {
+					dataLoader.sequence++;
+					int dataIndex = databaseLoad ? 3:0; 
+					outputRow[dataIndex] = nameontology;
+					outputRow[dataIndex+1] = proper.getURI();
+					outputRow[dataIndex+2] = "rdf:type";
+					outputRow[dataIndex+3] = "rdfs:property";
+					/**
+					dataLoader.sequence++;
+					outputRow[0] = nameontology;
+					outputRow[1] = proper.getURI();
+					outputRow[2] = "rdf:type";
+					outputRow[3] = "rdfs:property";**/
+					if (databaseLoad) {
+						
+						if(!j.hasNext()){dataLoader.logBasic("to database is true");}
+						outputRow[0] = meta.getTransMeta().getName().toUpperCase();
+						outputRow[1] = meta.getStepName().toUpperCase();
+						outputRow[2] = Integer.valueOf(dataLoader.sequence);
+						try {
+							dataLoader.insertTableRow(smi, outputRow);
+						} catch (Exception e) {
+
+							logError("Error in dataLoader.inserTableRow"+e.getMessage());
+						}
+					} else {
+					
+						
+						dataLoader.getBaseStep().putRow(data.outputRowMeta,outputRow);
+						
+						
+						// // put the row to the output row stream
+						// putRow(data.outputRowMeta, outputRow);
+					}
+				}
+			}
+		}// fin comprobacion
+
+		// }// fin del for
+		ii++;
+		if (ii >= myList.size()) {
+			repetir = false;
+			if(databaseLoad) // to close theconnection
+				try {
+					DatabaseLoader.closeConnection();
+				} catch (Exception e) {
+					logError("Error when DatabaseLoader.closeConnection() "+e.getMessage());
+					
+				}
+		}
+
+
+
+		// indicate that processRow() should be called again
+		return repetir;// to do it only one time
+
+	}
+	 public List<String> cleanspaces(String limpiar){
+			
+			//logError("nameontology "+meta.getNameOntology());
+			String replace = limpiar.replace("[", "");
+			
+			String replace1 = replace.replace("]", "");
+
+			String replace2 = replace1.replaceAll("\\s+", "");
+
+			List<String> myList = new ArrayList<String>(Arrays.asList(replace2
+					.split(",")));
+
+			
+			return myList;
+	 }
+	 
+	 public String cleanSlash(String limpiar){
+		 String nameontology = null;
+		 StringTokenizer st2 = new StringTokenizer(limpiar.toString(),
+					"/");
+			int nutok = st2.countTokens();
+			int cont = 0;
+
+			while (st2.hasMoreTokens()) {
+
+				nameontology = st2.nextToken();
+				if (cont == nutok - 2) {
+					nameontology = st2.nextToken();
+					break;
+				}
+				;
+				cont++;
+			}
+		 
+		 return nameontology;
+	 }
+    
+    
+    
 }
 	
