@@ -320,7 +320,7 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 				new Thread(new DBLoader(data)).start();
 				
 				//// timer wait to tread precatch
-				
+				/**
 				long startTime = System.currentTimeMillis();
 				long elapsedTime = 0;
 
@@ -328,13 +328,14 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 				    //perform db poll/check
 				    elapsedTime = (new Date()).getTime() - startTime;
 				}//----------------------------------
+				*/
 				MessageBox dialog = 
 						  new MessageBox(shell, SWT.ICON_INFORMATION | SWT.OK);
 						dialog.setText("OK");						
 				dialog.setMessage(BaseMessages.getString(PKG,
 						"GetPropertiesOWL.PrecatchButton.Title.Ok"));   		    
 			    dialog.open();
-				dispose();
+				//dispose();
 			}
 		});
 		
@@ -522,7 +523,7 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 
 		String data = meta.getOutputField().trim();// read contents of text area
 													// into 'data'
-		if (!data.equals("")) {
+		if ((!data.equals(""))&&(!data.equals("[]"))) {
 
 			String replace = data.replace("[", "");
 			String replace1 = replace.replace("]", "");
@@ -574,7 +575,7 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 	 * Called when the user confirms the dialog
 	 */
 	private void ok() {
-	if (numt>0){ //validar exitan datos
+	if (numt>=0){ //validar exitan datos
 		this.setDialogMetadata();
 	}
 		dispose();
@@ -785,7 +786,16 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 	}
 	private void setDialogMetadata() {
 		LinkedList ListFinal = new LinkedList<String>();
-
+		if (numt==0){  // la tabla esta vacia 
+			ListSource.clear();  
+			ListFinal.clear();
+			meta.setStepName("GetPropertiesOWl");
+			meta.setOutputField(ListSource.toString());
+			meta.setNameOntology(ListFinal.toString());
+		}else {
+			ListSource.clear();  //borrar la lista antes de crear 
+		
+		
 		meta.setStepName("GetPropertiesOWl");
 		for (int i = 0; i < this.numt; i++) {
 
@@ -795,7 +805,7 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 
 		}
 		meta.setOutputField(ListSource.toString());
-		ListFinal=ListSource; //reemplazmos solos los nombres donde de ontologias es necesario
+		ListFinal=ListSource; //reemplazamos solos los nombres donde de ontologias es necesario
 		int k=0;
 		for (int i = 0; i < ListNames.size(); i=i+2) { //si es cero no hay nada que reemplazar
 			k=(Integer)ListNames.get(i);
@@ -809,6 +819,9 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 		
 		
 		meta.setNameOntology(ListFinal.toString());
+		}//fin if
+		
+		
 	}
 
 }
