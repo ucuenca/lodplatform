@@ -157,16 +157,18 @@ public class GetPropertiesOWLData extends BaseStepData implements StepDataInterf
 
 
 		List<String> myList;
-		List<String> myListNames;
+
 		myList = cleanspaces(meta.getOutputField());
-		myListNames = cleanspaces(meta.getNameOntology());
-		String nameontology = cleanSlash(myListNames.get(ii).toString());
-		// JOptionPane.showMessageDialog(null, myList.size());
-		// for (int ii = 0; ii < myList.size(); ii++) {
-		// data.model.read(meta.getOutputField().toString()); // here i load
-		// model from ontology
-		// data.model.removeAll();
-		// System.out.println(myList.get(ii));
+
+		String mn = meta.getNameOntology();
+		
+		 String replace = mn.trim().replace("[", "");
+		 String replace1 = replace.replace("]", "");
+		ArrayList<String> myListNames = new ArrayList<String>(
+				Arrays.asList(replace1.split(",")));
+		
+		String nameontology = myListNames.get(ii).toString();
+
 		
 		try {
 

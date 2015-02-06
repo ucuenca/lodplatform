@@ -227,7 +227,7 @@ public class GetPropertiesOWLMeta extends BaseStepMeta implements StepMetaInterf
 
 	    retval.append( "    " ).append( XMLHandler.addTagValue("outputfield", outputField));
 	    retval.append( "    " ).append( XMLHandler.addTagValue( "nameontology", nameOntology));
-
+	    retval.append( "    " ).append( XMLHandler.addTagValue( "stepname", stepName));
 		return retval.toString();
 	}
 
@@ -246,7 +246,7 @@ public class GetPropertiesOWLMeta extends BaseStepMeta implements StepMetaInterf
 		try {
 			setOutputField(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "outputfield")));
 			setNameOntology(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "nameontology")));
-		
+			setStepName(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "stepname")));
 			
 		} catch (Exception e) {
 			throw new KettleXMLException("GetPropertiesOWL unable to read step info from XML node", e);
@@ -265,6 +265,7 @@ public class GetPropertiesOWLMeta extends BaseStepMeta implements StepMetaInterf
 	{
 		try{
 			rep.saveStepAttribute(id_transformation, id_step, "nameontology", nameOntology); //$NON-NLS-1$
+			rep.saveStepAttribute(id_transformation, id_step, "stepname", stepName); //$NON-NLS-1$
 			rep.saveStepAttribute(id_transformation, id_step, "outputfield", outputField); //$NON-NLS-1$
 			
 		}
@@ -286,6 +287,7 @@ public class GetPropertiesOWLMeta extends BaseStepMeta implements StepMetaInterf
 		try{
 			outputField  = rep.getStepAttributeString(id_step, "outputfield"); //$NON-NLS-1$
 			nameOntology  = rep.getStepAttributeString(id_step, "nameontology"); //$NON-NLS-1$
+			stepName  = rep.getStepAttributeString(id_step, "stepName");
 		}
 		catch(Exception e){
 			throw new KettleException("Unable to load step from repository", e);
