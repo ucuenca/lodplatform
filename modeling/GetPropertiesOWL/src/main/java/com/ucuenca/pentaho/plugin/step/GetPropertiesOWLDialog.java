@@ -277,6 +277,31 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 
 		// Stepname line
 
+		//---------------------
+		
+		// Stepname line
+		wlStepname = new Label(shell, SWT.RIGHT);
+		wlStepname
+				.setText(BaseMessages.getString(PKG, "System.Label.StepName"));
+		props.setLook(wlStepname);
+		fdlStepname = new FormData();
+		fdlStepname.left = new FormAttachment(0, 0);		
+		fdlStepname.top = new FormAttachment(0, margin);
+		fdlStepname.right = new FormAttachment(middle, -margin);
+		wlStepname.setLayoutData(fdlStepname);
+
+		wStepname = new Text(shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
+		wStepname.setText("");
+		props.setLook(wStepname);
+		wStepname.addModifyListener(lsMod);
+		fdStepname = new FormData();
+		fdStepname.left = new FormAttachment(middle, 0);
+		fdStepname.top = new FormAttachment(0, margin);
+		fdStepname.right = new FormAttachment(100, 0);
+		wStepname.setLayoutData(fdStepname);
+		//------------------
+		
+		
 		// output field value
 		Label wlValName = new Label(shell, SWT.RIGHT);
 		wlValName.setText(BaseMessages.getString(PKG,
@@ -285,8 +310,8 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 		FormData fdlValName = new FormData();
 		fdlValName.left = new FormAttachment(0, 0);
 		fdlValName.right = new FormAttachment(middle, -margin);
-		// fdlValName.top = new FormAttachment(wStepname, margin);
-		fdlValName.top = new FormAttachment(wlStepname, margin);
+		 fdlValName.top = new FormAttachment(wStepname, margin);
+		//fdlValName.top = new FormAttachment(10, margin);
 
 		wlValName.setLayoutData(fdlValName);
 
@@ -295,9 +320,8 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 		wHelloFieldName.addModifyListener(lsMod);
 		FormData fdValName = new FormData();
 		fdValName.left = new FormAttachment(middle, 0);
-		fdValName.right = new FormAttachment(100, 0);
-		// fdValName.top = new FormAttachment(wStepname, margin);
-		fdValName.top = new FormAttachment(wlStepname, margin);
+		fdValName.right = new FormAttachment(100, 0);	
+		fdValName.top = new FormAttachment(wlStepname, margin+10);
 		wHelloFieldName.setLayoutData(fdValName);
 
 		//------------
@@ -370,7 +394,9 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 		String[] titles = {
 				BaseMessages.getString(PKG, "GetPropertiesOWL.FieldName.col1"),
 				BaseMessages.getString(PKG, "GetPropertiesOWL.FieldName.col2"),
-				BaseMessages.getString(PKG, "GetPropertiesOWL.FieldName.col3") };
+				BaseMessages.getString(PKG, "GetPropertiesOWL.FieldName.col3"),
+				BaseMessages.getString(PKG, "GetPropertiesOWL.FieldName.col4")
+		};
 		for (int i = 0; i < titles.length; i++) {
 			TableColumn column = new TableColumn(table, SWT.NONE);
 			column.setText(titles[i]);
@@ -530,25 +556,34 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 			ArrayList<String> myList = new ArrayList<String>(
 					Arrays.asList(replace1.split(",")));
 
-			// ListSource = meta.getListSourcetoProcess();
+			// ---------------------listanombres
+			 replace = meta.getNameOntology().trim().replace("[", "");
+			 replace1 = replace.replace("]", "");
+			ArrayList<String> myListNames = new ArrayList<String>(
+					Arrays.asList(replace1.split(",")));
+
+			
+			
+			//---------------------------
 
 			for (int i = 0; i < myList.size(); i++) {
 				TableItem item = new TableItem(table, SWT.NONE, numt++);
 				item.setText(0, String.valueOf(numt));
-				item.setText(1, myList.get(i).toString());
+				item.setText(1, myListNames.get(i).toString());
+				item.setText(2, myList.get(i).toString());
 				// --
 				Pattern pat = Pattern.compile("^http://.*");
 				Matcher mat = pat.matcher(myList.get(i).toString().trim());
 				if (mat.matches()) { // entonces es una uri
-					item.setText(2, BaseMessages.getString(PKG,
+					item.setText(3, BaseMessages.getString(PKG,
 							"GetPropertiesOWL.FieldName.mt2"));
 				} else {
-					item.setText(2, BaseMessages.getString(PKG,
+					item.setText(3, BaseMessages.getString(PKG,
 							"GetPropertiesOWL.FieldName.mt3"));
 				}
 				// --
+				wStepname.setText(meta.getStepName());
 
-				//wHelloFieldName.setText(myList.get(i).toString());
 			}// fin for
 		}// fin if
 			// } else {
@@ -589,8 +624,9 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 			String result = dialog.open();
 			TableItem item = new TableItem(table, SWT.NONE, numt++);
 			item.setText(0, String.valueOf(numt));
-			item.setText(1, dialog.getFilterPath() + "/" + dialog.getFileName());
-			item.setText(2, BaseMessages.getString(PKG, "GetPropertiesOWL.FieldName.mt3"));
+			item.setText(1, dialog.getFileName());  //nombre del archivo
+			item.setText(2, dialog.getFilterPath() + "/" + dialog.getFileName());
+			item.setText(3, BaseMessages.getString(PKG, "GetPropertiesOWL.FieldName.mt3"));
 			setNameOnto(dialog.getFilterPath() + "/" + dialog.getFileName(),numt);
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.toString(), e);
@@ -644,26 +680,15 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 			Pattern pat = Pattern.compile("^http.*");
 			Matcher mat = pat.matcher(wHelloFieldName.getText());
 			
-			if (mat.matches()) { // entonces es una uri completa directa , no necesito usar prefix ej  http://iflastandards.info/ns/fr/frbr/frbrer/
-				
-                
-				
-				TableItem item = new TableItem(table, SWT.NONE, numt++);
-					item.setText(0, String.valueOf(numt));
-					item.setText(1, wHelloFieldName.getText());
-					item.setText(2, BaseMessages.getString(PKG,
-							"GetPropertiesOWL.FieldName.mt2"));
-					setNameOnto(wHelloFieldName.getText(),numt); //para guardar el nombre y no la busqueda
-			} else {  // NO ES UNA URI completa por ejemplo solo bibo 
-		
-				String myresult = ConsultUri(wHelloFieldName.getText());// search
+		String myresult = ConsultUri(wHelloFieldName.getText().trim());// search
 				// in
 
 				if (myresult != null) {
 					TableItem item = new TableItem(table, SWT.NONE, numt++);
 					item.setText(0, String.valueOf(numt));
-					item.setText(1, myresult);
-					item.setText(2, BaseMessages.getString(PKG,
+					item.setText(1, wHelloFieldName.getText().trim());
+					item.setText(2, myresult);
+					item.setText(3, BaseMessages.getString(PKG,
 							"GetPropertiesOWL.FieldName.mt2"));
 					setNameOnto(wHelloFieldName.getText(),numt); //para guardar el nombre y no la busqueda
 				}else { // solo aqui es el error pues si es una noUri como bibo que no se valida
@@ -683,7 +708,7 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 				
 				
 
-			}// fin si no es una uri
+	
 
 		}
 	}// fin add URI
@@ -785,40 +810,22 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 		}
 	}
 	private void setDialogMetadata() {
-		LinkedList ListFinal = new LinkedList<String>();
-		if (numt==0){  // la tabla esta vacia 
-			ListSource.clear();  
-			ListFinal.clear();
-			meta.setStepName("GetPropertiesOWl");
-			meta.setOutputField(ListSource.toString());
-			meta.setNameOntology(ListFinal.toString());
-		}else {
-			ListSource.clear();  //borrar la lista antes de crear 
-		
+		ListSource.clear();  
+		ListNames.clear();
+		if (numt>0){ 
 		
 		meta.setStepName("GetPropertiesOWl");
 		for (int i = 0; i < this.numt; i++) {
 
 			TableItem miti = table.getItem(i);
-			ListSource.add(miti.getText(1));
-
+			ListSource.add(miti.getText(2));
+			ListNames.add(miti.getText(1));
 
 		}
+		meta.setStepName(wStepname.getText().toUpperCase());
 		meta.setOutputField(ListSource.toString());
-		ListFinal=ListSource; //reemplazamos solos los nombres donde de ontologias es necesario
-		int k=0;
-		for (int i = 0; i < ListNames.size(); i=i+2) { //si es cero no hay nada que reemplazar
-			k=(Integer)ListNames.get(i);
-				//remplaza posicion valor
-				
-				ListFinal.set((Integer)ListNames.get(i)-1,ListNames.get(i+1)) ;
-				
-
-
-		}
-		
-		
-		meta.setNameOntology(ListFinal.toString());
+		meta.setNameOntology(ListNames.toString());
+	
 		}//fin if
 		
 		
