@@ -282,7 +282,7 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 		// Stepname line
 		wlStepname = new Label(shell, SWT.RIGHT);
 		wlStepname
-				.setText(BaseMessages.getString(PKG, "System.Label.StepName"));
+				.setText(BaseMessages.getString(PKG, "System.Label.StepNameLabel"));
 		props.setLook(wlStepname);
 		fdlStepname = new FormData();
 		fdlStepname.left = new FormAttachment(0, 0);		
@@ -291,7 +291,7 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 		wlStepname.setLayoutData(fdlStepname);
 
 		wStepname = new Text(shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
-		wStepname.setText("");
+		wStepname.setText(BaseMessages.getString(PKG, "System.Label.StepName"));
 		props.setLook(wStepname);
 		wStepname.addModifyListener(lsMod);
 		fdStepname = new FormData();
@@ -343,23 +343,6 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 				//data.initOAIHarvester(meta, data);
 				new Thread(new DBLoader(data)).start();
 				
-				//// timer wait to tread precatch
-				/**
-				long startTime = System.currentTimeMillis();
-				long elapsedTime = 0;
-
-				while (elapsedTime < 60*1000) {
-				    //perform db poll/check
-				    elapsedTime = (new Date()).getTime() - startTime;
-				}//----------------------------------
-				*/
-				MessageBox dialog = 
-						  new MessageBox(shell, SWT.ICON_INFORMATION | SWT.OK);
-						dialog.setText("OK");						
-				dialog.setMessage(BaseMessages.getString(PKG,
-						"GetPropertiesOWL.PrecatchButton.Title.Ok"));   		    
-			    dialog.open();
-				//dispose();
 			}
 		});
 		
@@ -546,9 +529,9 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 	 * and puts it into the dialog controls.
 	 */
 	private void populateDialog() {
-
+		wStepname.selectAll();
 		String data = meta.getOutputField().trim();// read contents of text area
-													// into 'data'
+												// into 'data'
 		if ((!data.equals(""))&&(!data.equals("[]"))) {
 
 			String replace = data.replace("[", "");
@@ -561,9 +544,7 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 			 replace1 = replace.replace("]", "");
 			ArrayList<String> myListNames = new ArrayList<String>(
 					Arrays.asList(replace1.split(",")));
-
-			
-			
+	
 			//---------------------------
 
 			for (int i = 0; i < myList.size(); i++) {
@@ -582,10 +563,15 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 							"GetPropertiesOWL.FieldName.mt3"));
 				}
 				// --
-				wStepname.setText(meta.getStepName());
+				
 
 			}// fin for
+			
 		}// fin if
+		if(meta.getStepName()!=null){
+			wStepname.setText(meta.getStepName());	
+		}
+		
 			// } else {
 			// wHelloFieldName.setText(BaseMessages.getString(PKG,
 			// "GetPropertiesOWL.FieldName.MensajeInicio"));
@@ -610,6 +596,7 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 	 * Called when the user confirms the dialog
 	 */
 	private void ok() {
+
 	if (numt>=0){ //validar exitan datos
 		this.setDialogMetadata();
 	}
@@ -814,7 +801,7 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 		ListNames.clear();
 		if (numt>0){ 
 		
-		meta.setStepName("GetPropertiesOWl");
+		
 		for (int i = 0; i < this.numt; i++) {
 
 			TableItem miti = table.getItem(i);
@@ -822,12 +809,13 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 			ListNames.add(miti.getText(1));
 
 		}
-		meta.setStepName(wStepname.getText().toUpperCase());
+		
 		meta.setOutputField(ListSource.toString());
 		meta.setNameOntology(ListNames.toString());
 	
 		}//fin if
-		
+		stepname = wStepname.getText(); //set name in the spoon
+		meta.setStepName(wStepname.getText());
 		
 	}
 
