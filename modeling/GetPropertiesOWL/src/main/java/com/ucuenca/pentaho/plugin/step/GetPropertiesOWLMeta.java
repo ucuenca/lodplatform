@@ -330,24 +330,28 @@ public class GetPropertiesOWLMeta extends BaseStepMeta implements StepMetaInterf
 		// modify the row structure and add the field this step generates  
 		row.addValueMeta(v);*/
 		// The filename...
-		ValueMetaInterface NombreOntologiaOWL = new ValueMeta("Nombre_Ontologia", ValueMetaInterface.TYPE_STRING);
+		ValueMetaInterface NombreOntologiaOWL = new ValueMeta(BaseMessages.getString(PKG,
+				"GetPropertiesOWL.Result.col1"), ValueMetaInterface.TYPE_STRING);
 		NombreOntologiaOWL.setOrigin(origin);
 		NombreOntologiaOWL.setLength(30);
 		row.addValueMeta(NombreOntologiaOWL);
 		// The filename...
-		ValueMetaInterface URInameOWL = new ValueMeta("URInameOWL_Subjet", ValueMetaInterface.TYPE_STRING);
+		ValueMetaInterface URInameOWL = new ValueMeta(BaseMessages.getString(PKG,
+				"GetPropertiesOWL.Result.col2"), ValueMetaInterface.TYPE_STRING);
 		URInameOWL.setOrigin(origin);
 		URInameOWL.setLength(190);
 		row.addValueMeta(URInameOWL);
 		
 		// The filename...
-				ValueMetaInterface TypeOWL = new ValueMeta("TypeOWL_Predicade", ValueMetaInterface.TYPE_STRING);
+				ValueMetaInterface TypeOWL = new ValueMeta(BaseMessages.getString(PKG,
+						"GetPropertiesOWL.Result.col3"), ValueMetaInterface.TYPE_STRING);
 				TypeOWL.setOrigin(origin);
 				TypeOWL.setLength(165);
 				row.addValueMeta(TypeOWL);
 				
 				// The filename...
-			ValueMetaInterface ObjectOWL = new ValueMeta("ObjectOWL", ValueMetaInterface.TYPE_STRING);
+			ValueMetaInterface ObjectOWL = new ValueMeta(BaseMessages.getString(PKG,
+					"GetPropertiesOWL.Result.col4"), ValueMetaInterface.TYPE_STRING);
 				ObjectOWL.setOrigin(origin);
 				ObjectOWL.setLength(110);
 				row.addValueMeta(ObjectOWL);

@@ -805,8 +805,9 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 		for (int i = 0; i < this.numt; i++) {
 
 			TableItem miti = table.getItem(i);
-			ListSource.add(miti.getText(2));
 			ListNames.add(miti.getText(1));
+			ListSource.add(miti.getText(2));
+
 
 		}
 		
