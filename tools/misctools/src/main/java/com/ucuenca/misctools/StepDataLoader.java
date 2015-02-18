@@ -104,9 +104,7 @@ public class StepDataLoader {
 			tableFields = new LinkedHashMap<String, String>();
 			tableFields.put("TRANSID", "VARCHAR(50)");
 			tableFields.put("STEPID", "VARCHAR(50)");
-			tableFields.put("SEQUENCE", "INTEGER");
-			List<String> pk = new ArrayList<String>();
-			pk.add("TRANSID"); 
+			tableFields.put("SEQUENCE", "INTEGER"); 
 			if(outputRowMeta == null) this.getMetaFieldsDef(smi);
 			for(ValueMetaInterface fieldMeta:outputRowMeta.getValueMetaList()) {
 				String fieldName = fieldMeta.getName().toUpperCase().replaceAll(" ", "_");
