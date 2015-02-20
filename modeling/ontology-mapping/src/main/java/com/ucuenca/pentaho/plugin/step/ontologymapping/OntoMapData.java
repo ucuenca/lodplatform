@@ -22,17 +22,32 @@
 
 package com.ucuenca.pentaho.plugin.step.ontologymapping;
 
+import java.sql.ResultSet;
 import java.text.DateFormatSymbols;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.lang.ArrayUtils;
+import org.eclipse.swt.widgets.TableItem;
 import org.pentaho.di.core.RowMetaAndData;
+import org.pentaho.di.core.RowSet;
+import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.core.row.RowMetaInterface;
+import org.pentaho.di.core.row.ValueMetaInterface;
 import org.pentaho.di.trans.step.BaseStepData;
 import org.pentaho.di.trans.step.StepDataInterface;
+import org.pentaho.di.trans.step.StepMetaInterface;
+import org.pentaho.di.ui.core.widget.ColumnInfo;
+import org.pentaho.di.ui.core.widget.TableView;
 
+import com.ucuenca.misctools.DatabaseLoader;
+import com.ucuenca.misctools.StepDataLoader;
 import com.ucuenca.pentaho.plugin.step.ontologymapping.rdf.Entity;
 
 /**
@@ -56,6 +71,11 @@ import com.ucuenca.pentaho.plugin.step.ontologymapping.rdf.Entity;
  *   
  */
 public class OntoMapData extends BaseStepData implements StepDataInterface {
+	
+	public Object[] ontologies, data;
+	public RowMetaInterface ontologiesMeta, dataMeta;
+    public RowSet ontologiesRowSet;
+    public RowSet dataRowSet;
 
 	public RowMetaInterface outputRowMeta;
 	
@@ -69,6 +89,16 @@ public class OntoMapData extends BaseStepData implements StepDataInterface {
 	  public boolean firstRow;
 	  
 	  public Entity<String, String> entity;
+	  
+	//must be included for DataBase Data Loading
+		public static final String CLASSIFICATIONTABLE = "CLASSMAPPING";
+		public static final String ANNOTATIONTABLE = "ANNOTATIONMAPPING";
+		public static final String RELATIONTABLE = "RELATIONMAPPING";
+		//private final StepDataLoader dataLoader = new StepDataLoader(DBTABLE);
+		//End Database Data Loading attributes
+		
+		private String transName;
+		private String stepName;
 	
     public OntoMapData()
 	{    	
@@ -79,5 +109,113 @@ public class OntoMapData extends BaseStepData implements StepDataInterface {
 	    daf = new SimpleDateFormat();
 	    dafs = new DateFormatSymbols();
 	}
+    
+    
+    
+    public String getTransName() {
+		return transName;
+	}
+
+
+
+	public void setTransName(String transName) {
+		this.transName = transName;
+	}
+
+
+
+	public String getStepName() {
+		return stepName;
+	}
+
+
+
+	public void setStepName(String stepName) {
+		this.stepName = stepName;
+	}
+
+
+
+	public void saveTable(TableView table, String tableName)throws Exception {
+    	ColumnInfo[] columns = table.getColumns();
+    	Map<String, String> tableFields = new LinkedHashMap<String, String>();
+    	tableFields.put("TRANSID", "VARCHAR(50)");
+		tableFields.put("STEPID", "VARCHAR(50)");
+    	for(ColumnInfo column:columns) tableFields.put(column.getName().toUpperCase().replaceAll(" ", "_"), "VARCHAR(100)");
+    	tableFields.put("PRIMARY KEY", "(TRANSID, STEPID, "+ columns[0].getName().toUpperCase().replaceAll(" ", "_") + ")");
+    	DatabaseLoader.createTable(tableName, tableFields);
+    	Object[] pk = new Object[]{this.getTransName(), this.getStepName()};
+    	DatabaseLoader.executeUpdate("DELETE FROM " + tableName + " WHERE TRANSID = ? AND STEPID = ?", pk);
+    	for(int i=0;i<table.getItemCount();i++) {
+    		Object[] tableValues = table.getItem(i);
+    		Object[] values = pk;
+    		values = ArrayUtils.addAll(values, tableValues);
+    		if(((String)values[2]).length() > 0) {
+	    		try {
+	    			int totalFields = values.length;
+	    			String sqlInsertion = "INSERT INTO " + tableName + " VALUES(";
+	    			while(--totalFields >= 1) sqlInsertion += "?,";
+	    			sqlInsertion += "?)";
+	    			DatabaseLoader.executeUpdate(sqlInsertion, values);
+	    		}catch(Exception e) {
+	    			throw new KettleException("ERROR EXECUTING SQL INSERT: "+ e.getMessage());
+	    		}
+    		}
+    	}
+    }
+	
+	public void queryTable(TableView tableView, String tableName)throws Exception {
+		Boolean first = Boolean.TRUE;
+    	ColumnInfo[] columns = tableView.getColumns();
+    	List<String> tableFields = new ArrayList<String>();
+    	for(ColumnInfo column:columns) tableFields.add(column.getName().toUpperCase().replaceAll(" ", "_"));
+    	Object[] pk = new Object[]{this.getTransName(), this.getStepName()};
+    	ResultSet rs = DatabaseLoader.executeQuery("SELECT " + 
+    			tableFields.toString().substring(1, tableFields.toString().length()-1) + 
+    			" FROM " + tableName + " WHERE TRANSID = ? AND STEPID = ?", pk);
+    	tableView.removeAll();
+    	int row = 0;
+    	while(rs.next()) {
+    		/*List<String> values = new ArrayList<String>();
+    		int count = 1;
+    		while(count <= tableFields.size()) {
+    			values.add(rs.getString(count));
+    			count ++;
+    		}*/
+    		if(row == 0) {
+	    		TableItem item = tableView.table.getItem( row );
+	    		int count = 1;
+	    		while(count <= tableFields.size()) {
+	    			item.setText(count, rs.getString(count));
+	    			count ++;
+	    		}
+    		} else {
+    			List<String> values = new ArrayList<String>();
+        		int count = 1;
+        		while(count <= tableFields.size()) {
+        			values.add(rs.getString(count));
+        			count ++;
+        		}
+        		tableView.add(values.toArray(new String[values.size()]));
+    		}
+    		//item.setText(values.toArray(new String[values.size()]));
+    		/*if(first) {
+    			table.getRow(0).setData(values.toArray(new String[values.size()]));
+    			first = false;
+    		} else {*/
+    			//table.add(values.toArray(new String[values.size()]));
+    		//}
+    		row++;
+    	}
+    	tableView.setRowNums();
+        tableView.optWidth( true );
+    }
+	
+	public Boolean deleteTableRecords(String tableName) throws Exception {
+    	Object[] pk = new Object[]{this.getTransName(), this.getStepName()};
+    	return DatabaseLoader.executeUpdate("DELETE FROM " + tableName 
+    			+ " WHERE TRANSID = ? AND STEPID = ?", pk);
+	}
+    
 }
 	

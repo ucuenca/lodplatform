@@ -50,9 +50,15 @@ import org.pentaho.di.trans.TransMeta;
 import org.pentaho.di.trans.step.BaseStepMeta;
 import org.pentaho.di.trans.step.StepDataInterface;
 import org.pentaho.di.trans.step.StepDialogInterface;
+import org.pentaho.di.trans.step.StepIOMeta;
+import org.pentaho.di.trans.step.StepIOMetaInterface;
 import org.pentaho.di.trans.step.StepInterface;
 import org.pentaho.di.trans.step.StepMeta;
 import org.pentaho.di.trans.step.StepMetaInterface;
+import org.pentaho.di.trans.step.errorhandling.Stream;
+import org.pentaho.di.trans.step.errorhandling.StreamIcon;
+import org.pentaho.di.trans.step.errorhandling.StreamInterface;
+import org.pentaho.di.trans.step.errorhandling.StreamInterface.StreamType;
 import org.pentaho.di.trans.steps.constant.Constant;
 import org.pentaho.di.trans.steps.constant.ConstantData;
 import org.pentaho.di.trans.steps.constant.ConstantMeta;
@@ -98,6 +104,53 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 	  private int[] fieldPrecision;
 	  /** Flag : set empty string **/
 	  private boolean[] setEmptyString;
+	  
+	  private String ontologyStepName;
+	  private String dataStepName;
+	  private String ontologyDbTable;
+	  private String dataDbTable;
+	  private String mapBaseURI;
+	  
+
+	public String getMapBaseURI() {
+		return mapBaseURI;
+	}
+
+	public void setMapBaseURI(String mapBaseURI) {
+		this.mapBaseURI = mapBaseURI;
+	}
+
+	public String getOntologyStepName() {
+		return ontologyStepName;
+	}
+
+	public void setOntologyStepName(String ontologyStepName) {
+		this.ontologyStepName = ontologyStepName;
+	}
+
+	public String getDataStepName() {
+		return dataStepName;
+	}
+
+	public void setDataStepName(String dataStepName) {
+		this.dataStepName = dataStepName;
+	}
+
+	public String getOntologyDbTable() {
+		return ontologyDbTable;
+	}
+
+	public void setOntologyDbTable(String ontologyDbTable) {
+		this.ontologyDbTable = ontologyDbTable;
+	}
+
+	public String getDataDbTable() {
+		return dataDbTable;
+	}
+
+	public void setDataDbTable(String dataDbTable) {
+		this.dataDbTable = dataDbTable;
+	}
 
 	/**
 	 * Constructor should call super() to make sure the base class has a chance to initialize properly.
@@ -347,6 +400,7 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 	public Object clone() {
 		OntoMapMeta retval = (OntoMapMeta) super.clone();
 
+		/*
 	    int nrfields = fieldName.length;
 
 	    retval.allocate( nrfields );
@@ -362,7 +416,7 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 	      retval.fieldLength[i] = fieldLength[i];
 	      retval.fieldPrecision[i] = fieldPrecision[i];
 	      retval.setEmptyString[i] = setEmptyString[i];
-	    }
+	    }*/
 
 	    return retval;
 	}
@@ -374,6 +428,7 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 	 */
 	private void readData( Node stepnode ) throws KettleXMLException {
 	    try {
+	    	/*
 	      Node fields = XMLHandler.getSubNode( stepnode, "fields" );
 	      int nrfields = XMLHandler.countNodes( fields, "field" );
 
@@ -399,6 +454,18 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 	        String emptyString = XMLHandler.getTagValue( fnode, "set_empty_string" );
 	        setEmptyString[i] = !Const.isEmpty( emptyString ) && "Y".equalsIgnoreCase( emptyString );
 	      }
+	      */
+	      List<StreamInterface> infoStreams = getStepIOMeta().getInfoStreams();
+	      infoStreams.get( 0 ).setSubject( XMLHandler.getTagValue( stepnode, "ontologiesStep" ) );
+	      infoStreams.get( 1 ).setSubject( XMLHandler.getTagValue( stepnode, "dataStep" ) );
+	      
+			this.setOntologyStepName( XMLHandler.getTagValue( stepnode, "ontologiesStep" ));
+			this.setOntologyDbTable( XMLHandler.getTagValue( stepnode, "ontologiesDBTable" ) );
+			this.setDataStepName( XMLHandler.getTagValue( stepnode, "dataStep" ) );
+			this.setDataDbTable( XMLHandler.getTagValue( stepnode, "dataDBTable" ) );
+			this.setMapBaseURI( XMLHandler.getTagValue( stepnode, "mapBaseURI" ) );
+	      
+	      
 	    } catch ( Exception e ) {
 	      throw new KettleXMLException( "Unable to load step info from XML", e );
 	    }
@@ -415,7 +482,18 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 	public String getXML() throws KettleValueException {
 		
 		StringBuffer retval = new StringBuffer( 300 );
+		/*
+		List<StreamInterface> infoStreams = getStepIOMeta().getInfoStreams();
+	    retval.append( XMLHandler.addTagValue( "ontologiesStep", infoStreams.get( 0 ).getStepname() ) );
+	    retval.append( XMLHandler.addTagValue( "dataStep", infoStreams.get( 1 ).getStepname() ) );
+		*/
+		retval.append( XMLHandler.addTagValue( "ontologiesStep", this.getOntologyStepName() ));
+		retval.append( XMLHandler.addTagValue( "ontologiesDBTable", this.getOntologyDbTable() ));
+		retval.append( XMLHandler.addTagValue( "dataStep", this.getDataStepName() ));
+		retval.append( XMLHandler.addTagValue( "dataDBTable", this.getDataStepName() ));
+		retval.append( XMLHandler.addTagValue( "mapBaseURI", this.getMapBaseURI() ));
 
+	    /*
 	    retval.append( "    <fields>" ).append( Const.CR );
 	    for ( int i = 0; i < fieldName.length; i++ ) {
 	      if ( fieldName[i] != null && fieldName[i].length() != 0 ) {
@@ -434,7 +512,7 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 	      }
 	    }
 	    retval.append( "    </fields>" ).append( Const.CR );
-
+		*/
 	    return retval.toString();
 	}
 
@@ -462,7 +540,7 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 	public void saveRep(Repository rep, ObjectId id_transformation, ObjectId id_step) throws KettleException
 	{
 		try {
-	      for ( int i = 0; i < fieldName.length; i++ ) {
+	      /*for ( int i = 0; i < fieldName.length; i++ ) {
 	        if ( fieldName[i] != null && fieldName[i].length() != 0 ) {
 	          rep.saveStepAttribute( id_transformation, id_step, i, "field_name", fieldName[i] );
 	          rep.saveStepAttribute( id_transformation, id_step, i, "field_type", fieldType[i] );
@@ -475,7 +553,22 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 	          rep.saveStepAttribute( id_transformation, id_step, i, "field_precision", fieldPrecision[i] );
 	          rep.saveStepAttribute( id_transformation, id_step, i, "set_empty_string", setEmptyString[i] );
 	        }
-	      }
+	      }*/
+	      /*
+	      List<StreamInterface> infoStreams = getStepIOMeta().getInfoStreams();
+
+	      rep.saveStepAttribute( id_transformation, id_step, "ontologiesStep", infoStreams.get( 0 ).getStepname() );
+	      rep.saveStepAttribute( id_transformation, id_step, "dataStep", infoStreams.get( 1 ).getStepname() );
+	      */
+	      rep.saveStepAttribute( id_transformation, id_step, "ontologiesStep", this.getOntologyStepName() );
+	      rep.saveStepAttribute( id_transformation, id_step, "ontologiesDBTable", this.getOntologyDbTable() );
+	      rep.saveStepAttribute( id_transformation, id_step, "dataStep", this.getDataStepName() );
+	      rep.saveStepAttribute( id_transformation, id_step, "dataDBTable", this.getDataStepName() );
+	      rep.saveStepAttribute( id_transformation, id_step, "mapBaseURI", this.getMapBaseURI() );
+
+	      
+	      
+	      
 	    } catch ( Exception e ) {
 	      throw new KettleException( "Unable to save step information to the repository for id_step=" + id_step, e );
 	    }
@@ -492,6 +585,7 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 	 */
 	public void readRep(Repository rep, ObjectId id_step, List<DatabaseMeta> databases, Map<String, Counter> counters) throws KettleException {
 		try {
+			/*
 	      int nrfields = rep.countNrStepAttributes( id_step, "field_name" );
 
 	      allocate( nrfields );
@@ -509,10 +603,42 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 	        fieldPrecision[i] = (int) rep.getStepAttributeInteger( id_step, i, "field_precision" );
 	        setEmptyString[i] = rep.getStepAttributeBoolean( id_step, i, "set_empty_string", false );
 	      }
+	      */
+			this.setOntologyStepName( rep.getStepAttributeString( id_step, "ontologiesStep" ));
+			this.setOntologyDbTable( rep.getStepAttributeString( id_step, "ontologiesDBTable" ) );
+			this.setDataStepName( rep.getStepAttributeString( id_step, "dataStep" ) );
+			this.setDataDbTable( rep.getStepAttributeString( id_step, "dataDBTable" ) );
+			this.setMapBaseURI( rep.getStepAttributeString( id_step, "mapBaseURI" ) );
+	      /*
+	      List<StreamInterface> infoStreams = getStepIOMeta().getInfoStreams();
+	      infoStreams.get( 0 ).setSubject( rep.getStepAttributeString( id_step, "ontologiesStep" ) );
+	      infoStreams.get( 1 ).setSubject( rep.getStepAttributeString( id_step, "dataStep" ) );
+	      */
 	    } catch ( Exception e ) {
 	      throw new KettleException( "Unexpected error reading step information from the repository", e );
 	    }
 	}
+	
+	/**
+	   * Returns the Input/Output metadata for this step. The generator step only produces output, does not accept input!
+	   */
+	  public StepIOMetaInterface getStepIOMeta() {
+	    if ( ioMeta == null ) {
+	
+	      ioMeta = new StepIOMeta( true, true, false, false, false, false );
+	
+	      ioMeta.addStream( new Stream( StreamType.INFO, null, BaseMessages.getString(
+	        PKG, "OntologyMapping.InfoStream.FirstStream.Description" ), StreamIcon.INFO, null ) );
+	      ioMeta.addStream( new Stream( StreamType.INFO, null, BaseMessages.getString(
+	        PKG, "OntologyMapping.InfoStream.SecondStream.Description" ), StreamIcon.INFO, null ) );
+	    }
+	
+	    return ioMeta;
+	  }
+	  
+	  public void resetStepIoMeta() {
+	    // Don't reset!
+	  }
 
 	/**
 	 * This method is called to determine the changes the step is making to the row-stream.
@@ -583,10 +709,11 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 	    }
 
 	    // Check the constants...
+	    /*
 	    ConstantData data = new ConstantData();
 	    ConstantMeta meta = (ConstantMeta) stepMeta.getStepMetaInterface();
 	    Constant.buildRow( meta, data, remarks );	
-    	
+    	*/
 	}
 
 

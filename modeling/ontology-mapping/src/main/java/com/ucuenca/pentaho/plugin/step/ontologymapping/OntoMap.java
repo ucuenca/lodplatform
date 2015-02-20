@@ -46,12 +46,16 @@ import org.pentaho.di.trans.step.StepDataInterface;
 import org.pentaho.di.trans.step.StepInterface;
 import org.pentaho.di.trans.step.StepMeta;
 import org.pentaho.di.trans.step.StepMetaInterface;
+import org.pentaho.di.trans.step.errorhandling.StreamInterface;
 import org.pentaho.di.trans.steps.constant.ConstantData;
 import org.pentaho.di.trans.steps.constant.ConstantMeta;
 
+import com.ucuenca.pentaho.plugin.step.r2rml.R2RMLGenerator;
+
+/*
 import com.ucuenca.pentaho.plugin.step.ontologymapping.rdf.Entity;
 import com.ucuenca.pentaho.plugin.step.ontologymapping.rdf.RDFModel;
-
+*/
 /**
  * This class is part of the demo step plug-in implementation.
  * It demonstrates the basics of developing a plug-in step for PDI. 
@@ -120,7 +124,7 @@ public class OntoMap extends BaseStep implements StepInterface {
 	    data = (OntoMapData) sdi;
 
 	    data.firstRow = true;
-
+	    /*
 	    if ( super.init( smi, sdi ) ) {
 	      // Create a row (constants) with all the values in it...
 	      List<CheckResultInterface> remarks = new ArrayList<CheckResultInterface>(); // stores the errors...
@@ -135,6 +139,8 @@ public class OntoMap extends BaseStep implements StepInterface {
 	      }
 	    }
 	    return false;
+	    */
+	    return true;
 	}
 	
 	/**
@@ -144,7 +150,7 @@ public class OntoMap extends BaseStep implements StepInterface {
 	 * @param remarks
 	 * @return
 	 */
-	public static final RowMetaAndData buildRow( OntoMapMeta meta, OntoMapData data,
+	/*public static final RowMetaAndData buildRow( OntoMapMeta meta, OntoMapData data,
 	    List<CheckResultInterface> remarks ) {
 	    RowMetaInterface rowMeta = new RowMeta();
 	    Object[] rowData = new Object[meta.getFieldName().length];
@@ -294,7 +300,7 @@ public class OntoMap extends BaseStep implements StepInterface {
 	    } // end for
 
 	    return new RowMetaAndData( rowMeta, rowData );
-	  }
+	  }*/
 
 	/**
 	 * Once the transformation starts executing, the processRow() method is called repeatedly
@@ -319,7 +325,36 @@ public class OntoMap extends BaseStep implements StepInterface {
 	 */
 	public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws KettleException {
 
-		Object[] r = null;
+		/*Object[] r = null;
+		List<StreamInterface> infoStreams = meta.getStepIOMeta().getInfoStreams();
+
+	      data.ontologiesRowSet = findInputRowSet( infoStreams.get( 0 ).getStepname() );
+	      if ( data.ontologiesRowSet == null ) {
+	        throw new KettleException( BaseMessages.getString(
+	          PKG, "MergeJoin.Exception.UnableToFindSpecifiedStep", infoStreams.get( 0 ).getStepname() ) );
+	      }
+	
+	      data.dataRowSet = findInputRowSet( infoStreams.get( 1 ).getStepname() );
+	      if ( data.dataRowSet == null ) {
+	        throw new KettleException( BaseMessages.getString(
+	          PKG, "MergeJoin.Exception.UnableToFindSpecifiedStep", infoStreams.get( 1 ).getStepname() ) );
+	      }
+	
+	      data.ontologies = getRowFrom( data.ontologiesRowSet );
+	      if ( data.ontologies != null ) {
+	        data.ontologiesMeta = data.ontologiesRowSet.getRowMeta();
+	      } else {
+	        data.ontologies = null;
+	        data.ontologiesMeta = getTransMeta().getStepFields( infoStreams.get( 0 ).getStepname() );
+	      }
+	
+	      data.data = getRowFrom( data.dataRowSet );
+	      if ( data.data != null ) {
+	        data.dataMeta = data.dataRowSet.getRowMeta();
+	      } else {
+	        data.data = null;
+	        data.dataMeta = getTransMeta().getStepFields( infoStreams.get( 1 ).getStepname() );
+	      }
 	    r = getRow();
 
 	    if ( r == null ) { // no more rows to be expected from the previous step(s)
@@ -332,7 +367,7 @@ public class OntoMap extends BaseStep implements StepInterface {
 	      // additional constant fields.
 
 	      data.firstRow = false;
-	      data.entity = new Entity<String, String>(rowKey);
+	      //data.entity = new Entity<String, String>(rowKey);
 	      data.outputRowMeta = super.getInputRowMeta().clone();
 
 	      RowMetaInterface constants = data.constants.getRowMeta();
@@ -341,11 +376,11 @@ public class OntoMap extends BaseStep implements StepInterface {
 	    if(data.entity.getKey() != null && data.entity.getKey().equals(rowKey)) {
 	    	data.entity.addEntityRow(r);
 	    } else {
-	    	new RDFModel("http://biblioteca.ucuenca.edu.ec/resource/", super.getInputRowMeta())
+	    	/*new RDFModel("http://biblioteca.ucuenca.edu.ec/resource/", super.getInputRowMeta())
 	    	.process(data.entity);
 	    	
-	    	data.entity = new Entity<String, String>(rowKey);
-	    }
+	    	data.entity = new Entity<String, String>(rowKey);*/
+	    /*}
 	    
 
 	    // Add the constant data to the end of the row.
@@ -363,8 +398,10 @@ public class OntoMap extends BaseStep implements StepInterface {
 	        logBasic( BaseMessages.getString( PKG, "Constant.Log.LineNr", Long.toString( getLinesWritten() ) ) );
 	      }
 	    }
-
-	    return true;
+		*/
+		R2RMLGenerator.getInstance(smi, sdi).process();
+	    //return true;
+		return false;
 	}
 
 	/**
