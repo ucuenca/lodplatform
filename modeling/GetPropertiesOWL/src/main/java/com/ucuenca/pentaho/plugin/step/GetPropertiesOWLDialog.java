@@ -550,8 +550,8 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 			for (int i = 0; i < myList.size(); i++) {
 				TableItem item = new TableItem(table, SWT.NONE, numt++);
 				item.setText(0, String.valueOf(numt));
-				item.setText(1, myListNames.get(i).toString());
-				item.setText(2, myList.get(i).toString());
+				item.setText(1, myListNames.get(i).toString().trim());
+				item.setText(2, myList.get(i).toString().trim());
 				// --
 				Pattern pat = Pattern.compile("^http://.*");
 				Matcher mat = pat.matcher(myList.get(i).toString().trim());
@@ -618,34 +618,7 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.toString(), e);
 		}
-		// JFileChooser chooser = new JFileChooser();
-		/**
-		 * chooser.setCurrentDirectory(new java.io.File("."));
-		 * chooser.setDialogTitle("Choose the file .owl in your computer");
-		 * chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-		 * chooser.setAcceptAllFileFilterUsed(false);
-		 * 
-		 * if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) { //
-		 * System.out.println("getCurrentDirectory(): " + //
-		 * chooser.getCurrentDirectory()); JOptionPane.showMessageDialog(null,
-		 * "getSelectedFile() : " + chooser.getSelectedFile()); //
-		 * this.wHelloFieldName.setText(chooser.getSelectedFile().toString());
-		 * // para agregar a la tabla swt // this.table
-		 * 
-		 * TableItem item = new TableItem(table, SWT.NONE, numt++);
-		 * item.setText(0, String.valueOf(numt)); item.setText(1,
-		 * chooser.getSelectedFile().toString()); item.setText(2, "from file");
-		 * } else { JOptionPane.showMessageDialog(null,
-		 * "Please first you have to do almost any Selection "); }
-		 */
-		// The "stepname" variable will be the return value for the open()
-		// method.
-		// Setting to step name from the dialog control
-		// stepname = wStepname.getText();
-		// Setting the settings to the meta object
-		// meta.setOutputField(wHelloFieldName.getText());
-		// close the SWT dialog window
-		// dispose();
+
 	}
 
 	private void AddUri() {
