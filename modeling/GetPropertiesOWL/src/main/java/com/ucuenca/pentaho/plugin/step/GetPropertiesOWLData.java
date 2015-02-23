@@ -43,6 +43,7 @@ import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.util.FileManager;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 
 import java.io.File;
@@ -69,7 +70,7 @@ import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 
 import com.ucuenca.misctools.StepDataLoader;
 import com.ucuenca.misctools.DatabaseLoader;
-
+import com.hp.hpl.jena.shared.*;
 /**
  * This class is part of the demo step plug-in implementation.
  * It demonstrates the basics of developing a plug-in step for PDI. 
@@ -171,13 +172,14 @@ public class GetPropertiesOWLData extends BaseStepData implements StepDataInterf
 
 		
 		try {
-
+			dataLoader.logBasic("work in model " +myList.get(ii));
 			data.model.read(myList.get(ii));
 			dataLoader.logBasic("the load model is ok");
 		} catch (Exception eox) {
-			logError("Unload model from URI [" + eox.getMessage()
-					+ "] because of an error: " + eox.toString());
-
+			dataLoader.logBasic(" ERROR " + eox +" Unload model " +myListNames.get(ii) +" from  [" + myList.get(ii));
+			//Model model2 = FileManager.get().loadModel(myList.get(ii), myListNames.get(ii), "RDF/XML");
+			//logError(" ERROR " + eox +" Unload model " +myListNames.get(ii) +" from URI [" + myList.get(ii));
+			//data.model = (OntModel) FileManager.get().loadModel(myList.get(ii),"RDF/XML");
 		}
 
 		
@@ -228,7 +230,7 @@ public class GetPropertiesOWLData extends BaseStepData implements StepDataInterf
 							dataLoader.insertTableRow(smi, outputRow);
 						} catch (Exception e) {
 							
-							logError("Error in dataLoader.insertTableRow" + e.getMessage()) ;
+							dataLoader.logBasic("Error in dataLoader.insertTableRow" + e.getMessage()+" in the model is  "+myListNames.get(ii)) ;
 						}
 					} else {
 						
@@ -268,7 +270,7 @@ public class GetPropertiesOWLData extends BaseStepData implements StepDataInterf
 							dataLoader.insertTableRow(smi, outputRow);
 						} catch (Exception e) {
 
-							logError("Error in dataLoader.inserTableRow"+e.getMessage());
+							dataLoader.logBasic("Error in dataLoader.inserTableRow"+e.getMessage()+" in the model is  "+myListNames.get(ii));
 						}
 					} else {
 					
@@ -291,7 +293,7 @@ public class GetPropertiesOWLData extends BaseStepData implements StepDataInterf
 				try {
 					DatabaseLoader.closeConnection();
 				} catch (Exception e) {
-					logError("Error when DatabaseLoader.closeConnection() "+e.getMessage());
+					dataLoader.logBasic("Error when DatabaseLoader.closeConnection() "+e.getMessage()+" in the model is  "+myList.get(ii));
 					
 				}
 		}
