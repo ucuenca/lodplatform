@@ -546,21 +546,16 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
 		String tag = null;
 
 		if (prueba.getChildNodes().getLength() == 1) {
-
-			datos.add(prueba.getTextContent());
+			
+			String value = prueba.getNodeName().equals("setSpec") ? 
+					(prueba.getTextContent() + " => " + Sets.get(prueba.getTextContent()))
+					:prueba.getTextContent();
+			datos.add(value);
 		    tag = prueba.getTagName();
 			nameFields.add(tag);
 			if (prueba.getTagName().equals("identifier")) {
 				numRegistro = prueba.getTextContent();
 			}
-			
-			//load of the set with your correspond data
-			
-			if(prueba.getNodeName().equals("setSpec")){
-				datos.add(Sets.get(prueba.getTextContent()));
-				nameFields.add(prueba.getTextContent());				         							
-				}
-			
 
 		} else {
 			Element eElement = (Element) prueba;
