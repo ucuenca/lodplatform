@@ -13,7 +13,7 @@
    description="OAILoader"
    tooltip="OAILoader Tooltip"
    category="LODPlatform"
-   classname="com.ucuenca.pentaho.plugin.step.OAILoaderMeta">
+   classname="com.ucuenca.pentaho.plugin.step.oai.OAILoaderMeta">
 		
 		<!-- the list of jar files to include when loading the step -->
 		<libraries>
