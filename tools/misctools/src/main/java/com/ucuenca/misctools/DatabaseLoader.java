@@ -20,6 +20,11 @@ public class DatabaseLoader {
 	private static JdbcConnectionPool cp;
 	private static Connection conn;
 	
+	public static final String SQL_URI_CONNECTION =  "jdbc:h2:~/";
+	public static final String SQL_SCHEMA =  "dblod";
+	public static final String SQL_USERNAME = "sa";
+	public static final String SQL_PASSWORD = "sa";
+	
 	/**
 	 * Instantiation using Singleton DP. If no instance, creates a new H2DB Connection Pool
 	 * @return
@@ -27,7 +32,7 @@ public class DatabaseLoader {
 	 */
 	public static Connection getConnection()throws Exception {
 		if(conn == null) {
-			cp = JdbcConnectionPool.create("jdbc:h2:~/dblod", "sa", "sa");
+			cp = JdbcConnectionPool.create(SQL_URI_CONNECTION + SQL_SCHEMA, SQL_USERNAME, SQL_PASSWORD);
 			conn = cp.getConnection();
 			System.out.println("Connection established");
 		}
