@@ -39,16 +39,12 @@ import org.pentaho.di.core.RowMetaAndData;
 import org.pentaho.di.core.RowSet;
 import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.core.row.RowMetaInterface;
-import org.pentaho.di.core.row.ValueMetaInterface;
 import org.pentaho.di.trans.step.BaseStepData;
 import org.pentaho.di.trans.step.StepDataInterface;
-import org.pentaho.di.trans.step.StepMetaInterface;
 import org.pentaho.di.ui.core.widget.ColumnInfo;
 import org.pentaho.di.ui.core.widget.TableView;
 
 import com.ucuenca.misctools.DatabaseLoader;
-import com.ucuenca.misctools.StepDataLoader;
-import com.ucuenca.pentaho.plugin.step.ontologymapping.rdf.Entity;
 
 /**
  * This class is part of the demo step plug-in implementation.
@@ -79,22 +75,10 @@ public class OntoMapData extends BaseStepData implements StepDataInterface {
 
 	public RowMetaInterface outputRowMeta;
 	
-	public NumberFormat nf;
-	  public DecimalFormat df;
-	  public DecimalFormatSymbols dfs;
-	  public SimpleDateFormat daf;
-	  public DateFormatSymbols dafs;
-	  public RowMetaAndData constants;
-	  //RowMetaInterface outputMeta;
-	  public boolean firstRow;
-	  
-	  public Entity<String, String> entity;
-	  
-	//must be included for DataBase Data Loading
+	  	//must be included for DataBase Data Loading
 		public static final String CLASSIFICATIONTABLE = "CLASSMAPPING";
 		public static final String ANNOTATIONTABLE = "ANNOTATIONMAPPING";
 		public static final String RELATIONTABLE = "RELATIONMAPPING";
-		//private final StepDataLoader dataLoader = new StepDataLoader(DBTABLE);
 		//End Database Data Loading attributes
 		
 		private String transName;
@@ -103,39 +87,30 @@ public class OntoMapData extends BaseStepData implements StepDataInterface {
     public OntoMapData()
 	{    	
 		super();
-		nf = NumberFormat.getInstance();
-	    df = (DecimalFormat) nf;
-	    dfs = new DecimalFormatSymbols();
-	    daf = new SimpleDateFormat();
-	    dafs = new DateFormatSymbols();
 	}
-    
-    
-    
+
     public String getTransName() {
 		return transName;
 	}
-
-
 
 	public void setTransName(String transName) {
 		this.transName = transName;
 	}
 
-
-
 	public String getStepName() {
 		return stepName;
 	}
-
-
 
 	public void setStepName(String stepName) {
 		this.stepName = stepName;
 	}
 
-
-
+	/**
+	 * Saves table data on DB Schema
+	 * @param table Dialog TableView
+	 * @param tableName DB table name
+	 * @throws Exception
+	 */
 	public void saveTable(TableView table, String tableName)throws Exception {
     	ColumnInfo[] columns = table.getColumns();
     	Map<String, String> tableFields = new LinkedHashMap<String, String>();
@@ -164,8 +139,13 @@ public class OntoMapData extends BaseStepData implements StepDataInterface {
     	}
     }
 	
+	/**
+	 * Query DB Table data and load into the TableView
+	 * @param tableView Dialog TableView
+	 * @param tableName DB table name
+	 * @throws Exception
+	 */
 	public void queryTable(TableView tableView, String tableName)throws Exception {
-		Boolean first = Boolean.TRUE;
     	ColumnInfo[] columns = tableView.getColumns();
     	List<String> tableFields = new ArrayList<String>();
     	for(ColumnInfo column:columns) tableFields.add(column.getName().toUpperCase().replaceAll(" ", "_"));
@@ -176,12 +156,6 @@ public class OntoMapData extends BaseStepData implements StepDataInterface {
     	tableView.removeAll();
     	int row = 0;
     	while(rs.next()) {
-    		/*List<String> values = new ArrayList<String>();
-    		int count = 1;
-    		while(count <= tableFields.size()) {
-    			values.add(rs.getString(count));
-    			count ++;
-    		}*/
     		if(row == 0) {
 	    		TableItem item = tableView.table.getItem( row );
 	    		int count = 1;
@@ -198,19 +172,18 @@ public class OntoMapData extends BaseStepData implements StepDataInterface {
         		}
         		tableView.add(values.toArray(new String[values.size()]));
     		}
-    		//item.setText(values.toArray(new String[values.size()]));
-    		/*if(first) {
-    			table.getRow(0).setData(values.toArray(new String[values.size()]));
-    			first = false;
-    		} else {*/
-    			//table.add(values.toArray(new String[values.size()]));
-    		//}
     		row++;
     	}
     	tableView.setRowNums();
         tableView.optWidth( true );
     }
 	
+	/**
+	 * Delete DB table Data
+	 * @param tableName DB table name
+	 * @return Boolean.TRUE if the Deletion process succeeded
+	 * @throws Exception
+	 */
 	public Boolean deleteTableRecords(String tableName) throws Exception {
     	Object[] pk = new Object[]{this.getTransName(), this.getStepName()};
     	return DatabaseLoader.executeUpdate("DELETE FROM " + tableName 

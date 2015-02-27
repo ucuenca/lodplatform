@@ -14,28 +14,31 @@ public final class PrefixCCLookUp {
 	
 	private static final String URL_SERVICE = "http://prefix.cc/context";
 	
+	private static JSONObject dataCache = null;
+	
 	public static final String queryService(String prefix) throws Exception {
 		String URI = "";
 		try {
-			URL obj = new URL(URL_SERVICE);
-			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-			con.setRequestMethod("GET");
-			//con.setRequestProperty("User-Agent", USER_AGENT);
-			int responseCode = con.getResponseCode();
-
-			BufferedReader in = new BufferedReader(new InputStreamReader(
-					con.getInputStream()));
-			String inputLine;
-			StringBuffer response = new StringBuffer();
-
-			while ((inputLine = in.readLine()) != null) {
-				response.append(inputLine);
+			if(dataCache == null) {
+				URL obj = new URL(URL_SERVICE);
+				HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+				con.setRequestMethod("GET");
+				//con.setRequestProperty("User-Agent", USER_AGENT);
+				int responseCode = con.getResponseCode();
+	
+				BufferedReader in = new BufferedReader(new InputStreamReader(
+						con.getInputStream()));
+				String inputLine;
+				StringBuffer response = new StringBuffer();
+	
+				while ((inputLine = in.readLine()) != null) {
+					response.append(inputLine);
+				}
+				in.close();
+				JSONObject jsonRoot = new JSONObject(response.toString());
+				dataCache = jsonRoot.getJSONObject("@context");
 			}
-			in.close();
-
-			JSONObject jsonRoot = new JSONObject(response.toString());
-			URI = jsonRoot.getJSONObject("@context").getString(
-					prefix);
+			URI = dataCache.getString(prefix);
 
 		}catch (IOException e) {
 			throw new KettleException("PROBLEM TRYING TO CONNECT TO PREFIX.CC SERVICE", e);

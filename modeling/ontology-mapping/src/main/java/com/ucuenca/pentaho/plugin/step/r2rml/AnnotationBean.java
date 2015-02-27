@@ -15,20 +15,26 @@ public class AnnotationBean extends BeanInterface{
 	@Bean(fieldName = "PROPERTY")
 	private String property;
 	@Bean(fieldName = "DATAFIELD")
-	private String datafield; 
+	private String datafield;
+	@Bean(fieldName = "EXTRACTIONFIELD")
+	private String extractionfield;
 	@Bean(fieldName = "DATAVALUE")
 	private String datavalue;
 	@Bean(fieldName = "DATATYPE")
 	private String datatype;
+	@Bean(fieldName = "LANGUAGE")
+	private String language;
 	
 	public AnnotationBean(ResultSet rs) throws SQLException {
 		this.setId(rs.getString(1));
 		this.setEntityclassid(rs.getString(2));
 		this.setOntology(rs.getString(3));
 		this.setProperty(rs.getString(4));
-		this.setDatafield(rs.getString(5));
-		this.setDatavalue(rs.getString(6));
-		//this.setDatatype(rs.getString(7));
+		this.setExtractionfield(rs.getString(5));
+		this.setDatafield(rs.getString(6));
+		this.setDatavalue(rs.getString(7));
+		this.setDatatype(rs.getString(8));
+		this.setLanguage(rs.getString(9));
 	}
 
 	public String getId() {
@@ -63,6 +69,14 @@ public class AnnotationBean extends BeanInterface{
 		this.property = property;
 	}
 
+	public String getExtractionfield() {
+		return extractionfield;
+	}
+
+	public void setExtractionfield(String extractionfield) {
+		this.extractionfield = extractionfield;
+	}
+
 	public String getDatafield() {
 		return datafield;
 	}
@@ -85,6 +99,14 @@ public class AnnotationBean extends BeanInterface{
 
 	public void setDatatype(String datatype) {
 		this.datatype = datatype;
+	}
+
+	public String getLanguage() {
+		return language;
+	}
+
+	public void setLanguage(String language) {
+		this.language = language;
 	}
 	
 }

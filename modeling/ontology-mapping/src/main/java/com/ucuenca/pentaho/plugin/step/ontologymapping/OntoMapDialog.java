@@ -22,42 +22,21 @@
 
 package com.ucuenca.pentaho.plugin.step.ontologymapping;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.net.SocketTimeoutException;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.events.DragDetectEvent;
-import org.eclipse.swt.events.DragDetectListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -74,25 +53,13 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
-import org.pentaho.di.compatibility.Value;
 import org.pentaho.di.core.Const;
 import org.pentaho.di.core.Props;
-import org.pentaho.di.core.database.DatabaseInterface;
-import org.pentaho.di.core.database.DatabaseMeta;
-import org.pentaho.di.core.exception.KettleDatabaseException;
-import org.pentaho.di.core.exception.KettleEOFException;
 import org.pentaho.di.core.exception.KettleException;
-import org.pentaho.di.core.exception.KettleFileException;
-import org.pentaho.di.core.exception.KettleValueException;
-import org.pentaho.di.core.gui.PrimitiveGCInterface;
 import org.pentaho.di.core.row.RowMetaInterface;
 import org.pentaho.di.core.row.ValueMeta;
-import org.pentaho.di.core.row.ValueMetaAndData;
-import org.pentaho.di.core.row.ValueMetaInterface;
-import org.pentaho.di.core.util.EnvUtil;
 import org.pentaho.di.i18n.BaseMessages;
 import org.pentaho.di.trans.TransMeta;
 import org.pentaho.di.ui.core.widget.ColumnInfo;
@@ -104,10 +71,9 @@ import org.pentaho.di.trans.step.StepDataInterface;
 import org.pentaho.di.trans.step.StepDialogInterface;
 import org.pentaho.di.trans.step.StepMeta;
 import org.pentaho.di.trans.step.errorhandling.StreamInterface;
-import org.pentaho.di.trans.steps.selectvalues.SelectValuesMeta;
-import org.w3c.dom.Node;
 
 import com.ucuenca.misctools.DatabaseLoader;
+import com.ucuenca.pentaho.plugin.step.r2rml.DataTypeProcessor;
 
 /**
  * This class is part of the demo step plug-in implementation.
@@ -166,25 +132,15 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	  private TableView wRelTable;
 	  private FormData fdlMeta, fdRelation;
 	  
-	  private Button wDelClassTable, wDelAnnTable, wDelRelTable, wGetSelect, wGetRemove, wGetMeta, wDoMapping;
-	  private FormData fdDelClassTable, fdDelAnnTable, fdDelRelTable, fdGetSelect, fdGetRemove, fdGetMeta;
+	  private Button wDelClassTable, wDelAnnTable, wDelRelTable;
+	  private FormData fdDelClassTable, fdDelAnnTable, fdDelRelTable;
 
-
-	  private List<ColumnInfo> fieldColumns = new ArrayList<ColumnInfo>();
-
-
-	  
 	  private Label wlFields;
 	  private TableView wClassTable;
 	  private FormData fdlFields, fdFields;
 	  
-	  /**
-	   * Fields from previous step
-	   */
-	  private RowMetaInterface prevFields;
-	  
 	  private TransMeta transMeta;
-	  private Map<String, String[]> dataCache = new HashMap();
+	  private Map<String, String[]> dataCache = new HashMap<String, String[]>();
 	  
 
 	/**
@@ -201,54 +157,7 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 		super(parent, (BaseStepMeta) in, transMeta, sname);
 		meta = (OntoMapMeta) in;
 		this.transMeta = transMeta;
-	}
-	
-	private void precatchingData() {
-		try {
-			List<StreamInterface> infoStreams = meta.getStepIOMeta().getInfoStreams();
-			OntoMapData data = (OntoMapData)meta.getStepData();
-	
-		      StepMeta stepMeta = infoStreams.get( 0 ).getStepMeta();
-		      if ( stepMeta != null ) {
-		        RowMetaInterface prev = transMeta.getStepFields( stepMeta );
-		        if ( prev != null ) {
-		          //BaseStepDialog.getFieldsFromPrevious( prev, wKeys1, 1, new int[] { 1 }, new int[] {}, -1, -1, null );
-		        }
-		      }
-	      /*
-	      data.ontologiesRowSet = getfindInputRowSet( infoStreams.get( 0 ).getStepname() );
-	      if ( data.ontologiesRowSet == null ) {
-	        throw new KettleException( BaseMessages.getString(
-	          PKG, "MergeJoin.Exception.UnableToFindSpecifiedStep", infoStreams.get( 0 ).getStepname() ) );
-	      }
-	
-	      data.dataRowSet = findInputRowSet( infoStreams.get( 1 ).getStepname() );
-	      if ( data.dataRowSet == null ) {
-	        throw new KettleException( BaseMessages.getString(
-	          PKG, "MergeJoin.Exception.UnableToFindSpecifiedStep", infoStreams.get( 1 ).getStepname() ) );
-	      }
-	
-	      data.ontologies = getRowFrom( data.ontologiesRowSet );
-	      if ( data.ontologies != null ) {
-	        data.ontologiesMeta = data.ontologiesRowSet.getRowMeta();
-	      } else {
-	        data.ontologies = null;
-	        data.ontologiesMeta = getTransMeta().getStepFields( infoStreams.get( 0 ).getStepname() );
-	      }
-	
-	      data.data = getRowFrom( data.dataRowSet );
-	      if ( data.data != null ) {
-	        data.dataMeta = data.dataRowSet.getRowMeta();
-	      } else {
-	        data.data = null;
-	        data.dataMeta = getTransMeta().getStepFields( infoStreams.get( 1 ).getStepname() );
-	      }*/
-		}catch(Exception e) {
-			e.printStackTrace();
-			
-		}
-	}
-		
+	}	
 
 	/**
 	 * This method is called by Spoon when the user opens the settings dialog of the step.
@@ -265,7 +174,7 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	 * or null if the user cancelled the dialog.
 	 */
 	public String open() {
-		this.precatchingData();
+		//this.precatchingData();
 		Shell parent = getParent();
 	    Display display = parent.getDisplay();
 
@@ -444,9 +353,6 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 				
 			}
 		});
-	    
-	    // ???
-	    //final int FieldsRows = meta.getFieldName().length;
 
 	    ColumnInfo[] colinf = new ColumnInfo[] {
   	      new ColumnInfo("ID", ColumnInfo.COLUMN_TYPE_TEXT, false ),
@@ -552,33 +458,6 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	    colinf[8].setComboValuesSelectionListener(cmbValuesLs);
 	    colinf[10].setComboValuesSelectionListener(cmbValuesLs);
 	    
-
-	    /*
-	    colinf[3] =
-	      new ColumnInfo(
-	        BaseMessages.getString( PKG, "ConstantDialog.Length.Column" ), ColumnInfo.COLUMN_TYPE_TEXT, false );
-	    colinf[4] =
-	      new ColumnInfo(
-	        BaseMessages.getString( PKG, "ConstantDialog.Precision.Column" ), ColumnInfo.COLUMN_TYPE_TEXT, false );
-	    colinf[5] =
-	      new ColumnInfo(
-	        BaseMessages.getString( PKG, "ConstantDialog.Currency.Column" ), ColumnInfo.COLUMN_TYPE_TEXT, false );
-	    colinf[6] =
-	      new ColumnInfo(
-	        BaseMessages.getString( PKG, "ConstantDialog.Decimal.Column" ), ColumnInfo.COLUMN_TYPE_TEXT, false );
-	    colinf[7] =
-	      new ColumnInfo(
-	        BaseMessages.getString( PKG, "ConstantDialog.Group.Column" ), ColumnInfo.COLUMN_TYPE_TEXT, false );
-	    colinf[8] =
-	      new ColumnInfo(
-	        BaseMessages.getString( PKG, "ConstantDialog.Value.Column" ), ColumnInfo.COLUMN_TYPE_TEXT, false );
-	    colinf[9] =
-	      new ColumnInfo(
-	        BaseMessages.getString( PKG, "ConstantDialog.Value.SetEmptyString" ),
-	        ColumnInfo.COLUMN_TYPE_CCOMBO,
-	        new String[] {
-	          BaseMessages.getString( PKG, "System.Combo.Yes" ), BaseMessages.getString( PKG, "System.Combo.No" ) } );
-		*/
 	    wClassTable =
 	      new TableView(
 	        transMeta, wClassifyComp, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI, colinf, 0, lsMod, props );
@@ -641,17 +520,7 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 			}
 		});
 
-	    // ???
-	    //final int RemoveRows = meta.getFieldName().length;
-
 	    ColumnInfo[] colann = new ColumnInfo[] {
-	    /*
-	    colrem[0] =
-	      new ColumnInfo(
-	        BaseMessages.getString( PKG, "ConstantDialog.Name.Column" ),
-	        ColumnInfo.COLUMN_TYPE_CCOMBO, new String[] { BaseMessages.getString(
-	          PKG, "ConstantDialog.Name.Column" ) + "..." }, false );
-	     */
 	      new ColumnInfo("ID", ColumnInfo.COLUMN_TYPE_TEXT, false ),
 	      new ColumnInfo(
 	    	        BaseMessages.getString( PKG, "OntologyMapping.Classification.ID" ), ColumnInfo.COLUMN_TYPE_CCOMBO, 
@@ -663,11 +532,20 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
   	        BaseMessages.getString( PKG, "OntologyMapping.Ontology.Property" ), ColumnInfo.COLUMN_TYPE_CCOMBO, ValueMeta
   	          .getTypes() ),
   	      new ColumnInfo(
+  	        BaseMessages.getString( PKG, "OntologyMapping.Value.Data.Extraction" ), ColumnInfo.COLUMN_TYPE_CCOMBO, 
+  	        new String[]{"value1", "value2"}),
+  	      new ColumnInfo(
   	        BaseMessages.getString( PKG, "OntologyMapping.Data.Field" ), ColumnInfo.COLUMN_TYPE_CCOMBO, 
   	        new String[]{"field1", "field2"}),	    
 	      new ColumnInfo(
 	        BaseMessages.getString( PKG, "OntologyMapping.Value.Field" ), ColumnInfo.COLUMN_TYPE_CCOMBO, 
-	        new String[]{"value1", "value2"})};
+	        new String[]{"value1", "value2"}),
+	      new ColumnInfo(
+	        BaseMessages.getString( PKG, "OntologyMapping.Field.Datatype" ), ColumnInfo.COLUMN_TYPE_CCOMBO, 
+	        DataTypeProcessor.getDataTypes()),
+	      new ColumnInfo(
+	        BaseMessages.getString( PKG, "OntologyMapping.Field.Language" ), ColumnInfo.COLUMN_TYPE_CCOMBO, 
+	        new String[]{"es-es", "en-us"})};
 	    
 	    colann[0].setReadOnly(Boolean.TRUE);
 	    colann[1].setComboValuesSelectionListener(new ComboValuesSelectionListener() {
@@ -697,23 +575,13 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 		});
 	    
 	    colann[4].setComboValuesSelectionListener(cmbFieldsLs);
-	    colann[5].setComboValuesSelectionListener(cmbValuesLs);
-	    // ???
-	    fieldColumns.add( colann[0] );
+	    colann[5].setComboValuesSelectionListener(cmbFieldsLs);
+	    colann[6].setComboValuesSelectionListener(cmbValuesLs);
 	    
 	    wAnnTable =
 	      new TableView(
 	        transMeta, wAnnotateComp, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI, colann, 0, lsMod, props );	    
 	    
-	    /*
-	    wGetRemove = new Button( wAnnotateComp, SWT.PUSH );
-	    wGetRemove.setText( BaseMessages.getString( PKG, "SelectValuesDialog.GetRemove.Button" ) );
-	    wGetRemove.addListener( SWT.Selection, lsGet );
-	    fdGetRemove = new FormData();
-	    fdGetRemove.right = new FormAttachment( 100, 0 );
-	    fdGetRemove.top = new FormAttachment( 50, 0 );
-	    wGetRemove.setLayoutData( fdGetRemove );
-		*/
 	    fdAnnotate = new FormData();
 	    fdAnnotate.left = new FormAttachment( 0, 0 );
 	    fdAnnotate.top = new FormAttachment( wDelAnnTable, margin );
@@ -774,8 +642,6 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 			}
 		});
 
-	    //final int MetaRows = meta.getFieldName().length;
-
 	    ColumnInfo[] colrel =
 	      new ColumnInfo[] {
 	    	new ColumnInfo("ID", ColumnInfo.COLUMN_TYPE_TEXT, false ),
@@ -791,49 +657,7 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
       	          ColumnInfo.COLUMN_TYPE_CCOMBO, ValueMeta.getAllTypes(), false ),
 	        new ColumnInfo(
 	        		BaseMessages.getString( PKG, "OntologyMapping.Classification.ID" ) + " 2",
-	          ColumnInfo.COLUMN_TYPE_CCOMBO, ValueMeta.getAllTypes(), false ),
-	          /*
-	        new ColumnInfo(
-	          BaseMessages.getString( PKG, "SelectValuesDialog.ColumnInfo.Length" ),
-	          ColumnInfo.COLUMN_TYPE_TEXT, false ),
-	        new ColumnInfo(
-	          BaseMessages.getString( PKG, "SelectValuesDialog.ColumnInfo.Precision" ),
-	          ColumnInfo.COLUMN_TYPE_TEXT, false ),
-	        new ColumnInfo(
-	          BaseMessages.getString( PKG, "SelectValuesDialog.ColumnInfo.Storage.Label" ), ColumnInfo.COLUMN_TYPE_CCOMBO,
-	          new String[] {
-	            BaseMessages.getString( PKG, "System.Combo.Yes" ), BaseMessages.getString( PKG, "System.Combo.No" ), } ),
-	        new ColumnInfo(
-	          BaseMessages.getString( PKG, "SelectValuesDialog.ColumnInfo.Format" ),
-	          ColumnInfo.COLUMN_TYPE_FORMAT, 3 ),
-	        new ColumnInfo(
-	          BaseMessages.getString( PKG, "SelectValuesDialog.ColumnInfo.DateLenient" ), ColumnInfo.COLUMN_TYPE_CCOMBO,
-	          new String[] {
-	            BaseMessages.getString( PKG, "System.Combo.Yes" ), BaseMessages.getString( PKG, "System.Combo.No" ), } ),
-	        new ColumnInfo(
-	          BaseMessages.getString( PKG, "SelectValuesDialog.ColumnInfo.DateFormatLocale" ),
-	          ColumnInfo.COLUMN_TYPE_CCOMBO, EnvUtil.getLocaleList() ),
-	        new ColumnInfo(
-	          BaseMessages.getString( PKG, "SelectValuesDialog.ColumnInfo.DateFormatTimeZone" ),
-	          ColumnInfo.COLUMN_TYPE_CCOMBO, EnvUtil.getTimeZones() ),
-	        new ColumnInfo(
-	          BaseMessages.getString( PKG, "SelectValuesDialog.ColumnInfo.LenientStringToNumber" ),
-	          ColumnInfo.COLUMN_TYPE_CCOMBO, new String[] {
-	            BaseMessages.getString( PKG, "System.Combo.Yes" ), BaseMessages.getString( PKG, "System.Combo.No" ), } ),
-	            */
-	        /*new ColumnInfo(
-	          BaseMessages.getString( PKG, "SelectValuesDialog.ColumnInfo.Encoding" ),
-	          ColumnInfo.COLUMN_TYPE_CCOMBO, getCharsets(), false ),*/
-	          /*
-	        new ColumnInfo(
-	          BaseMessages.getString( PKG, "SelectValuesDialog.ColumnInfo.Decimal" ),
-	          ColumnInfo.COLUMN_TYPE_TEXT, false ),
-	        new ColumnInfo(
-	          BaseMessages.getString( PKG, "SelectValuesDialog.ColumnInfo.Grouping" ),
-	          ColumnInfo.COLUMN_TYPE_TEXT, false ),
-	        new ColumnInfo(
-	          BaseMessages.getString( PKG, "SelectValuesDialog.ColumnInfo.Currency" ),
-	          ColumnInfo.COLUMN_TYPE_TEXT, false ),*/ };
+	          ColumnInfo.COLUMN_TYPE_CCOMBO, ValueMeta.getAllTypes(), false ) };
 	    //colmeta[5].setToolTip( BaseMessages.getString( PKG, "SelectValuesDialog.ColumnInfo.Storage.Tooltip" ) );
 	    
 	    colrel[1].setComboValuesSelectionListener(new ComboValuesSelectionListener() {
@@ -868,22 +692,11 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 				return getClassificationIDS();
 			}
 		});
-	    // ????
-	    fieldColumns.add( colrel[0] );
 	    
 	    wRelTable =
 	      new TableView(
 	        transMeta, wRelationComp, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI, colrel, 0, lsMod, props );
 
-	    /*
-	    wGetMeta = new Button( wRelationComp, SWT.PUSH );
-	    wGetMeta.setText( BaseMessages.getString( PKG, "SelectValuesDialog.GetMeta.Button" ) );
-	    wGetMeta.addListener( SWT.Selection, lsGet );
-	    fdGetMeta = new FormData();
-	    fdGetMeta.right = new FormAttachment( 100, 0 );
-	    fdGetMeta.top = new FormAttachment( 50, 0 );
-	    wGetMeta.setLayoutData( fdGetMeta );
-		*/
 	    fdRelation = new FormData();
 	    fdRelation.left = new FormAttachment( 0, 0 );
 	    fdRelation.top = new FormAttachment( wDelRelTable, margin );
@@ -956,30 +769,6 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	      }
 	    };
 	    shell.addListener( SWT.Resize, lsResize );
-	    
-	    //
-	    // Search the fields in the background
-	    //
-	
-	    final Runnable runnable = new Runnable() {
-	      public void run() {
-	        StepMeta stepMeta = transMeta.findStep( stepname );
-	        if ( stepMeta != null ) {
-	          try {
-	            RowMetaInterface row = transMeta.getPrevStepFields( stepMeta );
-	            prevFields = row;
-	            // Remember these fields...
-	            for ( int i = 0; i < row.size(); i++ ) {
-	              //inputFields.put( row.getValueMeta( i ).getName(), Integer.valueOf( i ) );
-	            }
-	            //setComboBoxes();
-	          } catch ( KettleException e ) {
-	            logError( BaseMessages.getString( PKG, "System.Dialog.GetFieldsFailed.Message" ) );
-	          }
-	        }
-	      }
-	    };
-	    new Thread( runnable ).start();
 
 	    // Set the shell size, based upon previous time...
 	    super.setSize();
@@ -996,6 +785,10 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	    return stepname;
 	}
 	
+	/**
+	 * Saves Previous Steps Required Metadata into the MetaObject
+	 * 
+	 */
 	private void getPrevStepsMeta() {
 		String ontologyStepName = wStep1.getText();
 		meta.setOntologyDbTable(this.stepDBTableLookup(transMeta.findStep(ontologyStepName)));
@@ -1008,6 +801,11 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 		meta.setMapBaseURI(baseURI);
 	}
 	
+	/**
+	 * Browse DB Table name on Previous Steps 
+	 * @param stepMeta
+	 * @return
+	 */
 	private String stepDBTableLookup(StepMeta stepMeta) {
 		String tableName = null;
 		if(stepMeta != null) {
@@ -1025,6 +823,13 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 		return tableName;
 	}
 	
+	/**
+	 * Gets the Output Fields of a previous step
+	 * @param stepName
+	 * @param filter
+	 * @return
+	 * @throws KettleException
+	 */
 	private String[] getStepFieldsMeta(String stepName, Object... filter) throws KettleException{
 		filter = filter != null ? filter:new String[]{};
 		String [] fieldNames;
@@ -1040,22 +845,10 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 		return Arrays.asList(fields).toArray(new String[fields.length]);
 	}
 	
-	private String[] findComboValues(TableItem tableItem, int currentCol) {
-		int[] filters = currentCol == 4 ? new int[]{6,8}:(currentCol == 6 ? new int[]{4,8}:new int[]{4,6});
-		
-		String stepName = wStep2.getText();
-		String [] values = new String[]{"No fields found"};
-		try {
-			List<String> filter= new ArrayList<String>();
-			if(!StringUtils.isEmpty(tableItem.getText(filters[0]) )) filter.add(tableItem.getText(filters[0]));
-			if(!StringUtils.isEmpty(tableItem.getText(filters[1]) )) filter.add(tableItem.getText(filters[1]));
-			values = this.getStepFieldsMeta(stepName, filter.toArray());
-		}catch(KettleException e) {
-			
-		}
-		return values;
-	}
-	
+	/**
+	 * Gets  record IDs of the Classification Table
+	 * @return
+	 */
 	private String[] getClassificationIDS() {
 		String [] classificationID = wClassTable.getItems(0);
 		List<String> idList = new ArrayList<String>();
@@ -1066,6 +859,10 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 		return classificationID.length > 0 ? classificationID:new String[]{"No Items found"};
 	}
 	
+	/**
+	 * Query ontologies available for mapping
+	 * @return
+	 */
 	private String[] getOntologiesList() {
 		String [] rsField = new String[]{"No values found"};
 		try {
@@ -1095,6 +892,13 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 		return rsField;
 	}
 	
+	/**
+	 * Query Entity properties
+	 * @param tableItem 
+	 * @param isClass
+	 * @param columnFilter
+	 * @return
+	 */
 	private String[] getOntologyProperties(TableItem tableItem, Boolean isClass, Integer columnFilter) {
 		List<String> result = new ArrayList<String>();
 		String [] rsField = new String[]{"No values found"};
@@ -1121,6 +925,10 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 		return rsField;
 	}
 	
+	/**
+	 * Query saved Mapping Table Data
+	 * @param stepname
+	 */
 	private void getMappingTableData(String stepname) {
 		OntoMapData data = ((OntoMapData)meta.getStepData());
 		data.setTransName(transMeta.getName());
@@ -1150,66 +958,10 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 			wStep2.setText( Const.NVL( meta.getDataStepName(), "" ) );
 		}
 		wBaseURI.setText( Const.NVL( meta.getMapBaseURI(), "http://" ) );
-		/*
-		int i;
-		if ( log.isDebug() ) {
-		  logDebug( "getting fields info..." );
-		}
-		*/
-		/*
-		List<StreamInterface> infoStreams = meta.getStepIOMeta().getInfoStreams();
-
-	    wStep1.setText( Const.NVL( infoStreams.get( 0 ).getStepname(), "" ) );
-	    wStep2.setText( Const.NVL( infoStreams.get( 1 ).getStepname(), "" ) );
-		*/
-		
-		/*for ( i = 0; i < meta.getFieldName().length; i++ ) {
-		  if ( meta.getFieldName()[i] != null ) {
-		    TableItem item = wClassTable.table.getItem( i );
-		    int col = 1;
-		    item.setText( col++, meta.getFieldName()[i] );
-		
-		    String type = meta.getFieldType()[i];
-		    String format = meta.getFieldFormat()[i];
-		    String length = meta.getFieldLength()[i] < 0 ? "" : ( "" + meta.getFieldLength()[i] );
-		    String prec = meta.getFieldPrecision()[i] < 0 ? "" : ( "" + meta.getFieldPrecision()[i] );
-		
-		    String curr = meta.getCurrency()[i];
-		    String group = meta.getGroup()[i];
-		    String decim = meta.getDecimal()[i];
-		    String def = meta.getValue()[i];
-		
-		    item.setText( col++, Const.NVL( type, "" ) );
-		    item.setText( col++, Const.NVL( format, "" ) );
-		    item.setText( col++, Const.NVL( length, "" ) );
-		    item.setText( col++, Const.NVL( prec, "" ) );
-		    item.setText( col++, Const.NVL( curr, "" ) );
-		    item.setText( col++, Const.NVL( decim, "" ) );
-		    item.setText( col++, Const.NVL( group, "" ) );
-		    item.setText( col++, Const.NVL( def, "" ) );
-		    item
-		      .setText( col++, meta.isSetEmptyString()[i]
-		        ? BaseMessages.getString( PKG, "System.Combo.Yes" ) : BaseMessages.getString(
-		          PKG, "System.Combo.No" ) );
-		
-	      }
-	    }
-	
-		wClassTable.setRowNums();
-		wClassTable.optWidth( true );*/
 	
 	    wStepname.selectAll();
 	    wStepname.setFocus();
 	  }
-	
-	/**
-	 * This helper method puts the step configuration stored in the meta object
-	 * and puts it into the dialog controls.
-	 */
-	/*private void populateDialog() {
-		wStepname.selectAll();
-		wHelloFieldName.setText(meta.getOutputField());	
-	}*/
 
 	/**
 	 * Called when the user cancels the dialog.  
@@ -1254,46 +1006,14 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 		    infoStreams.get( 1 ).setStepMeta( transMeta.findStep( wStep2.getText() ) );
 		}
 
-	    int i;
-	    // Table table = wFields.table;
-
-	    int nrfields = wClassTable.nrNonEmpty();
-
-	    meta.allocate( nrfields );
-
-	    //CHECKSTYLE:Indentation:OFF
-	    //CHECKSTYLE:LineLength:OFF
-	    /*
-	    for ( i = 0; i < nrfields; i++ ) {
-	      TableItem item = wFields.getNonEmpty( i );
-	      meta.getFieldName()[i] = item.getText( 1 );
-	      meta.isSetEmptyString()[i] = BaseMessages.getString( PKG, "System.Combo.Yes" ).equalsIgnoreCase( item.getText( 10 ) );
-
-	      meta.getFieldType()[i] = meta.isSetEmptyString()[i] ? "String" : item.getText( 2 );
-	      meta.getFieldFormat()[i] = item.getText( 3 );
-	      String slength = item.getText( 4 );
-	      String sprec = item.getText( 5 );
-	      meta.getCurrency()[i] = item.getText( 6 );
-	      meta.getDecimal()[i] = item.getText( 7 );
-	      meta.getGroup()[i] = item.getText( 8 );
-	      meta.getValue()[i] = meta.isSetEmptyString()[i] ? "" : item.getText( 9 );
-
-	      try {
-	        meta.getFieldLength()[i] = Integer.parseInt( slength );
-	      } catch ( Exception e ) {
-	        meta.getFieldLength()[i] = -1;
-	      }
-	      try {
-	        meta.getFieldPrecision()[i] = Integer.parseInt( sprec );
-	      } catch ( Exception e ) {
-	        meta.getFieldPrecision()[i] = -1;
-	      }
-
-	    }*/
-
 	    dispose();
 	}
 	
+	/**
+	 * Delete DB Table records
+	 * @param tableName DB table name
+	 * @param tableView Dialog TableView involved
+	 */
 	private void deleteTableRecords(String tableName, TableView tableView) {
 		try{
 			OntoMapData data = ((OntoMapData)meta.getStepData());

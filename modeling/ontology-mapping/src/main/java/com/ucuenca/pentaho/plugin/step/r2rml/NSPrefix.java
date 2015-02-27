@@ -1,5 +1,10 @@
 package com.ucuenca.pentaho.plugin.step.r2rml;
 
+/**
+ * Default prefixes for R2RML mapping definition
+ * @author depcc
+ *
+ */
 public enum NSPrefix {
 	
 	RR("rr", "http://www.w3.org/ns/r2rml#"),

@@ -1,45 +1,55 @@
 package com.ucuenca.pentaho.plugin.step.r2rml;
 
-import java.lang.reflect.Method;
+import java.io.FileOutputStream;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringUtils;
 import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.trans.step.StepDataInterface;
 import org.pentaho.di.trans.step.StepMetaInterface;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.RDFS;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.vocabulary.XSD;
 import com.ucuenca.misctools.DatabaseLoader;
 import com.ucuenca.misctools.PrefixCCLookUp;
 import com.ucuenca.pentaho.plugin.step.ontologymapping.OntoMapData;
 import com.ucuenca.pentaho.plugin.step.ontologymapping.OntoMapMeta;
 
+/**
+ * R2RML mapping file processor
+ * @author depcc
+ *
+ */
 public class R2RMLGenerator {
 	
 	private OntoMapMeta meta;
 	private OntoMapData data;
 	
-	private String sqlClassificationRows = "SELECT ID, ONTOLOGY, ENTITY, RELATIVE_URI, URI_FIELD_ID, "
-			+ "DATAFIELD_1, DATAVALUE_1, DATAFIELD_2, DATAVALUE_2, DATAFIELD_3, DATAVALUE_3 FROM ";
-	private String sqlAnnotationRows = "SELECT ID, ENTITY_CLASSID, ONTOLOGY, PROPERTY,"
-			+ " DATAFIELD, DATAVALUE FROM ";
-	private String sqlRelationRows = "SELECT * FROM ";
+	private String sqlClassificationRows = "SELECT ID, ONTOLOGY, ENTITY, RELATIVE_URI, URI_FIELD_ID,"
+			+ " DATAFIELD_1, DATAVALUE_1, DATAFIELD_2, DATAVALUE_2, DATAFIELD_3, DATAVALUE_3 FROM ";
+	private String sqlAnnotationRows = "SELECT ID, ENTITY_CLASSID, ONTOLOGY, PROPERTY, EXTRACTIONFIELD,"
+			+ " DATAFIELD, DATAVALUE, DATATYPE, LANGUAGE  FROM ";
+	private String sqlRelationRows = "SELECT ID, ENTITY_CLASSID_1, ONTOLOGY, PROPERTY, ENTITY_CLASSID_2"
+			+ " FROM ";
 	
 	private String baseURI;
 	private Model r2rmlModel;
 	private Map<String, String> prefixes = new HashMap<String, String>();
+	private Map<String, Object[]> mappedEntities = new HashMap<String, Object[]>();
 	
-	private static R2RMLGenerator instance;
-	
-	private R2RMLGenerator(StepMetaInterface smi, StepDataInterface sdi) throws KettleException {
+	public R2RMLGenerator(StepMetaInterface smi, StepDataInterface sdi) throws KettleException {
 		try {
 			meta = (OntoMapMeta) smi;
 			data = (OntoMapData) sdi;
@@ -55,19 +65,20 @@ public class R2RMLGenerator {
 		}
 	}
 	
+	/**
+	 * Assing default namespace prefixes to model
+	 * @throws Exception
+	 */
 	private void setModelDefaultNS() throws Exception {
 		for(NSPrefix prefix:NSPrefix.values()) {
 			r2rmlModel.setNsPrefix(prefix.getPrefix(), prefix.getURI());
 		}
 	}
 	
-	public static R2RMLGenerator getInstance(StepMetaInterface smi, StepDataInterface sdi) throws KettleException {
-		if(instance == null) {
-			instance = new R2RMLGenerator(smi, sdi);
-		}
-		return instance;
-	}
-	
+	/**
+	 * R2RML mapping file processor
+	 * @throws KettleException
+	 */
 	public void process() throws KettleException {
 		try {
 			ResultSet rsClass = this.getClassificationRows();
@@ -82,7 +93,7 @@ public class R2RMLGenerator {
 					Pattern pattern = Pattern.compile("\\$\\{(.*)\\}"); // extract field name
 			        Matcher matcher = pattern.matcher(entityId);
 			        if (matcher.find()) {
-			        	String field = StringUtils.capitalize( matcher.group(1) );
+			        	String field = matcher.group(1).toUpperCase().replaceAll(" ", "_");
 			        	/*Pattern patternFnc = Pattern.compile("\\.(.*)"); // extract its function
 			            Matcher matcherFnc = patternFnc.matcher(id);
 			            String function = matcherFnc.find() ? matcherFnc.group(1):null;
@@ -90,98 +101,283 @@ public class R2RMLGenerator {
 			            /*String sqlField = entityId.replaceAll("\\$\\{(.*)\\}", classBean.getFieldName(field));
 			            entityRealId = this.processFieldFunction(data.CLASSIFICATIONTABLE, 
 			            		sqlField, "ID = '" + id + "'");*/
-			        	entityRealId = entityId.replaceAll("\\$\\{(.*)\\}", classBean.getFieldName(field));
 			        	
-			            
+			        	//entityRealId = entityId.replaceAll("\\$\\{(.*)\\}", classBean.getFieldName(field));
+			        	entityRealId = entityId.replaceAll("\\$\\{(.*)\\}", field);        
 			        }
 				} else {
-					entityRealId = entityId;
+					entityRealId = entityId.toUpperCase().replaceAll(" ", "_");
 				}
 				String vocPrefix = classBean.getOntology();
-				//this.getOntologyURI(vocPrefix);
+				this.getOntologyURI(vocPrefix);
 				String vocEntity = classBean.getEntity();
-				Resource resource = r2rmlModel.createResource("<#TriplesMap"+id);
+				Resource resource = r2rmlModel.createResource("#TriplesMap"+ id);
 				resource.addProperty(RR.logicalTable, 
 						r2rmlModel.createResource()
-							.addProperty(RR.tableName, meta.getDataDbTable())
+							.addProperty(RR.sqlQuery, this.getEntitySQLDefinition(entityRealId, classBean))
 					)
 					.addProperty(RR.subjectMap,
 						r2rmlModel.createResource()
-							.addProperty(RR.template, this.baseURI + relativeURI + "{" + entityRealId + "}")
-							.addProperty(RR.cclass, this.getOntologyURI(vocPrefix) + vocEntity)
+							.addProperty(RR.template, this.baseURI + relativeURI + "{" + id + "_ID}")
+							.addProperty(RR.cclass, /*this.getOntologyURI(vocPrefix) +*/
+									ResourceFactory.createProperty( prefixes.get(vocPrefix), 
+											vocEntity.split(prefixes.get(vocPrefix))[1] )
+									)
 					);
-				/*r2rmlModel.createResource(this.baseURI + relativeURI + entityRealId)
-						.addProperty(RDF.type, this.getOntologyURI(vocPrefix) + vocEntity);*/
-				this.processAnnotationModeling(id, resource);
-				//r2rmlModel.createStatement(null, null, null);
+				mappedEntities.put(id, new Object[]{relativeURI, entityRealId, classBean});
+
+				this.processAnnotationModeling(id);
 			}
+			this.processRelationModeling();
 			finishProcess();
 		}catch(Exception e) {
 			throw new KettleException(e);
 		}
 	}
 	
-	private void processAnnotationModeling(String classId, Resource parent)throws Exception {
+	/**
+	 * Mapping Annotation Rules
+	 * @param classId Classification Record ID
+	 * @throws Exception
+	 */
+	private void processAnnotationModeling(String classId)throws Exception {
 		ResultSet rs = this.getAnnotationRows(classId);
 		while(rs.next()) {
 			AnnotationBean annBean =  new AnnotationBean(rs);
-			//String id = annBean.getId();
+			String id = annBean.getId();
 			String vocPrefix = annBean.getOntology();
-			parent.addProperty(RR.predicateObjectMap, 
-				r2rmlModel.createResource()
-					.addProperty(RR.predicate, this.getOntologyURI(vocPrefix) + annBean.getProperty())
-					.addProperty(RR.objectMap,
-						r2rmlModel.createResource()
-						.addProperty(RR.column, annBean.getDatafield())
-					)
-				);
+			String vocProperty = annBean.getProperty();
+			this.getOntologyURI(vocPrefix);
+			Resource resource = r2rmlModel.createResource("#TriplesMap"+ id);
 			
+			Resource objectMapResource = r2rmlModel.createResource();
+			objectMapResource.addProperty(RR.column, id + "_DATA");
+			if(annBean.getDatatype().length() > 0) {
+				objectMapResource.addProperty(RR.datatype, 
+						ResourceFactory.createProperty( XSD.getURI(), annBean.getDatatype() ));
+			}
+			if(annBean.getLanguage().length() > 0) {
+				objectMapResource.addProperty(RR.language, annBean.getLanguage() );
+			}
+			
+			resource.addProperty(RR.logicalTable, 
+					r2rmlModel.createResource()
+						.addProperty(RR.sqlQuery, this.getPropertySQLDefinition(classId, annBean))
+				)
+				.addProperty(RR.subjectMap,
+						r2rmlModel.createResource()
+							.addProperty(RR.template, this.baseURI + mappedEntities.get(classId)[0] + "{" + classId + "_ID}")
+				)
+				.addProperty(RR.predicateObjectMap,
+						r2rmlModel.createResource()
+							.addProperty(RR.predicate,
+									ResourceFactory.createProperty( prefixes.get(vocPrefix), 
+											vocProperty.split(prefixes.get(vocPrefix))[1] )
+							)
+							.addProperty(RR.objectMap, objectMapResource)
+				);
 		}
 	}
 	
+	/**
+	 * Mapping Relation Rules
+	 * @throws Exception
+	 */
+	private void processRelationModeling()throws Exception {
+		ResultSet rs = this.getRelationRows();
+		while(rs.next()) {
+			RelationBean relBean =  new RelationBean(rs);
+			String id = relBean.getId();
+			String entity1 = relBean.getEntityclassid1();
+			String vocPrefix = relBean.getOntology();
+			String vocProperty = relBean.getProperty();
+			String entity2 = relBean.getEntityclassid2();
+			Object []entityProp1 = mappedEntities.get(entity1);
+			Object []entityProp2 = mappedEntities.get(entity2);
+			this.getOntologyURI(vocPrefix);
+			Resource resource = r2rmlModel.createResource("#TriplesMap"+ id);
+			resource.addProperty(RR.logicalTable, 
+					r2rmlModel.createResource()
+						.addProperty(RR.sqlQuery, this.getRelationSQLDefinition(relBean))
+				)
+				.addProperty(RR.subjectMap,
+						r2rmlModel.createResource()
+							.addProperty(RR.template, this.baseURI + (String)entityProp1[0] + "{" + entity1 + "_ID}")
+				)
+				.addProperty(RR.predicateObjectMap,
+						r2rmlModel.createResource()
+							.addProperty(RR.predicate,
+									ResourceFactory.createProperty( prefixes.get(vocPrefix), 
+											vocProperty.split(prefixes.get(vocPrefix))[1] )
+							)
+							.addProperty(RR.objectMap,
+									r2rmlModel.createResource()
+									.addProperty(RR.template, this.baseURI + (String)entityProp2[0] + "{" + entity2 + "_ID}")
+							)
+				);
+		}
+	}
+	
+	/**
+	 * Get Classification rules from Database
+	 * @return
+	 * @throws Exception
+	 */
 	private ResultSet getClassificationRows() throws Exception {
 		return DatabaseLoader.executeQuery(sqlClassificationRows, 
-				new Object[]{data.getTransName(), data.getStepName()});
+				new Object[]{meta.getParentStepMeta().getParentTransMeta().getName(), meta.getParentStepMeta().getName()});
 	}
 	
+	/**
+	 * Generate SQL Query for table definition on entities
+	 * @param entityId ID Field
+	 * @param classBean Classification bean
+	 * @return SQL Query as String
+	 * @throws Exception
+	 */
+	private String getEntitySQLDefinition(String entityId, ClassificationBean classBean) throws Exception {
+		String classId = classBean.getId();
+		String sql = "SELECT " + entityId.toUpperCase() + " AS " + classId + "_ID FROM " + meta.getDataDbTable()
+				+ " WHERE ";
+		String[] condField = new String[]{"TRANSID", "STEPID", classBean.getDatafield1(), classBean.getDatafield2(), classBean.getDatafield3()};
+		String[] condValue = new String[]{meta.getParentStepMeta().getParentTransMeta().getName().toUpperCase(), 
+				meta.getDataStepName().toUpperCase(), classBean.getDatavalue1(), classBean.getDatavalue2(), classBean.getDatavalue3()};
+		
+		return this.generateSQLPredicate(sql, condField, condValue);
+	}
+	
+	/**
+	 * Get Annotation rules from Database
+	 * @param classId Classification rule id
+	 * @return
+	 * @throws Exception
+	 */
 	private ResultSet getAnnotationRows(String classId) throws Exception {
 		return DatabaseLoader.executeQuery(sqlAnnotationRows, 
-				new Object[]{data.getTransName(), data.getStepName(), classId});
+				new Object[]{meta.getParentStepMeta().getParentTransMeta().getName(), 
+				meta.getParentStepMeta().getName(), classId});
 	}
 	
-	private String processFieldFunction(String table, String field, String pk) throws KettleException {
-		/*Method method = bean.getClass().getDeclaredMethod("get" + field);
-		String value = (String)method.invoke(bean);*/
-		String returnValue = null;
-		String sqlField = "SELECT " + field.toUpperCase() + " FROM " 
-		+ table + " WHERE TRANSID = ? AND STEPID = ?" + "" + pk;
-		try {
-			ResultSet rs = DatabaseLoader.executeQuery(sqlField, 
-					new Object[]{data.getTransName(), data.getStepName()});
-			while(rs.next()) {
-				returnValue = rs.getString(1);
-				break;
+	/**
+	 * Generate SQL Query for table definition on properties
+	 * @param classId Entity field ID
+	 * @param annBean Annotation bean
+	 * @return SQL query as String
+	 * @throws Exception
+	 */
+	private String getPropertySQLDefinition(String classId, AnnotationBean annBean) throws Exception {
+		String annId = annBean.getId();
+		String sql = "SELECT " + annBean.getExtractionfield().toUpperCase() + " AS " + annId + "_DATA, "
+				+ ((String)mappedEntities.get(classId)[1]).toUpperCase() + " AS " + classId + "_ID"
+				+ " FROM " + meta.getDataDbTable()
+				+ " WHERE ";
+		String[] condField = new String[]{"TRANSID", "STEPID", annBean.getDatafield()};
+		String[] condValue = new String[]{meta.getParentStepMeta().getParentTransMeta().getName().toUpperCase(), 
+				meta.getDataStepName().toUpperCase(), annBean.getDatavalue()};
+		
+		return this.generateSQLPredicate(sql, condField, condValue);
+	}
+	
+	/**
+	 * Get Relation rules from Database
+	 * @return
+	 * @throws Exception
+	 */
+	private ResultSet getRelationRows() throws Exception {
+		return DatabaseLoader.executeQuery(sqlRelationRows, 
+				new Object[]{meta.getParentStepMeta().getParentTransMeta().getName(), 
+				meta.getParentStepMeta().getName()});
+	}
+	
+	/**
+	 * Generate SQL Query for table definition to generate relation mapping between entities
+	 * @param relBean Relation bean
+	 * @return SQL query as String
+	 * @throws Exception
+	 */
+	private String getRelationSQLDefinition(RelationBean relBean) throws Exception {
+		String entityId1 = relBean.getEntityclassid1();
+		String entityId2 = relBean.getEntityclassid2();
+		Object[] entityProp1 = mappedEntities.get(entityId1);
+		Object[] entityProp2 = mappedEntities.get(entityId2);
+		String sql = "SELECT " + ((String)entityProp1[1]).toUpperCase() + " AS " + entityId1 + "_ID, "
+				+ ((String)entityProp2[1]).toUpperCase() + " AS " + entityId2 + "_ID"
+				+ " FROM " + meta.getDataDbTable()
+				+ " WHERE ";
+		ClassificationBean classBean2 = (ClassificationBean)entityProp2[2];
+		String[] condField = new String[]{"TRANSID", "STEPID", classBean2.getDatafield1(),
+				classBean2.getDatafield2(), classBean2.getDatafield3()};
+		String[] condValue = new String[]{meta.getParentStepMeta().getParentTransMeta().getName().toUpperCase(), 
+				meta.getDataStepName().toUpperCase(), classBean2.getDatavalue1(), 
+					classBean2.getDatavalue2(), classBean2.getDatavalue3()};
+		
+		return this.generateSQLPredicate(sql, condField, condValue);
+	}
+	
+	/**
+	 * SQL predicate constructor for table definitions
+	 * @param sqlQuery SQL query defitinion without predicate
+	 * @param condFields Conditional fields
+	 * @param condValues Data fields
+	 * @return
+	 */
+	private String generateSQLPredicate(String sqlQuery, String[] condFields, String condValues[]) {
+		for(int i=0;i<condFields.length;i++) {
+			if(condFields[i] != null && condFields[i].length() > 0 
+					&& condValues[i] != null && condValues[i].length() > 0) {
+				sqlQuery += (i == 0) ? "": " AND ";
+				sqlQuery += condFields[i].toUpperCase() 
+						+ ((i < 2) ? " = '":" LIKE '") 
+						+ condValues[i] + "'";
 			}
-		}catch(Exception e) {
-			throw new KettleException("ERROR WHILE TRYING TO EXECUTE FUNCTION MANIPULATION ==>" + field, e);
 		}
-		return returnValue;
+		return sqlQuery;
 	}
 	
+	/**
+	 * Query ontology base URI from prefix.cc service and added it to the prefix stack
+	 * @param prefix
+	 * @return
+	 * @throws Exception
+	 */
 	private String getOntologyURI(String prefix) throws Exception {
+		prefix = prefix.trim();
 		String URI = "";
 		if(prefixes.containsKey(prefix)) {
 			URI = prefixes.get(prefix);
 		} else {
 			URI = PrefixCCLookUp.queryService(prefix);
 			prefixes.put(prefix, URI);
+			r2rmlModel.setNsPrefix(prefix, URI);
 		}
 		return URI;
 	}
 	
+	/**
+	 * Final process to generate R2RML file 
+	 * @throws Exception
+	 */
 	private void finishProcess() throws Exception{
-		r2rmlModel.write(System.out, "N-TRIPLES");
+		FileOutputStream out = new FileOutputStream("/home/depcc/r2rml.ttl");
+		r2rmlModel.write(out, "TURTLE");
 		DatabaseLoader.closeConnection();
+	}
+	
+	/**
+	 * Return R2RML model sentences as a List
+	 * @return ArrayList with model sententes
+	 */
+	public List<String[]> getModelSentences() {
+		List<String[]> rowSet = new ArrayList<String[]>();
+		StmtIterator iter = r2rmlModel.listStatements();
+		while (iter.hasNext()) {
+		    Statement stmt      = iter.nextStatement();
+		    Resource  subject   = stmt.getSubject();
+		    Property  predicate = stmt.getPredicate();
+		    RDFNode   object    = stmt.getObject();
+	    	rowSet.add( new String[]{subject.toString(), predicate.toString(), object.toString()} );
+		}
+		return rowSet;
 	}
 
 }

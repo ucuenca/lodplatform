@@ -22,23 +22,12 @@
 
 package com.ucuenca.pentaho.plugin.step.ontologymapping;
 
-import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-import org.pentaho.di.core.CheckResult;
-import org.pentaho.di.core.CheckResultInterface;
-import org.pentaho.di.core.RowMetaAndData;
 import org.pentaho.di.core.exception.KettleException;
-import org.pentaho.di.core.row.RowDataUtil;
 import org.pentaho.di.core.row.RowMeta;
-import org.pentaho.di.core.row.RowMetaInterface;
-import org.pentaho.di.core.row.ValueMeta;
-import org.pentaho.di.core.row.ValueMetaInterface;
-import org.pentaho.di.core.row.value.ValueMetaFactory;
-import org.pentaho.di.core.util.StringUtil;
-import org.pentaho.di.i18n.BaseMessages;
 import org.pentaho.di.trans.Trans;
 import org.pentaho.di.trans.TransMeta;
 import org.pentaho.di.trans.step.BaseStep;
@@ -46,16 +35,9 @@ import org.pentaho.di.trans.step.StepDataInterface;
 import org.pentaho.di.trans.step.StepInterface;
 import org.pentaho.di.trans.step.StepMeta;
 import org.pentaho.di.trans.step.StepMetaInterface;
-import org.pentaho.di.trans.step.errorhandling.StreamInterface;
-import org.pentaho.di.trans.steps.constant.ConstantData;
-import org.pentaho.di.trans.steps.constant.ConstantMeta;
 
 import com.ucuenca.pentaho.plugin.step.r2rml.R2RMLGenerator;
 
-/*
-import com.ucuenca.pentaho.plugin.step.ontologymapping.rdf.Entity;
-import com.ucuenca.pentaho.plugin.step.ontologymapping.rdf.RDFModel;
-*/
 /**
  * This class is part of the demo step plug-in implementation.
  * It demonstrates the basics of developing a plug-in step for PDI. 
@@ -82,6 +64,8 @@ public class OntoMap extends BaseStep implements StepInterface {
 	
 	private OntoMapMeta meta;
 	private OntoMapData data;
+	
+	private Iterator rowIter;
 
 	/**
 	 * The constructor should simply pass on its arguments to the parent class.
@@ -122,185 +106,9 @@ public class OntoMap extends BaseStep implements StepInterface {
 		// Casting to step-specific implementation classes is safe
 		meta = (OntoMapMeta) smi;
 	    data = (OntoMapData) sdi;
-
-	    data.firstRow = true;
-	    /*
-	    if ( super.init( smi, sdi ) ) {
-	      // Create a row (constants) with all the values in it...
-	      List<CheckResultInterface> remarks = new ArrayList<CheckResultInterface>(); // stores the errors...
-	      data.constants = buildRow( meta, data, remarks );
-	      if ( remarks.isEmpty() ) {
-	        return true;
-	      } else {
-	        for ( int i = 0; i < remarks.size(); i++ ) {
-	          CheckResultInterface cr = remarks.get( i );
-	          logError( cr.getText() );
-	        }
-	      }
-	    }
-	    return false;
-	    */
-	    return true;
+	    
+	    return super.init( smi, sdi );
 	}
-	
-	/**
-	 * Implementation
-	 * @param meta
-	 * @param data
-	 * @param remarks
-	 * @return
-	 */
-	/*public static final RowMetaAndData buildRow( OntoMapMeta meta, OntoMapData data,
-	    List<CheckResultInterface> remarks ) {
-	    RowMetaInterface rowMeta = new RowMeta();
-	    Object[] rowData = new Object[meta.getFieldName().length];
-
-	    for ( int i = 0; i < meta.getFieldName().length; i++ ) {
-	      int valtype = ValueMeta.getType( meta.getFieldType()[i] );
-	      if ( meta.getFieldName()[i] != null ) {
-	        ValueMetaInterface value = null;
-	        try {
-	          value = ValueMetaFactory.createValueMeta( meta.getFieldName()[i], valtype );
-	        } catch ( Exception exception ) {
-	          remarks.add( new CheckResult( CheckResultInterface.TYPE_RESULT_ERROR, exception.getMessage(), null ) );
-	          continue;
-	        }
-	        value.setLength( meta.getFieldLength()[i] );
-	        value.setPrecision( meta.getFieldPrecision()[i] );
-
-	        if ( meta.isSetEmptyString()[i] ) {
-	          // Just set empty string
-	          rowData[i] = StringUtil.EMPTY_STRING;
-	        } else {
-
-	          String stringValue = meta.getValue()[i];
-
-	          // If the value is empty: consider it to be NULL.
-	          if ( stringValue == null || stringValue.length() == 0 ) {
-	            rowData[i] = null;
-
-	            if ( value.getType() == ValueMetaInterface.TYPE_NONE ) {
-	              String message =
-	                BaseMessages.getString(
-	                  PKG, "Constant.CheckResult.SpecifyTypeError", value.getName(), stringValue );
-	              remarks.add( new CheckResult( CheckResultInterface.TYPE_RESULT_ERROR, message, null ) );
-	            }
-	          } else {
-	            switch ( value.getType() ) {
-	              case ValueMetaInterface.TYPE_NUMBER:
-	                try {
-	                  if ( meta.getFieldFormat()[i] != null
-	                    || meta.getDecimal()[i] != null || meta.getGroup()[i] != null
-	                    || meta.getCurrency()[i] != null ) {
-	                    if ( meta.getFieldFormat()[i] != null && meta.getFieldFormat()[i].length() >= 1 ) {
-	                      data.df.applyPattern( meta.getFieldFormat()[i] );
-	                    }
-	                    if ( meta.getDecimal()[i] != null && meta.getDecimal()[i].length() >= 1 ) {
-	                      data.dfs.setDecimalSeparator( meta.getDecimal()[i].charAt( 0 ) );
-	                    }
-	                    if ( meta.getGroup()[i] != null && meta.getGroup()[i].length() >= 1 ) {
-	                      data.dfs.setGroupingSeparator( meta.getGroup()[i].charAt( 0 ) );
-	                    }
-	                    if ( meta.getCurrency()[i] != null && meta.getCurrency()[i].length() >= 1 ) {
-	                      data.dfs.setCurrencySymbol( meta.getCurrency()[i] );
-	                    }
-
-	                    data.df.setDecimalFormatSymbols( data.dfs );
-	                  }
-
-	                  rowData[i] = new Double( data.nf.parse( stringValue ).doubleValue() );
-	                } catch ( Exception e ) {
-	                  String message =
-	                    BaseMessages.getString(
-	                      PKG, "Constant.BuildRow.Error.Parsing.Number", value.getName(), stringValue, e
-	                        .toString() );
-	                  remarks.add( new CheckResult( CheckResultInterface.TYPE_RESULT_ERROR, message, null ) );
-	                }
-	                break;
-
-	              case ValueMetaInterface.TYPE_STRING:
-	                rowData[i] = stringValue;
-	                break;
-
-	              case ValueMetaInterface.TYPE_DATE:
-	                try {
-	                  if ( meta.getFieldFormat()[i] != null ) {
-	                    data.daf.applyPattern( meta.getFieldFormat()[i] );
-	                    data.daf.setDateFormatSymbols( data.dafs );
-	                  }
-
-	                  rowData[i] = data.daf.parse( stringValue );
-	                } catch ( Exception e ) {
-	                  String message =
-	                    BaseMessages.getString(
-	                      PKG, "Constant.BuildRow.Error.Parsing.Date", value.getName(), stringValue, e.toString() );
-	                  remarks.add( new CheckResult( CheckResultInterface.TYPE_RESULT_ERROR, message, null ) );
-	                }
-	                break;
-
-	              case ValueMetaInterface.TYPE_INTEGER:
-	                try {
-	                  rowData[i] = new Long( Long.parseLong( stringValue ) );
-	                } catch ( Exception e ) {
-	                  String message =
-	                    BaseMessages.getString(
-	                      PKG, "Constant.BuildRow.Error.Parsing.Integer", value.getName(), stringValue, e
-	                        .toString() );
-	                  remarks.add( new CheckResult( CheckResultInterface.TYPE_RESULT_ERROR, message, null ) );
-	                }
-	                break;
-
-	              case ValueMetaInterface.TYPE_BIGNUMBER:
-	                try {
-	                  rowData[i] = new BigDecimal( stringValue );
-	                } catch ( Exception e ) {
-	                  String message =
-	                    BaseMessages.getString(
-	                      PKG, "Constant.BuildRow.Error.Parsing.BigNumber", value.getName(), stringValue, e
-	                        .toString() );
-	                  remarks.add( new CheckResult( CheckResultInterface.TYPE_RESULT_ERROR, message, null ) );
-	                }
-	                break;
-
-	              case ValueMetaInterface.TYPE_BOOLEAN:
-	                rowData[i] =
-	                  Boolean
-	                    .valueOf( "Y".equalsIgnoreCase( stringValue ) || "TRUE".equalsIgnoreCase( stringValue ) );
-	                break;
-
-	              case ValueMetaInterface.TYPE_BINARY:
-	                rowData[i] = stringValue.getBytes();
-	                break;
-
-	              case ValueMetaInterface.TYPE_TIMESTAMP:
-	                try {
-	                  rowData[i] = Timestamp.valueOf( stringValue );
-	                } catch ( Exception e ) {
-	                  String message =
-	                    BaseMessages.getString(
-	                      PKG, "Constant.BuildRow.Error.Parsing.Timestamp", value.getName(), stringValue, e
-	                        .toString() );
-	                  remarks.add( new CheckResult( CheckResultInterface.TYPE_RESULT_ERROR, message, null ) );
-	                }
-	                break;
-
-	              default:
-	                String message =
-	                  BaseMessages.getString(
-	                    PKG, "Constant.CheckResult.SpecifyTypeError", value.getName(), stringValue );
-	                remarks.add( new CheckResult( CheckResultInterface.TYPE_RESULT_ERROR, message, null ) );
-	            }
-	          }
-	        }
-	        // Now add value to the row!
-	        // This is in fact a copy from the fields row, but now with data.
-	        rowMeta.addValueMeta( value );
-
-	      } // end if
-	    } // end for
-
-	    return new RowMetaAndData( rowMeta, rowData );
-	  }*/
 
 	/**
 	 * Once the transformation starts executing, the processRow() method is called repeatedly
@@ -324,84 +132,26 @@ public class OntoMap extends BaseStep implements StepInterface {
 	 * @return true to indicate that the function should be called again, false if the step is done
 	 */
 	public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws KettleException {
-
-		/*Object[] r = null;
-		List<StreamInterface> infoStreams = meta.getStepIOMeta().getInfoStreams();
-
-	      data.ontologiesRowSet = findInputRowSet( infoStreams.get( 0 ).getStepname() );
-	      if ( data.ontologiesRowSet == null ) {
-	        throw new KettleException( BaseMessages.getString(
-	          PKG, "MergeJoin.Exception.UnableToFindSpecifiedStep", infoStreams.get( 0 ).getStepname() ) );
-	      }
-	
-	      data.dataRowSet = findInputRowSet( infoStreams.get( 1 ).getStepname() );
-	      if ( data.dataRowSet == null ) {
-	        throw new KettleException( BaseMessages.getString(
-	          PKG, "MergeJoin.Exception.UnableToFindSpecifiedStep", infoStreams.get( 1 ).getStepname() ) );
-	      }
-	
-	      data.ontologies = getRowFrom( data.ontologiesRowSet );
-	      if ( data.ontologies != null ) {
-	        data.ontologiesMeta = data.ontologiesRowSet.getRowMeta();
-	      } else {
-	        data.ontologies = null;
-	        data.ontologiesMeta = getTransMeta().getStepFields( infoStreams.get( 0 ).getStepname() );
-	      }
-	
-	      data.data = getRowFrom( data.dataRowSet );
-	      if ( data.data != null ) {
-	        data.dataMeta = data.dataRowSet.getRowMeta();
-	      } else {
-	        data.data = null;
-	        data.dataMeta = getTransMeta().getStepFields( infoStreams.get( 1 ).getStepname() );
-	      }
-	    r = getRow();
-
-	    if ( r == null ) { // no more rows to be expected from the previous step(s)
-	      setOutputDone();
-	      return false;
-	    }
-	    String rowKey = (String)r[0];
-	    if ( data.firstRow ) {
-	      // The output meta is the original input meta + the
-	      // additional constant fields.
-
-	      data.firstRow = false;
-	      //data.entity = new Entity<String, String>(rowKey);
-	      data.outputRowMeta = super.getInputRowMeta().clone();
-
-	      RowMetaInterface constants = data.constants.getRowMeta();
-	      data.outputRowMeta.mergeRowMeta( constants );
-	    }
-	    if(data.entity.getKey() != null && data.entity.getKey().equals(rowKey)) {
-	    	data.entity.addEntityRow(r);
-	    } else {
-	    	/*new RDFModel("http://biblioteca.ucuenca.edu.ec/resource/", super.getInputRowMeta())
-	    	.process(data.entity);
-	    	
-	    	data.entity = new Entity<String, String>(rowKey);*/
-	    /*}
-	    
-
-	    // Add the constant data to the end of the row.
-	    r = RowDataUtil.addRowData( r, getInputRowMeta().size(), data.constants.getData() );
-
-	    putRow( data.outputRowMeta, r );
-
-	    if ( log.isRowLevel() ) {
-	      logRowlevel( BaseMessages.getString(
-	        PKG, "Constant.Log.Wrote.Row", Long.toString( getLinesWritten() ), getInputRowMeta().getString( r ) ) );
-	    }
-
-	    if ( checkFeedback( getLinesWritten() ) ) {
-	      if ( log.isBasic() ) {
-	        logBasic( BaseMessages.getString( PKG, "Constant.Log.LineNr", Long.toString( getLinesWritten() ) ) );
-	      }
-	    }
-		*/
-		R2RMLGenerator.getInstance(smi, sdi).process();
-	    //return true;
-		return false;
+		Boolean hasMoreData = Boolean.TRUE;
+		if (first) {
+			first = false;
+			data.outputRowMeta = new RowMeta();
+			meta.getFields(data.outputRowMeta, getStepname(), null, null, this, null, null);
+			
+			R2RMLGenerator r2rmlParser = new R2RMLGenerator(smi, sdi);
+			r2rmlParser.process();
+			List<String[]> rowSet = r2rmlParser.getModelSentences();
+			this.rowIter = rowSet.iterator();
+			
+		}
+		if(rowIter.hasNext()) {
+			putRow(data.outputRowMeta, ((Object[])rowIter.next()) );
+			
+		} else {
+			hasMoreData = Boolean.FALSE;
+			setOutputDone();
+		}
+		return hasMoreData;
 	}
 
 	/**
