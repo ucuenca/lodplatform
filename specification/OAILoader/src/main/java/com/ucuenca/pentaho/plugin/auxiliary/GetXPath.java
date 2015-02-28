@@ -6,7 +6,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.ucuenca.pentaho.plugin.step.OAILoaderMeta;
+import com.ucuenca.pentaho.plugin.step.oai.OAILoaderMeta;
 
 public class GetXPath {
 	OAILoaderMeta meta;

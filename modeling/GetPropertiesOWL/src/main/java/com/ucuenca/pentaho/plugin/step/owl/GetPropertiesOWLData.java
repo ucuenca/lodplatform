@@ -20,7 +20,7 @@
  *
  ******************************************************************************/
 
-package com.ucuenca.pentaho.plugin.step;
+package com.ucuenca.pentaho.plugin.step.owl;
 
 import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.core.logging.LogChannelInterface;
@@ -209,7 +209,7 @@ public class GetPropertiesOWLData extends BaseStepData implements StepDataInterf
 
 					dataLoader.sequence++;
 					int dataIndex = databaseLoad ? 3:0; 
-					outputRow[dataIndex] = nameontology;
+					outputRow[dataIndex] = nameontology.trim();
 					outputRow[dataIndex+1] = cls.getURI();
 					outputRow[dataIndex+2] = "rdf:type";
 					outputRow[dataIndex+3] = "rdfs:class";
@@ -250,7 +250,7 @@ public class GetPropertiesOWLData extends BaseStepData implements StepDataInterf
 				if (proper.getLocalName() != null) {
 					dataLoader.sequence++;
 					int dataIndex = databaseLoad ? 3:0; 
-					outputRow[dataIndex] = nameontology;
+					outputRow[dataIndex] = nameontology.trim();
 					outputRow[dataIndex+1] = proper.getURI();
 					outputRow[dataIndex+2] = "rdf:type";
 					outputRow[dataIndex+3] = "rdfs:property";
