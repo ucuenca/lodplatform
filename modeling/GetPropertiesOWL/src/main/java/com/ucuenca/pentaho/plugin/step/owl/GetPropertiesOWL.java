@@ -20,7 +20,7 @@
  *
  ******************************************************************************/
 
-package com.ucuenca.pentaho.plugin.step;
+package com.ucuenca.pentaho.plugin.step.owl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -128,37 +128,10 @@ public class GetPropertiesOWL extends BaseStep implements StepInterface {
 		GetPropertiesOWLMeta meta = (GetPropertiesOWLMeta) smi;
 		GetPropertiesOWLData data = (GetPropertiesOWLData) sdi;
 
-		if (super.init(meta, data)) {
-
-			try {
-				// LinkedList miListSource = new LinkedList<String>();
-				
-				/**
-				 * String replace = meta.getOutputField().replace("[", "");
-				 * System.out.println(replace); String replace1 =
-				 * replace.replace("]", ""); System.out.println(replace1);
-				 * List<String> myList = new ArrayList<String>(
-				 * Arrays.asList(replace1.split(",")));
-				 * System.out.println(myList.toString());
-				 * 
-				 * JOptionPane.showMessageDialog(null, myList.size()); for (int
-				 * i = 0; i < myList.size(); i++) { //
-				 * data.model.read(meta.getOutputField().toString()); // // here
-				 * i load model from ontology data.model.removeAll();
-				 * System.out.println(myList.get(i));
-				 * data.model.read(myList.get(i)); }
-				 */
-				// data.model=(OntModel) mfl.readModel(null,
-				// meta.getOutputField());
-			} catch (Exception e) {
-				logError("Unload model from URI [" + e.getMessage()
-						+ "] because of an error: " + e.toString());
-				return true;
-			}
-
-			// data.shapeNr=0;
-		}
-		return true;
+		data.getDataLoader().setBaseStep(this);
+		System.out.println("init "+meta.getOutputField());
+		//return true;
+		return super.init(meta, data);
 	}
 
 	/**
@@ -196,191 +169,19 @@ public class GetPropertiesOWL extends BaseStep implements StepInterface {
 		GetPropertiesOWLMeta meta = (GetPropertiesOWLMeta) smi;
 		GetPropertiesOWLData data = (GetPropertiesOWLData) sdi;
 
-		// get incoming row, getRow() potentially blocks waiting for more rows,
-		// returns null if no more rows expected
-		Object[] r = getRow();
-		String replace = meta.getOutputField().replace("[", "");
-		//System.out.println(replace);
-		String replace1 = replace.replace("]", "");
-		//System.out.println(replace1);
-		//para quitar espacios en blanco
-		String replace2=replace1.replaceAll("\\s+","");
-		
-		List<String> myList = new ArrayList<String>(Arrays.asList(replace2
-				.split(",")));
-		//System.out.println(myList.toString());
-
-		//get name onlogy
-		
-		StringTokenizer st2 = new StringTokenizer(myList.get(ii).toString(), "/");
-		int nutok=st2.countTokens();int cont=0;
-		
-		while (st2.hasMoreTokens()) {
-			
-			nameontology=st2.nextToken();
-			if(cont==nutok-2){
-				nameontology=st2.nextToken();
-				break;
-				};
-			cont++;
-		}
-		
-		//JOptionPane.showMessageDialog(null, myList.size());
-		// for (int ii = 0; ii < myList.size(); ii++) {
-		// data.model.read(meta.getOutputField().toString()); // here i load
-		// model from ontology
-		// data.model.removeAll();
-		//System.out.println(myList.get(ii));
-		try {
-			
-			data.model.read(myList.get(ii));
-
-		} catch (Exception eox) {
-			logError("Unload model from URI [" + eox.getMessage()
-					+ "] because of an error: " + eox.toString());
-			
-		}
-
-		// if no more rows are expected, indicate step is finished and
-		// processRow() should not be called again
-		if (data.model.isEmpty()) { // par	a ver si esta cargado el modelo
-			setOutputDone();
-			return false;
-		}
-
-		// the "first" flag is inherited from the base step implementation
-		// it is used to guard some processing tasks, like figuring out
-		// field indexes
-		// in the row structure that only need to be done once
-		if (first) { // all ok for the momento
+		if (first) {
 			first = false;
-
-			// clone the input row structure and place it in our data object
 			data.outputRowMeta = new RowMeta();
-
-			// data.outputRowMeta = (RowMetaInterface)
-			// getInputRowMeta().clone();
-			// use meta.getFields() to change it, so it reflects the output
-			// row structure
 			meta.getFields(data.outputRowMeta, getStepname(), null, null, this);
 		}
 
-		// safely add the string "Hello World!" at the end of the output row
-		// the row array will be resized if necessary
-		// Object[] outputRow = RowDataUtil.addValueData(r,
-		// data.outputRowMeta.size() - 1, "Hello World!");
-		Object[] outputRow = RowDataUtil.allocateRowData(data.outputRowMeta
-				.size());
-		// -------------------------------here get properties for each class
-		// of ontology-----------
-		if (!data.model.isEmpty()) {
-			for (Iterator<OntClass> i = data.model.listClasses(); i.hasNext();) {
-				OntClass cls = i.next();
-
-				if (cls.getLocalName() != null) { // Para que no se recorran
-													// clases vacias
-
-					// outputRow[0]=cls.getURI()+" "+cls.getLocalName();//para
-					// que salgan los nombres
-		//			System.out.println(cls.getNameSpace());
-					//outputRow[0] = "Ontologia" + myList.get(ii);
-					outputRow[0] = this.nameontology;
-					outputRow[1] = cls.getURI();
-					outputRow[2] = "rdf:type";
-					outputRow[3] = "rdfs:class";
-					// put the row to the output row stream
-					putRow(data.outputRowMeta, outputRow);
-					// System.out.print(cls.getURI()+" "+cls.getLocalName()+" rdf:type  rdfs:class");
-					// //obtengo nombre de la clase
-					// for(Iterator it =
-					// cls.listInstances(true);it.hasNext();){
-					// Individual ind = (Individual)it.next();
-
-					// Propiedades
-					// if(ind.isIndividual()){
-					// System.out.println(ind.getLocalName()+" ");//imprime
-					// las instancias
-
-					// ---------------------------Obtener las propiedades de
-					// la clase
-
-					// show the properties of this individual
-
-					// System.out.println( "  " + cls.getURI());
-					try {
-					ExtendedIterator itq = cls.listDeclaredProperties();
-
-					while (itq.hasNext()) {
-						OntProperty property = (OntProperty) itq.next();
-						//outputRow[0] = "Ontologia -> " + myList.get(ii);
-						outputRow[0] = this.nameontology;
-						outputRow[1] = property;
-						outputRow[2] = "rdf:type";
-						outputRow[3] = "rdfs:property";
-						// System.out.println("property  "+ property);
-						putRow(data.outputRowMeta, outputRow);
-					}
-
-					for (StmtIterator j = cls.listProperties(); j.hasNext();) {
-						String name = j.getClass().getName();
-
-						Statement s = j.next();
-						Resource sujeto = s.getSubject();
-						// Model modelopropiedad =
-						// s.getObject().getModel().getP;
-						outputRow[1] = "    " + s.getPredicate().getLocalName()
-								+ " -> ";
-
-						// System.out.print( "    " +
-						// s.getPredicate().getLocalName() + " -> " );
-
-						if (s.getObject().isLiteral()) {
-							outputRow[2] = s.getLiteral().getLexicalForm();
-							// System.out.println(
-							// s.getLiteral().getLexicalForm() );
-						} else {
-							outputRow[2] = s.getObject();
-							// System.out.println( s.getObject() );
-						}
-						outputRow[3] = "rdfs:property";
-						putRow(data.outputRowMeta, outputRow);
-					}
-					}catch (Exception eox1){
-						
-						logError("Unload model from URI [" + eox1.getMessage()
-								+ "] because of an error: " + eox1.toString());
-					}
-					// ------------------------------
-					// }
-					// obtener las clases de las propiedades
-
-					// }//end for
-				}// fin for quita nulos
-			//	System.out.println();
-			}
-		}// fin comprobacion
-
-		// }// fin del for
-		ii++;
-		if (ii >= myList.size()) {
-			repetir = false;
-		}
-		
-
-		// ----------------------------------------------------------------------------------------
-		// outputRow[0]="hola";
-		/*
-		 * outputRow[1]="soy"; outputRow[2]="yo"; // put the row to the output
-		 * row stream putRow(data.outputRowMeta, outputRow);
-		 */
-
-		// log progress if it is time to to so
+		Boolean hasMoreData = data.getData(smi, sdi, false);
+		if(!hasMoreData) setOutputDone();
 		if (checkFeedback(getLinesRead())) {
 			logBasic("Linenr " + getLinesRead()); // Some basic logging
+			
 		}
-
-		// indicate that processRow() should be called again
-		return repetir;// to do it only one time
+		return hasMoreData;
 
 	}
 

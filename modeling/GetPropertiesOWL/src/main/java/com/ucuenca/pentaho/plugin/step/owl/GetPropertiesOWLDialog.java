@@ -20,7 +20,7 @@
  *
  ******************************************************************************/
 
-package com.ucuenca.pentaho.plugin.step;
+package com.ucuenca.pentaho.plugin.step.owl;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -115,6 +115,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
@@ -188,9 +189,11 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 	private ColumnInfo fieldColumn = null;
 	private Table table;
 	private int numt = 0;
-
+	//must be included for DataBase Data Loading
+		private Button precatchDataButton;
 	private int NumRowSelected;
 	private LinkedList ListSource = new LinkedList<String>();
+	private LinkedList ListNames = new LinkedList<String>();
 
 	/**
 	 * The constructor should simply invoke super() and save the incoming meta
@@ -210,6 +213,9 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 			String sname) {
 		super(parent, (BaseStepMeta) in, transMeta, sname);
 		meta = (GetPropertiesOWLMeta) in;
+		
+		//must be included for DataBase Data Loading
+				meta.setTransMeta(transMeta);
 	}
 
 	/**
@@ -271,6 +277,31 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 
 		// Stepname line
 
+		//---------------------
+		
+		// Stepname line
+		wlStepname = new Label(shell, SWT.RIGHT);
+		wlStepname
+				.setText(BaseMessages.getString(PKG, "System.Label.StepNameLabel"));
+		props.setLook(wlStepname);
+		fdlStepname = new FormData();
+		fdlStepname.left = new FormAttachment(0, 0);		
+		fdlStepname.top = new FormAttachment(0, margin);
+		fdlStepname.right = new FormAttachment(middle, -margin);
+		wlStepname.setLayoutData(fdlStepname);
+
+		wStepname = new Text(shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
+		wStepname.setText(BaseMessages.getString(PKG, "System.Label.StepName"));
+		props.setLook(wStepname);
+		wStepname.addModifyListener(lsMod);
+		fdStepname = new FormData();
+		fdStepname.left = new FormAttachment(middle, 0);
+		fdStepname.top = new FormAttachment(0, margin);
+		fdStepname.right = new FormAttachment(100, 0);
+		wStepname.setLayoutData(fdStepname);
+		//------------------
+		
+		
 		// output field value
 		Label wlValName = new Label(shell, SWT.RIGHT);
 		wlValName.setText(BaseMessages.getString(PKG,
@@ -279,8 +310,8 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 		FormData fdlValName = new FormData();
 		fdlValName.left = new FormAttachment(0, 0);
 		fdlValName.right = new FormAttachment(middle, -margin);
-		// fdlValName.top = new FormAttachment(wStepname, margin);
-		fdlValName.top = new FormAttachment(wlStepname, margin);
+		 fdlValName.top = new FormAttachment(wStepname, margin);
+		//fdlValName.top = new FormAttachment(10, margin);
 
 		wlValName.setLayoutData(fdlValName);
 
@@ -289,11 +320,34 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 		wHelloFieldName.addModifyListener(lsMod);
 		FormData fdValName = new FormData();
 		fdValName.left = new FormAttachment(middle, 0);
-		fdValName.right = new FormAttachment(100, 0);
-		// fdValName.top = new FormAttachment(wStepname, margin);
-		fdValName.top = new FormAttachment(wlStepname, margin);
+		fdValName.right = new FormAttachment(100, 0);	
+		fdValName.top = new FormAttachment(wlStepname, margin+10);
 		wHelloFieldName.setLayoutData(fdValName);
 
+		//------------
+		
+		//must be included for DataBase Data Loading
+		precatchDataButton = new Button(shell, SWT.PUSH);
+		props.setLook(precatchDataButton);
+		precatchDataButton.setText(BaseMessages.getString(PKG, "GetPropertiesOWL.PrecatchButton.Title"));
+		precatchDataButton.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				GetPropertiesOWLData data = (GetPropertiesOWLData)meta.getStepData();
+				setDialogMetadata();
+				data.getDataLoader().setStepName("GetPropertiesOWl");
+				data.getDataLoader().setDatabaseLoad(Boolean.TRUE);
+				
+				
+		
+			
+				//data.initOAIHarvester(meta, data);
+				new Thread(new DBLoader(data)).start();
+				
+			}
+		});
+		
+		//--------------
+		
 		// OK and cancel buttons
 		wOK = new Button(shell, SWT.PUSH);
 		wOK.setText(BaseMessages.getString(PKG, "System.Button.OK"));
@@ -323,7 +377,9 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 		String[] titles = {
 				BaseMessages.getString(PKG, "GetPropertiesOWL.FieldName.col1"),
 				BaseMessages.getString(PKG, "GetPropertiesOWL.FieldName.col2"),
-				BaseMessages.getString(PKG, "GetPropertiesOWL.FieldName.col3") };
+				BaseMessages.getString(PKG, "GetPropertiesOWL.FieldName.col3"),
+				BaseMessages.getString(PKG, "GetPropertiesOWL.FieldName.col4")
+		};
 		for (int i = 0; i < titles.length; i++) {
 			TableColumn column = new TableColumn(table, SWT.NONE);
 			column.setText(titles[i]);
@@ -349,7 +405,7 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 		table.setLayoutData(fdmitabla);
 
 		BaseStepDialog.positionBottomButtons(shell,
-				new Button[] { wOK, wCancel }, margin, table);
+				new Button[] { wOK, wCancel,precatchDataButton }, margin, table);
 		/**
 		 * fdok = new FormData(); fdok.left = new FormAttachment(wCancel,
 		 * middle); //fdok.right = new FormAttachment(100, 0);
@@ -441,42 +497,81 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 		return stepname;
 	}
 
+	
+	private class DBLoader implements Runnable {
+
+		private GetPropertiesOWLData data;
+		
+		private DBLoader(GetPropertiesOWLData data) {
+			this.data = data;
+		}
+		
+		public void run() {
+			try {
+				int x = 0;
+				while(data.getData(meta, data, true)) {
+					x++;
+				}
+				data.getDataLoader().logBasic(BaseMessages.getString(PKG,
+						"GetPropertiesOWL.Dialog.TotalRequests.Label") + x);
+			}catch(KettleException ex) {
+				ex.printStackTrace();
+				MessageBox dialog = 
+						  new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
+						dialog.setText("ERROR");						
+				dialog.setMessage(ex.getMessage());   		    
+			    dialog.open();
+			}
+		}
+	}
 	/**
 	 * This helper method puts the step configuration stored in the meta object
 	 * and puts it into the dialog controls.
 	 */
 	private void populateDialog() {
-
+		wStepname.selectAll();
 		String data = meta.getOutputField().trim();// read contents of text area
-													// into 'data'
-		if (!data.equals("")) {
+												// into 'data'
+		if ((!data.equals(""))&&(!data.equals("[]"))) {
 
-			String replace = meta.getOutputField().replace("[", "");
+			String replace = data.replace("[", "");
 			String replace1 = replace.replace("]", "");
 			ArrayList<String> myList = new ArrayList<String>(
 					Arrays.asList(replace1.split(",")));
 
-			// ListSource = meta.getListSourcetoProcess();
+			// ---------------------listanombres
+			 replace = meta.getNameOntology().trim().replace("[", "");
+			 replace1 = replace.replace("]", "");
+			ArrayList<String> myListNames = new ArrayList<String>(
+					Arrays.asList(replace1.split(",")));
+	
+			//---------------------------
 
 			for (int i = 0; i < myList.size(); i++) {
 				TableItem item = new TableItem(table, SWT.NONE, numt++);
 				item.setText(0, String.valueOf(numt));
-				item.setText(1, myList.get(i).toString());
+				item.setText(1, myListNames.get(i).toString().trim());
+				item.setText(2, myList.get(i).toString().trim());
 				// --
 				Pattern pat = Pattern.compile("^http://.*");
-				Matcher mat = pat.matcher(myList.get(i).toString());
+				Matcher mat = pat.matcher(myList.get(i).toString().trim());
 				if (mat.matches()) { // entonces es una uri
-					item.setText(2, BaseMessages.getString(PKG,
+					item.setText(3, BaseMessages.getString(PKG,
 							"GetPropertiesOWL.FieldName.mt2"));
 				} else {
-					item.setText(2, BaseMessages.getString(PKG,
+					item.setText(3, BaseMessages.getString(PKG,
 							"GetPropertiesOWL.FieldName.mt3"));
 				}
 				// --
+				
 
-				wHelloFieldName.setText(myList.get(i).toString());
 			}// fin for
+			
 		}// fin if
+		if(meta.getStepName()!=null){
+			wStepname.setText(meta.getStepName());	
+		}
+		
 			// } else {
 			// wHelloFieldName.setText(BaseMessages.getString(PKG,
 			// "GetPropertiesOWL.FieldName.MensajeInicio"));
@@ -501,26 +596,10 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 	 * Called when the user confirms the dialog
 	 */
 	private void ok() {
-	
-		if (numt>0){ //validacion
-		for (int i = 0; i < this.numt; i++) {
 
-			TableItem miti = table.getItem(i);
-			ListSource.add(miti.getText(1));
-
-
-			// JOptionPane.showMessageDialog(null, ListSource.get(i));
-			// meta.setOutputField(ListSource.get(i).toString()); //para que
-			// tome solo la seleccionada
-
-		}
-		meta.setOutputField(ListSource.toString());
-		meta.setListSourcetoProcess(ListSource);
-		// meta.setOutputField(ListSource.get(i)); //para que tome solo la
-		// seleccionada
-
-		
-		}//fin if
+	if (numt>=0){ //validar exitan datos
+		this.setDialogMetadata();
+	}
 		dispose();
 	}
 
@@ -532,39 +611,14 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 			String result = dialog.open();
 			TableItem item = new TableItem(table, SWT.NONE, numt++);
 			item.setText(0, String.valueOf(numt));
-			item.setText(1, dialog.getFilterPath() + "/" + dialog.getFileName());
-			item.setText(2, BaseMessages.getString(PKG, "GetPropertiesOWL.FieldName.mt3"));
+			item.setText(1, dialog.getFileName());  //nombre del archivo
+			item.setText(2, dialog.getFilterPath() + "/" + dialog.getFileName());
+			item.setText(3, BaseMessages.getString(PKG, "GetPropertiesOWL.FieldName.mt3"));
+			setNameOnto(dialog.getFilterPath() + "/" + dialog.getFileName(),numt);
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.toString(), e);
 		}
-		// JFileChooser chooser = new JFileChooser();
-		/**
-		 * chooser.setCurrentDirectory(new java.io.File("."));
-		 * chooser.setDialogTitle("Choose the file .owl in your computer");
-		 * chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-		 * chooser.setAcceptAllFileFilterUsed(false);
-		 * 
-		 * if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) { //
-		 * System.out.println("getCurrentDirectory(): " + //
-		 * chooser.getCurrentDirectory()); JOptionPane.showMessageDialog(null,
-		 * "getSelectedFile() : " + chooser.getSelectedFile()); //
-		 * this.wHelloFieldName.setText(chooser.getSelectedFile().toString());
-		 * // para agregar a la tabla swt // this.table
-		 * 
-		 * TableItem item = new TableItem(table, SWT.NONE, numt++);
-		 * item.setText(0, String.valueOf(numt)); item.setText(1,
-		 * chooser.getSelectedFile().toString()); item.setText(2, "from file");
-		 * } else { JOptionPane.showMessageDialog(null,
-		 * "Please first you have to do almost any Selection "); }
-		 */
-		// The "stepname" variable will be the return value for the open()
-		// method.
-		// Setting to step name from the dialog control
-		// stepname = wStepname.getText();
-		// Setting the settings to the meta object
-		// meta.setOutputField(wHelloFieldName.getText());
-		// close the SWT dialog window
-		// dispose();
+
 	}
 
 	private void AddUri() {
@@ -586,27 +640,17 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 			Pattern pat = Pattern.compile("^http.*");
 			Matcher mat = pat.matcher(wHelloFieldName.getText());
 			
-			if (mat.matches()) { // entonces es una uri completa directa , no necesito usar prefix ej  http://iflastandards.info/ns/fr/frbr/frbrer/
-				
-                
-				
-				TableItem item = new TableItem(table, SWT.NONE, numt++);
-					item.setText(0, String.valueOf(numt));
-					item.setText(1, wHelloFieldName.getText());
-					item.setText(2, BaseMessages.getString(PKG,
-							"GetPropertiesOWL.FieldName.mt2"));
-	
-			} else {  // NO ES UNA URI completa por ejemplo solo bibo 
-		
-				String myresult = ConsultUri(wHelloFieldName.getText());// search
+		String myresult = ConsultUri(wHelloFieldName.getText().trim());// search
 				// in
 
 				if (myresult != null) {
 					TableItem item = new TableItem(table, SWT.NONE, numt++);
 					item.setText(0, String.valueOf(numt));
-					item.setText(1, myresult);
-					item.setText(2, BaseMessages.getString(PKG,
+					item.setText(1, wHelloFieldName.getText().trim());
+					item.setText(2, myresult);
+					item.setText(3, BaseMessages.getString(PKG,
 							"GetPropertiesOWL.FieldName.mt2"));
+					setNameOnto(wHelloFieldName.getText(),numt); //para guardar el nombre y no la busqueda
 				}else { // solo aqui es el error pues si es una noUri como bibo que no se valida
 					
 					MessageBox dialog = 
@@ -622,11 +666,18 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 				}
 				
 				
+				
 
-			}// fin si no es una uri
+	
 
 		}
 	}// fin add URI
+
+	private void setNameOnto(String myresult,int numt) {
+		ListNames.add(numt);
+		ListNames.add(myresult);
+		
+	}
 
 	/** to load URI from Web */
 	private String ConsultUri(String mysearching) {
@@ -717,6 +768,29 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 			table.remove(NumRowSelected);
 			numt--;
 		}
+	}
+	private void setDialogMetadata() {
+		ListSource.clear();  
+		ListNames.clear();
+		if (numt>0){ 
+		
+		
+		for (int i = 0; i < this.numt; i++) {
+
+			TableItem miti = table.getItem(i);
+			ListNames.add(miti.getText(1));
+			ListSource.add(miti.getText(2));
+
+
+		}
+		
+		meta.setOutputField(ListSource.toString());
+		meta.setNameOntology(ListNames.toString());
+	
+		}//fin if
+		stepname = wStepname.getText(); //set name in the spoon
+		meta.setStepName(wStepname.getText());
+		
 	}
 
 }

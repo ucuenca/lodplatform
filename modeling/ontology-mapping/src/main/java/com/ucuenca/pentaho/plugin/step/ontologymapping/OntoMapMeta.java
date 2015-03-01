@@ -22,14 +22,12 @@
 
 package com.ucuenca.pentaho.plugin.step.ontologymapping;
 
-import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.swt.widgets.Shell;
 import org.pentaho.di.core.CheckResult;
 import org.pentaho.di.core.CheckResultInterface;
-import org.pentaho.di.core.Const;
 import org.pentaho.di.core.Counter;
 import org.pentaho.di.core.database.DatabaseMeta;
 import org.pentaho.di.core.exception.KettleException;
@@ -39,7 +37,6 @@ import org.pentaho.di.core.exception.KettleXMLException;
 import org.pentaho.di.core.row.RowMetaInterface;
 import org.pentaho.di.core.row.ValueMeta;
 import org.pentaho.di.core.row.ValueMetaInterface;
-import org.pentaho.di.core.row.value.ValueMetaFactory;
 import org.pentaho.di.core.variables.VariableSpace;
 import org.pentaho.di.core.xml.XMLHandler;
 import org.pentaho.di.i18n.BaseMessages;
@@ -50,12 +47,15 @@ import org.pentaho.di.trans.TransMeta;
 import org.pentaho.di.trans.step.BaseStepMeta;
 import org.pentaho.di.trans.step.StepDataInterface;
 import org.pentaho.di.trans.step.StepDialogInterface;
+import org.pentaho.di.trans.step.StepIOMeta;
+import org.pentaho.di.trans.step.StepIOMetaInterface;
 import org.pentaho.di.trans.step.StepInterface;
 import org.pentaho.di.trans.step.StepMeta;
 import org.pentaho.di.trans.step.StepMetaInterface;
-import org.pentaho.di.trans.steps.constant.Constant;
-import org.pentaho.di.trans.steps.constant.ConstantData;
-import org.pentaho.di.trans.steps.constant.ConstantMeta;
+import org.pentaho.di.trans.step.errorhandling.Stream;
+import org.pentaho.di.trans.step.errorhandling.StreamIcon;
+import org.pentaho.di.trans.step.errorhandling.StreamInterface;
+import org.pentaho.di.trans.step.errorhandling.StreamInterface.StreamType;
 import org.pentaho.metastore.api.IMetaStore;
 import org.w3c.dom.Node;
 
@@ -84,20 +84,52 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 	 *	{the package of the class specified}/messages/messages_{locale}.properties   
 	 */
 	private static Class<?> PKG = OntoMapMeta.class; // for i18n purposes
-	
-	private String[] currency;
-	  private String[] decimal;
-	  private String[] group;
-	  private String[] value;
-	
-	  private String[] fieldName;
-	  private String[] fieldType;
-	  private String[] fieldFormat;
-	
-	  private int[] fieldLength;
-	  private int[] fieldPrecision;
-	  /** Flag : set empty string **/
-	  private boolean[] setEmptyString;
+
+	  private String ontologyStepName;
+	  private String dataStepName;
+	  private String ontologyDbTable;
+	  private String dataDbTable;
+	  private String mapBaseURI;
+
+	public String getMapBaseURI() {
+		return mapBaseURI;
+	}
+
+	public void setMapBaseURI(String mapBaseURI) {
+		this.mapBaseURI = mapBaseURI;
+	}
+
+	public String getOntologyStepName() {
+		return ontologyStepName;
+	}
+
+	public void setOntologyStepName(String ontologyStepName) {
+		this.ontologyStepName = ontologyStepName;
+	}
+
+	public String getDataStepName() {
+		return dataStepName;
+	}
+
+	public void setDataStepName(String dataStepName) {
+		this.dataStepName = dataStepName;
+	}
+
+	public String getOntologyDbTable() {
+		return ontologyDbTable;
+	}
+
+	public void setOntologyDbTable(String ontologyDbTable) {
+		this.ontologyDbTable = ontologyDbTable;
+	}
+
+	public String getDataDbTable() {
+		return dataDbTable;
+	}
+
+	public void setDataDbTable(String dataDbTable) {
+		this.dataDbTable = dataDbTable;
+	}
 
 	/**
 	 * Constructor should call super() to make sure the base class has a chance to initialize properly.
@@ -105,156 +137,6 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 	public OntoMapMeta() {
 		super(); 
 	}
-	
-	/**
-	   * @return Returns the currency.
-	   */
-	  public String[] getCurrency() {
-	    return currency;
-	  }
-
-	  /**
-	   * @param currency
-	   *          The currency to set.
-	   */
-	  public void setCurrency( String[] currency ) {
-	    this.currency = currency;
-	  }
-
-	  /**
-	   * @return Returns the decimal.
-	   */
-	  public String[] getDecimal() {
-	    return decimal;
-	  }
-
-	  /**
-	   * @param decimal
-	   *          The decimal to set.
-	   */
-	  public void setDecimal( String[] decimal ) {
-	    this.decimal = decimal;
-	  }
-
-	  /**
-	   * @return Returns the fieldFormat.
-	   */
-	  public String[] getFieldFormat() {
-	    return fieldFormat;
-	  }
-
-	  /**
-	   * @param fieldFormat
-	   *          The fieldFormat to set.
-	   */
-	  public void setFieldFormat( String[] fieldFormat ) {
-	    this.fieldFormat = fieldFormat;
-	  }
-
-	  /**
-	   * @return Returns the fieldLength.
-	   */
-	  public int[] getFieldLength() {
-	    return fieldLength;
-	  }
-
-	  /**
-	   * @param fieldLength
-	   *          The fieldLength to set.
-	   */
-	  public void setFieldLength( int[] fieldLength ) {
-	    this.fieldLength = fieldLength;
-	  }
-
-	  /**
-	   * @return Returns the fieldName.
-	   */
-	  public String[] getFieldName() {
-	    return fieldName;
-	  }
-
-	  /**
-	   * @param fieldName
-	   *          The fieldName to set.
-	   */
-	  public void setFieldName( String[] fieldName ) {
-	    this.fieldName = fieldName;
-	  }
-
-	  /**
-	   * @return Returns the fieldPrecision.
-	   */
-	  public int[] getFieldPrecision() {
-	    return fieldPrecision;
-	  }
-
-	  /**
-	   * @param fieldPrecision
-	   *          The fieldPrecision to set.
-	   */
-	  public void setFieldPrecision( int[] fieldPrecision ) {
-	    this.fieldPrecision = fieldPrecision;
-	  }
-
-	  /**
-	   * @return Returns the fieldType.
-	   */
-	  public String[] getFieldType() {
-	    return fieldType;
-	  }
-
-	  /**
-	   * @param fieldType
-	   *          The fieldType to set.
-	   */
-	  public void setFieldType( String[] fieldType ) {
-	    this.fieldType = fieldType;
-	  }
-
-	  /**
-	   * @return the setEmptyString
-	   */
-	  public boolean[] isSetEmptyString() {
-	    return setEmptyString;
-	  }
-
-	  /**
-	   * @param setEmptyString
-	   *          the setEmptyString to set
-	   */
-	  public void setEmptyString( boolean[] setEmptyString ) {
-	    this.setEmptyString = setEmptyString;
-	  }
-
-	  /**
-	   * @return Returns the group.
-	   */
-	  public String[] getGroup() {
-	    return group;
-	  }
-
-	  /**
-	   * @param group
-	   *          The group to set.
-	   */
-	  public void setGroup( String[] group ) {
-	    this.group = group;
-	  }
-
-	  /**
-	   * @return Returns the value.
-	   */
-	  public String[] getValue() {
-	    return value;
-	  }
-
-	  /**
-	   * @param value
-	   *          The value to set.
-	   */
-	  public void setValue( String[] value ) {
-	    this.value = value;
-	  }
 	
 	/**
 	 * Called by Spoon to get a new instance of the SWT dialog for the step.
@@ -291,48 +173,6 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 	public StepDataInterface getStepData() {
 		return new OntoMapData();
 	}	
-
-	/**
-	 * This method is called every time a new step is created and should allocate/set the step configuration
-	 * to sensible defaults. The values set here will be used by Spoon when a new step is created.    
-	 */
-	public void setDefault() {
-		int i, nrfields = 0;
-
-	    this.allocate( nrfields );
-
-	    DecimalFormat decimalFormat = new DecimalFormat();
-
-	    for ( i = 0; i < nrfields; i++ ) {
-	      fieldName[i] = "field" + i;
-	      fieldType[i] = "Number";
-	      fieldFormat[i] = "\u00A40,000,000.00;\u00A4-0,000,000.00";
-	      fieldLength[i] = 9;
-	      fieldPrecision[i] = 2;
-	      currency[i] = decimalFormat.getDecimalFormatSymbols().getCurrencySymbol();
-	      decimal[i] = new String( new char[] { decimalFormat.getDecimalFormatSymbols().getDecimalSeparator() } );
-	      group[i] = new String( new char[] { decimalFormat.getDecimalFormatSymbols().getGroupingSeparator() } );
-	      value[i] = "-";
-	      setEmptyString[i] = false;
-	    }
-	}
-	
-	/**
-	 * Implementation
-	 * @param nrfields
-	 */
-	public void allocate( int nrfields ) {
-		fieldName = new String[nrfields];
-		fieldType = new String[nrfields];
-		fieldFormat = new String[nrfields];
-		fieldLength = new int[nrfields];
-		fieldPrecision = new int[nrfields];
-		currency = new String[nrfields];
-		decimal = new String[nrfields];
-		group = new String[nrfields];
-		value = new String[nrfields];
-		setEmptyString = new boolean[nrfields];
-	}
 	
 	/**
 	 * This method is used when a step is duplicated in Spoon. It needs to return a deep copy of this
@@ -346,24 +186,6 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 	 */
 	public Object clone() {
 		OntoMapMeta retval = (OntoMapMeta) super.clone();
-
-	    int nrfields = fieldName.length;
-
-	    retval.allocate( nrfields );
-
-	    for ( int i = 0; i < nrfields; i++ ) {
-	      retval.fieldName[i] = fieldName[i];
-	      retval.fieldType[i] = fieldType[i];
-	      retval.fieldFormat[i] = fieldFormat[i];
-	      retval.currency[i] = currency[i];
-	      retval.decimal[i] = decimal[i];
-	      retval.group[i] = group[i];
-	      retval.value[i] = value[i];
-	      retval.fieldLength[i] = fieldLength[i];
-	      retval.fieldPrecision[i] = fieldPrecision[i];
-	      retval.setEmptyString[i] = setEmptyString[i];
-	    }
-
 	    return retval;
 	}
 	
@@ -374,31 +196,16 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 	 */
 	private void readData( Node stepnode ) throws KettleXMLException {
 	    try {
-	      Node fields = XMLHandler.getSubNode( stepnode, "fields" );
-	      int nrfields = XMLHandler.countNodes( fields, "field" );
-
-	      allocate( nrfields );
-
-	      String slength, sprecision;
-
-	      for ( int i = 0; i < nrfields; i++ ) {
-	        Node fnode = XMLHandler.getSubNodeByNr( fields, "field", i );
-
-	        fieldName[i] = XMLHandler.getTagValue( fnode, "name" );
-	        fieldType[i] = XMLHandler.getTagValue( fnode, "type" );
-	        fieldFormat[i] = XMLHandler.getTagValue( fnode, "format" );
-	        currency[i] = XMLHandler.getTagValue( fnode, "currency" );
-	        decimal[i] = XMLHandler.getTagValue( fnode, "decimal" );
-	        group[i] = XMLHandler.getTagValue( fnode, "group" );
-	        value[i] = XMLHandler.getTagValue( fnode, "nullif" );
-	        slength = XMLHandler.getTagValue( fnode, "length" );
-	        sprecision = XMLHandler.getTagValue( fnode, "precision" );
-
-	        fieldLength[i] = Const.toInt( slength, -1 );
-	        fieldPrecision[i] = Const.toInt( sprecision, -1 );
-	        String emptyString = XMLHandler.getTagValue( fnode, "set_empty_string" );
-	        setEmptyString[i] = !Const.isEmpty( emptyString ) && "Y".equalsIgnoreCase( emptyString );
-	      }
+	      List<StreamInterface> infoStreams = getStepIOMeta().getInfoStreams();
+	      infoStreams.get( 0 ).setSubject( XMLHandler.getTagValue( stepnode, "ontologiesStep" ) );
+	      infoStreams.get( 1 ).setSubject( XMLHandler.getTagValue( stepnode, "dataStep" ) );
+	      
+			this.setOntologyStepName( XMLHandler.getTagValue( stepnode, "ontologiesStep" ));
+			this.setOntologyDbTable( XMLHandler.getTagValue( stepnode, "ontologiesDBTable" ) );
+			this.setDataStepName( XMLHandler.getTagValue( stepnode, "dataStep" ) );
+			this.setDataDbTable( XMLHandler.getTagValue( stepnode, "dataDBTable" ) );
+			this.setMapBaseURI( XMLHandler.getTagValue( stepnode, "mapBaseURI" ) );	      
+	      
 	    } catch ( Exception e ) {
 	      throw new KettleXMLException( "Unable to load step info from XML", e );
 	    }
@@ -416,24 +223,11 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 		
 		StringBuffer retval = new StringBuffer( 300 );
 
-	    retval.append( "    <fields>" ).append( Const.CR );
-	    for ( int i = 0; i < fieldName.length; i++ ) {
-	      if ( fieldName[i] != null && fieldName[i].length() != 0 ) {
-	        retval.append( "      <field>" ).append( Const.CR );
-	        retval.append( "        " ).append( XMLHandler.addTagValue( "name", fieldName[i] ) );
-	        retval.append( "        " ).append( XMLHandler.addTagValue( "type", fieldType[i] ) );
-	        retval.append( "        " ).append( XMLHandler.addTagValue( "format", fieldFormat[i] ) );
-	        retval.append( "        " ).append( XMLHandler.addTagValue( "currency", currency[i] ) );
-	        retval.append( "        " ).append( XMLHandler.addTagValue( "decimal", decimal[i] ) );
-	        retval.append( "        " ).append( XMLHandler.addTagValue( "group", group[i] ) );
-	        retval.append( "        " ).append( XMLHandler.addTagValue( "nullif", value[i] ) );
-	        retval.append( "        " ).append( XMLHandler.addTagValue( "length", fieldLength[i] ) );
-	        retval.append( "        " ).append( XMLHandler.addTagValue( "precision", fieldPrecision[i] ) );
-	        retval.append( "        " ).append( XMLHandler.addTagValue( "set_empty_string", setEmptyString[i] ) );
-	        retval.append( "      </field>" ).append( Const.CR );
-	      }
-	    }
-	    retval.append( "    </fields>" ).append( Const.CR );
+		retval.append( XMLHandler.addTagValue( "ontologiesStep", this.getOntologyStepName() ));
+		retval.append( XMLHandler.addTagValue( "ontologiesDBTable", this.getOntologyDbTable() ));
+		retval.append( XMLHandler.addTagValue( "dataStep", this.getDataStepName() ));
+		retval.append( XMLHandler.addTagValue( "dataDBTable", this.getDataDbTable() ));
+		retval.append( XMLHandler.addTagValue( "mapBaseURI", this.getMapBaseURI() ));
 
 	    return retval.toString();
 	}
@@ -451,6 +245,7 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 	public void loadXML(Node stepnode, List<DatabaseMeta> databases, Map<String, Counter> counters) throws KettleXMLException {
 		readData( stepnode );
 	}	
+	
 	/**
 	 * This method is called by Spoon when a step needs to serialize its configuration to a repository.
 	 * The repository implementation provides the necessary methods to save the step attributes.
@@ -462,20 +257,12 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 	public void saveRep(Repository rep, ObjectId id_transformation, ObjectId id_step) throws KettleException
 	{
 		try {
-	      for ( int i = 0; i < fieldName.length; i++ ) {
-	        if ( fieldName[i] != null && fieldName[i].length() != 0 ) {
-	          rep.saveStepAttribute( id_transformation, id_step, i, "field_name", fieldName[i] );
-	          rep.saveStepAttribute( id_transformation, id_step, i, "field_type", fieldType[i] );
-	          rep.saveStepAttribute( id_transformation, id_step, i, "field_format", fieldFormat[i] );
-	          rep.saveStepAttribute( id_transformation, id_step, i, "field_currency", currency[i] );
-	          rep.saveStepAttribute( id_transformation, id_step, i, "field_decimal", decimal[i] );
-	          rep.saveStepAttribute( id_transformation, id_step, i, "field_group", group[i] );
-	          rep.saveStepAttribute( id_transformation, id_step, i, "field_nullif", value[i] );
-	          rep.saveStepAttribute( id_transformation, id_step, i, "field_length", fieldLength[i] );
-	          rep.saveStepAttribute( id_transformation, id_step, i, "field_precision", fieldPrecision[i] );
-	          rep.saveStepAttribute( id_transformation, id_step, i, "set_empty_string", setEmptyString[i] );
-	        }
-	      }
+	      rep.saveStepAttribute( id_transformation, id_step, "ontologiesStep", this.getOntologyStepName() );
+	      rep.saveStepAttribute( id_transformation, id_step, "ontologiesDBTable", this.getOntologyDbTable() );
+	      rep.saveStepAttribute( id_transformation, id_step, "dataStep", this.getDataStepName() );
+	      rep.saveStepAttribute( id_transformation, id_step, "dataDBTable", this.getDataDbTable() );
+	      rep.saveStepAttribute( id_transformation, id_step, "mapBaseURI", this.getMapBaseURI() );
+	      
 	    } catch ( Exception e ) {
 	      throw new KettleException( "Unable to save step information to the repository for id_step=" + id_step, e );
 	    }
@@ -492,27 +279,37 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 	 */
 	public void readRep(Repository rep, ObjectId id_step, List<DatabaseMeta> databases, Map<String, Counter> counters) throws KettleException {
 		try {
-	      int nrfields = rep.countNrStepAttributes( id_step, "field_name" );
+			this.setOntologyStepName( rep.getStepAttributeString( id_step, "ontologiesStep" ));
+			this.setOntologyDbTable( rep.getStepAttributeString( id_step, "ontologiesDBTable" ) );
+			this.setDataStepName( rep.getStepAttributeString( id_step, "dataStep" ) );
+			this.setDataDbTable( rep.getStepAttributeString( id_step, "dataDBTable" ) );
+			this.setMapBaseURI( rep.getStepAttributeString( id_step, "mapBaseURI" ) );
 
-	      allocate( nrfields );
-
-	      for ( int i = 0; i < nrfields; i++ ) {
-	        fieldName[i] = rep.getStepAttributeString( id_step, i, "field_name" );
-	        fieldType[i] = rep.getStepAttributeString( id_step, i, "field_type" );
-
-	        fieldFormat[i] = rep.getStepAttributeString( id_step, i, "field_format" );
-	        currency[i] = rep.getStepAttributeString( id_step, i, "field_currency" );
-	        decimal[i] = rep.getStepAttributeString( id_step, i, "field_decimal" );
-	        group[i] = rep.getStepAttributeString( id_step, i, "field_group" );
-	        value[i] = rep.getStepAttributeString( id_step, i, "field_nullif" );
-	        fieldLength[i] = (int) rep.getStepAttributeInteger( id_step, i, "field_length" );
-	        fieldPrecision[i] = (int) rep.getStepAttributeInteger( id_step, i, "field_precision" );
-	        setEmptyString[i] = rep.getStepAttributeBoolean( id_step, i, "set_empty_string", false );
-	      }
 	    } catch ( Exception e ) {
 	      throw new KettleException( "Unexpected error reading step information from the repository", e );
 	    }
 	}
+	
+	/**
+	   * Returns the Input/Output metadata for this step. The generator step only produces output, does not accept input!
+	   */
+	  public StepIOMetaInterface getStepIOMeta() {
+	    if ( ioMeta == null ) {
+	
+	      ioMeta = new StepIOMeta( true, true, false, false, false, false );
+	
+	      ioMeta.addStream( new Stream( StreamType.INFO, null, BaseMessages.getString(
+	        PKG, "OntologyMapping.InfoStream.FirstStream.Description" ), StreamIcon.INFO, null ) );
+	      ioMeta.addStream( new Stream( StreamType.INFO, null, BaseMessages.getString(
+	        PKG, "OntologyMapping.InfoStream.SecondStream.Description" ), StreamIcon.INFO, null ) );
+	    }
+	
+	    return ioMeta;
+	  }
+	  
+	  public void resetStepIoMeta() {
+	    // Don't reset!
+	  }
 
 	/**
 	 * This method is called to determine the changes the step is making to the row-stream.
@@ -526,26 +323,24 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 	 * @param nextStep	the description of a step this step is passing rows to
 	 * @param space		the variable space for resolving variables
 	 */
-	public void getFields( RowMetaInterface rowMeta, String origin, RowMetaInterface[] info, StepMeta nextStep,
+	public void getFields( RowMetaInterface r, String origin, RowMetaInterface[] info, StepMeta nextStep,
 		    VariableSpace space, Repository repository, IMetaStore metaStore ) throws KettleStepException {
-		  
-		for ( int i = 0; i < fieldName.length; i++ ) {
-	      if ( fieldName[i] != null && fieldName[i].length() != 0 ) {
-	        int type = ValueMeta.getType( fieldType[i] );
-	        if ( type == ValueMetaInterface.TYPE_NONE ) {
-	          type = ValueMetaInterface.TYPE_STRING;
-	        }
-	        try {
-	          ValueMetaInterface v = ValueMetaFactory.createValueMeta( fieldName[i], type );
-	          v.setLength( fieldLength[i] );
-	          v.setPrecision( fieldPrecision[i] );
-	          v.setOrigin( origin );
-	          rowMeta.addValueMeta( v );
-	        } catch ( Exception e ) {
-	          throw new KettleStepException( e );
-	        }
-	      }
-	    }
+	        
+	        ValueMetaInterface id = new ValueMeta(BaseMessages.getString(PKG, "OntologyMapping.Table.Field.Subject"), ValueMetaInterface.TYPE_STRING);
+			id.setOrigin(origin);
+			id.setLength(1000);
+			r.addValueMeta(id);
+			
+			ValueMetaInterface field = new ValueMeta(BaseMessages.getString(PKG, "OntologyMapping.Table.Field.Predicate"), ValueMetaInterface.TYPE_STRING);
+			field.setOrigin(origin);
+			field.setLength(1000);
+			r.addValueMeta(field);
+			
+
+			ValueMetaInterface data = new ValueMeta(BaseMessages.getString(PKG, "OntologyMapping.Table.Field.Object"), ValueMetaInterface.TYPE_STRING);
+			data.setOrigin(origin);
+			data.setLength(10000);
+			r.addValueMeta(data);
 		
 	}
 
@@ -582,11 +377,11 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 	      remarks.add( cr );
 	    }
 
-	    // Check the constants...
-	    ConstantData data = new ConstantData();
-	    ConstantMeta meta = (ConstantMeta) stepMeta.getStepMetaInterface();
-	    Constant.buildRow( meta, data, remarks );	
-    	
+	}
+
+	public void setDefault() {
+		// TODO Auto-generated method stub
+		
 	}
 
 
