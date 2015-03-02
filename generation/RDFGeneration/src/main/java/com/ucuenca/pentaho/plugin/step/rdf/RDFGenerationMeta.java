@@ -80,7 +80,16 @@ public class RDFGenerationMeta extends BaseStepMeta implements StepMetaInterface
 	/**
 	 * Stores the name of the field added to the row-stream. 
 	 */
-	private String outputField;
+	private String inputFieldr2rml;
+	
+	 
+	    private String sqlvendor;
+	    private String databaseURL;
+	    private String userName;
+	    private String password;
+	    private String baseUri;
+	    private String directorioOutputRDF;
+	    private String format;
 
 	/**
 	 * Constructor should call super() to make sure the base class has a chance to initialize properly.
@@ -130,25 +139,73 @@ public class RDFGenerationMeta extends BaseStepMeta implements StepMetaInterface
 	 * to sensible defaults. The values set here will be used by Spoon when a new step is created.    
 	 */
 	public void setDefault() {
-		outputField = "demo_field";
+		inputFieldr2rml = "demo_field";
 	}
 	
-	/**
-	 * Getter for the name of the field added by this step
-	 * @return the name of the field added
-	 */
-	public String getOutputField() {
-		return outputField;
+		public String getInputFieldr2rml() {
+		return inputFieldr2rml;
 	}
 
-	/**
-	 * Setter for the name of the field added by this step
-	 * @param outputField the name of the field added
-	 */
-	public void setOutputField(String outputField) {
-		this.outputField = outputField;
+	public void setInputFieldr2rml(String inputFieldr2rml) {
+		this.inputFieldr2rml = inputFieldr2rml;
 	}
-	
+
+	public String getSqlvendor() {
+		return sqlvendor;
+	}
+
+	public void setSqlvendor(String sqlvendor) {
+		this.sqlvendor = sqlvendor;
+	}
+
+	public String getDatabaseURL() {
+		return databaseURL;
+	}
+
+	public void setDatabaseURL(String databaseURL) {
+		this.databaseURL = databaseURL;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public String getBaseUri() {
+		return baseUri;
+	}
+
+	public void setBaseUri(String baseUri) {
+		this.baseUri = baseUri;
+	}
+
+	public String getDirectorioOutputRDF() {
+		return directorioOutputRDF;
+	}
+
+	public void setDirectorioOutputRDF(String directorioOutputRDF) {
+		this.directorioOutputRDF = directorioOutputRDF;
+	}
+
+	public String getFormat() {
+		return format;
+	}
+
+	public void setFormat(String format) {
+		this.format = format;
+	}
+
 	/**
 	 * This method is used when a step is duplicated in Spoon. It needs to return a deep copy of this
 	 * step meta object. Be sure to create proper deep copies if the step configuration is stored in
@@ -175,7 +232,7 @@ public class RDFGenerationMeta extends BaseStepMeta implements StepMetaInterface
 	public String getXML() throws KettleValueException {
 		
 		// only one field to serialize
-		String xml = XMLHandler.addTagValue("outputfield", outputField);
+		String xml = XMLHandler.addTagValue("outputfield", inputFieldr2rml);
 		return xml;
 	}
 
@@ -192,7 +249,7 @@ public class RDFGenerationMeta extends BaseStepMeta implements StepMetaInterface
 	public void loadXML(Node stepnode, List<DatabaseMeta> databases, Map<String, Counter> counters) throws KettleXMLException {
 
 		try {
-			setOutputField(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "outputfield")));
+			setInputFieldr2rml(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "outputfield")));
 		} catch (Exception e) {
 			throw new KettleXMLException("Demo plugin unable to read step info from XML node", e);
 		}
@@ -209,7 +266,7 @@ public class RDFGenerationMeta extends BaseStepMeta implements StepMetaInterface
 	public void saveRep(Repository rep, ObjectId id_transformation, ObjectId id_step) throws KettleException
 	{
 		try{
-			rep.saveStepAttribute(id_transformation, id_step, "outputfield", outputField); //$NON-NLS-1$
+			rep.saveStepAttribute(id_transformation, id_step, "outputfield", inputFieldr2rml); //$NON-NLS-1$
 		}
 		catch(Exception e){
 			throw new KettleException("Unable to save step into repository: "+id_step, e); 
@@ -227,7 +284,7 @@ public class RDFGenerationMeta extends BaseStepMeta implements StepMetaInterface
 	 */
 	public void readRep(Repository rep, ObjectId id_step, List<DatabaseMeta> databases, Map<String, Counter> counters) throws KettleException {
 		try{
-			outputField  = rep.getStepAttributeString(id_step, "outputfield"); //$NON-NLS-1$
+			inputFieldr2rml  = rep.getStepAttributeString(id_step, "outputfield"); //$NON-NLS-1$
 		}
 		catch(Exception e){
 			throw new KettleException("Unable to load step from repository", e);
@@ -256,7 +313,7 @@ public class RDFGenerationMeta extends BaseStepMeta implements StepMetaInterface
 		ValueMetaInterface v = new ValueMeta();
 
 		// set the name of the new field 
-		v.setName(outputField);
+		v.setName(inputFieldr2rml);
 		
 		// type is going to be string
 		v.setType(ValueMeta.TYPE_STRING);

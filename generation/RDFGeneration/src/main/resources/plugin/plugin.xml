@@ -8,17 +8,17 @@
 	classname:		The step class implementing StepMetaInterface
  -->
 <plugin
-   id="DemoStep"
+   id="RDFGeneration"
    iconfile="icon.png"
-   description="Demo Step"
-   tooltip="Demo Step Tooltip"
+   description="RDF Generation"
+   tooltip="RDFGeneration"
    category="LODPlatform"
-   classname="com.ucuenca.pentaho.plugin.step.DemoStepMeta">
+   classname="com.ucuenca.pentaho.plugin.step.rdf.RDFGenerationMeta">
 		
 		<!-- the list of jar files to include when loading the step -->
 		<libraries>
 			<!-- the classes implementing the step interfaces are in this jar -->
-    		<library name="pentaho-plugin-base-0.0.1-SNAPSHOT.jar"/>
+    		<library name="RDFGeneration-0.0.1-SNAPSHOT.jar"/>
     		
     		<!-- specify additional jars to be included when loading the step plug-in -->
     		<!--  

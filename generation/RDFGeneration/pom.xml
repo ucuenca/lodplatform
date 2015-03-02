@@ -3,11 +3,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.ucuenca</groupId>
-  <artifactId>pentaho-plugin-base</artifactId>
+  <artifactId>RDFGeneration</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>pentaho-plugin-base</name>
+  <name>RDFGeneration</name>
   <!-- <url>http://maven.apache.org</url> -->
 
   <properties>
