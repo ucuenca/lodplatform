@@ -20,7 +20,7 @@
  *
  ******************************************************************************/
 
-package com.ucuenca.pentaho.plugin.step;
+package com.ucuenca.pentaho.plugin.step.rdf;
 
 import org.pentaho.di.core.row.RowMetaInterface;
 import org.pentaho.di.trans.step.BaseStepData;

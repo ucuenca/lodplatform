@@ -20,7 +20,7 @@
  *
  ******************************************************************************/
 
-package com.ucuenca.pentaho.plugin.step;
+package com.ucuenca.pentaho.plugin.step.rdf;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;

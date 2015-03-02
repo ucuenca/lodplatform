@@ -20,7 +20,7 @@
  *
  ******************************************************************************/
 
-package com.ucuenca.pentaho.plugin.step;
+package com.ucuenca.pentaho.plugin.step.rdf;
 
 import java.util.List;
 import java.util.Map;
