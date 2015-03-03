@@ -257,10 +257,8 @@ public class OAILoaderDialog extends BaseStepDialog implements
 		getFormats.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 			
-					Pattern pat = Pattern.compile("^http://.*");
-					
+					Pattern pat = Pattern.compile("^http://.*");					
 					Matcher mat = pat.matcher(txtURI.getText());
-
 					if (mat.matches()) { // entonces es una uri
 						//meta.setInputURI(txtURI.getText());	
 						valueUri=txtURI.getText();
@@ -543,7 +541,7 @@ public class OAILoaderDialog extends BaseStepDialog implements
 			list_xpath[k] = getPathOai.getMeta().getListpath().get(k);
 		}
 
-		if (list_xpath != null) {
+		if (list_xpath.length>0) {
 			EnterSelectionDialog s = new EnterSelectionDialog(shell,
 					list_xpath, BaseMessages.getString(PKG,
 							"OAILoader.Dialog.SelectALoopPath.Title"),
@@ -553,6 +551,14 @@ public class OAILoaderDialog extends BaseStepDialog implements
 			if (xpath != null) {
 				txtXpath.setText(xpath);
 			}
+		}else {
+			 MessageBox dialog = 
+					  new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
+					dialog.setText("ERROR");						
+			dialog.setMessage(BaseMessages.getString(PKG, "OAILoader.Manager.FORMAT"));
+		    		    
+		    dialog.open();
+			
 		}
 
 	}
@@ -584,15 +590,24 @@ public class OAILoaderDialog extends BaseStepDialog implements
 				digester.addSetNext(
 						"OAI-PMH/ListMetadataFormats/metadataFormat", "add");
 
-				schemas = (List) digester.parse(new StringReader(metadata
-						.toString()));
+				schemas = (List) digester.parse(new StringReader(metadata.toString()));
 
 				Iterator<Schema> i = schemas.iterator();
 				cbmPrefix.removeAll();
 
 				while (i.hasNext()) {
-					Schema schema = i.next();
-					cbmPrefix.add(schema.prefix);
+					Schema schema = i.next();				
+					
+					for (Format f: Format.values()){			
+						if(f.isState() && f.getName().equals(schema.prefix)){
+							cbmPrefix.add(schema.prefix);	
+							break;
+						}		else if(!f.isState() && f.getName().equals(schema.prefix)){
+							
+							cbmPrefix.add(schema.prefix+" ("+BaseMessages.getString(PKG, "OAILoader.Manager.FORMAT")+")");
+							break;
+						}				
+					}				
 				}
 				cbmPrefix.setEnabled(true);
 				Uri = ruta;
@@ -608,5 +623,40 @@ public class OAILoaderDialog extends BaseStepDialog implements
 		}
 
 	}
+	
+	public enum Format
+	{
+		XOAI ("xoai",true),
+		QDC  ("qdc",true),
+		UKETD_DC ("uketd_dc",true),
+		OAI_DC ("oai_dc",true),
+		DIM ("dim",false),
+		MARC ("marc",false),
+		ETDMS ("etdms",false),
+		RDF ("rdf",false),
+		MODS ("mods",false),
+		METS ("mets",false),
+		ORE ("ore",false),
+		DIDL ("didl",false);
+		
+		private final String name;
+		private final boolean state;
+		
+		Format(String name, boolean state){
+			
+			this.name=name;
+			this.state=state;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public boolean isState() {
+			return state;
+		}		
+		
+	}
 
 }
+
