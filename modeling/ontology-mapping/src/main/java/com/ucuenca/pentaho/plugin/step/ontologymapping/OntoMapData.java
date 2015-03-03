@@ -23,11 +23,7 @@
 package com.ucuenca.pentaho.plugin.step.ontologymapping;
 
 import java.sql.ResultSet;
-import java.text.DateFormatSymbols;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -35,7 +31,6 @@ import java.util.Map;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.eclipse.swt.widgets.TableItem;
-import org.pentaho.di.core.RowMetaAndData;
 import org.pentaho.di.core.RowSet;
 import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.core.row.RowMetaInterface;
@@ -109,9 +104,11 @@ public class OntoMapData extends BaseStepData implements StepDataInterface {
 	 * Saves table data on DB Schema
 	 * @param table Dialog TableView
 	 * @param tableName DB table name
+	 * @return List of generated SQL INSERT statements
 	 * @throws Exception
 	 */
-	public void saveTable(TableView table, String tableName)throws Exception {
+	public List<String> saveTable(TableView table, String tableName)throws Exception {
+		List<String> sqlInsertList = new ArrayList<String>();
     	ColumnInfo[] columns = table.getColumns();
     	Map<String, String> tableFields = new LinkedHashMap<String, String>();
     	tableFields.put("TRANSID", "VARCHAR(50)");
@@ -127,25 +124,34 @@ public class OntoMapData extends BaseStepData implements StepDataInterface {
     		values = ArrayUtils.addAll(values, tableValues);
     		if(((String)values[2]).length() > 0) {
 	    		try {
-	    			int totalFields = values.length;
 	    			String sqlInsertion = "INSERT INTO " + tableName + " VALUES(";
-	    			while(--totalFields >= 1) sqlInsertion += "?,";
+	    			String sqlInsertStack = sqlInsertion;
+	    			int count = 1;
+	    			while(count < values.length) {
+	    				sqlInsertion += "?,";
+	    				sqlInsertStack += "{" + (count-1) + "},";
+	    				count++;
+	    			}
 	    			sqlInsertion += "?)";
+	    			sqlInsertStack += "{"+ (values.length-1) +"})";
 	    			DatabaseLoader.executeUpdate(sqlInsertion, values);
+	    			sqlInsertList.add( new MessageFormat(sqlInsertStack).format(values) );
 	    		}catch(Exception e) {
 	    			throw new KettleException("ERROR EXECUTING SQL INSERT: "+ e.getMessage());
 	    		}
     		}
     	}
+    	return sqlInsertList;
     }
-	
+
 	/**
 	 * Query DB Table data and load into the TableView
 	 * @param tableView Dialog TableView
 	 * @param tableName DB table name
+	 * @return total number of queried rows
 	 * @throws Exception
 	 */
-	public void queryTable(TableView tableView, String tableName)throws Exception {
+	public int queryTable(TableView tableView, String tableName)throws Exception {
     	ColumnInfo[] columns = tableView.getColumns();
     	List<String> tableFields = new ArrayList<String>();
     	for(ColumnInfo column:columns) tableFields.add(column.getName().toUpperCase().replaceAll(" ", "_"));
@@ -176,6 +182,7 @@ public class OntoMapData extends BaseStepData implements StepDataInterface {
     	}
     	tableView.setRowNums();
         tableView.optWidth( true );
+        return row;
     }
 	
 	/**
