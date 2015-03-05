@@ -22,6 +22,8 @@
 
 package com.ucuenca.pentaho.plugin.step.ontologymapping;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -90,6 +92,25 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 	  private String ontologyDbTable;
 	  private String dataDbTable;
 	  private String mapBaseURI;
+	  private String outputDir;
+	  private List<String> sqlStack = new ArrayList<String>();
+
+	  
+	public String getOutputDir() {
+		return outputDir;
+	}
+
+	public void setOutputDir(String outputDir) {
+		this.outputDir = outputDir;
+	}
+
+	public List<String> getSqlStack() {
+		return sqlStack;
+	}
+
+	public void setSqlStack(List<String> sqlStack) {
+		this.sqlStack = sqlStack;
+	}
 
 	public String getMapBaseURI() {
 		return mapBaseURI;
@@ -204,7 +225,11 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 			this.setOntologyDbTable( XMLHandler.getTagValue( stepnode, "ontologiesDBTable" ) );
 			this.setDataStepName( XMLHandler.getTagValue( stepnode, "dataStep" ) );
 			this.setDataDbTable( XMLHandler.getTagValue( stepnode, "dataDBTable" ) );
-			this.setMapBaseURI( XMLHandler.getTagValue( stepnode, "mapBaseURI" ) );	      
+			this.setMapBaseURI( XMLHandler.getTagValue( stepnode, "mapBaseURI" ) );
+			String sqlStack = XMLHandler.getTagValue( stepnode, "sqlStack" );
+			sqlStack = sqlStack.substring(1, sqlStack.length()-1);
+			this.setSqlStack( Arrays.asList( sqlStack.split(",\\s") ) );
+			this.setOutputDir( XMLHandler.getTagValue( stepnode, "outputDir" ) );
 	      
 	    } catch ( Exception e ) {
 	      throw new KettleXMLException( "Unable to load step info from XML", e );
@@ -228,6 +253,8 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 		retval.append( XMLHandler.addTagValue( "dataStep", this.getDataStepName() ));
 		retval.append( XMLHandler.addTagValue( "dataDBTable", this.getDataDbTable() ));
 		retval.append( XMLHandler.addTagValue( "mapBaseURI", this.getMapBaseURI() ));
+		retval.append( XMLHandler.addTagValue( "outputDir", this.getOutputDir() ));
+		retval.append( XMLHandler.addTagValue( "sqlStack", this.getSqlStack().toString()));
 
 	    return retval.toString();
 	}
@@ -262,6 +289,8 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 	      rep.saveStepAttribute( id_transformation, id_step, "dataStep", this.getDataStepName() );
 	      rep.saveStepAttribute( id_transformation, id_step, "dataDBTable", this.getDataDbTable() );
 	      rep.saveStepAttribute( id_transformation, id_step, "mapBaseURI", this.getMapBaseURI() );
+	      rep.saveStepAttribute( id_transformation, id_step, "outputDir", this.getOutputDir() );
+	      rep.saveStepAttribute( id_transformation, id_step, "sqlStack", this.getSqlStack().toString() );
 	      
 	    } catch ( Exception e ) {
 	      throw new KettleException( "Unable to save step information to the repository for id_step=" + id_step, e );
@@ -284,6 +313,10 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 			this.setDataStepName( rep.getStepAttributeString( id_step, "dataStep" ) );
 			this.setDataDbTable( rep.getStepAttributeString( id_step, "dataDBTable" ) );
 			this.setMapBaseURI( rep.getStepAttributeString( id_step, "mapBaseURI" ) );
+			this.setOutputDir( rep.getStepAttributeString( id_step, "outputDir" ) );
+			String sqlStack = rep.getStepAttributeString( id_step, "sqlStack" );
+			sqlStack = sqlStack.substring(1, sqlStack.length()-1);
+			this.setSqlStack( Arrays.asList( sqlStack.split(",\\s") ) );
 
 	    } catch ( Exception e ) {
 	      throw new KettleException( "Unexpected error reading step information from the repository", e );

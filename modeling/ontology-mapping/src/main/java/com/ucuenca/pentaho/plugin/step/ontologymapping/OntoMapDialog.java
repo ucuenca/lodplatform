@@ -48,10 +48,13 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
@@ -115,6 +118,10 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	  private Label wlBaseURI;
 	  private Text wBaseURI;
 	  private FormData fdlBaseURI, fdBaseURI;
+	  
+	  private Label wlOutputDir;
+	  private Text wOutputDir;
+	  private FormData fdlOutputDir, fdOutputDir;
 	
 	private CTabFolder wTabFolder;
 	  private FormData fdTabFolder;
@@ -141,6 +148,10 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	  
 	  private TransMeta transMeta;
 	  private Map<String, String[]> dataCache = new HashMap<String, String[]>();
+
+	private Button wbOutputDir;
+
+	private FormData fdbOutputDir;
 	  
 
 	/**
@@ -221,7 +232,11 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	    SelectionListener inputStepLs = new SelectionListener() {
 			
 			public void widgetSelected(SelectionEvent arg0) {
-				getPrevStepsMeta();
+				try {
+					getPrevStepsMeta();
+				}catch(KettleException e) {
+					showErrorMessage(e.getMessage());
+				}
 			}
 
 			public void widgetDefaultSelected(SelectionEvent arg0) {
@@ -281,7 +296,6 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	    wStep2.setLayoutData( fdStep2 );
 	    wStep2.addSelectionListener(inputStepLs);
 	    
-	 // Filename line
 	    wlBaseURI = new Label( shell, SWT.RIGHT  | SWT.MEDIUM);
 	    wlBaseURI.setText( BaseMessages.getString( PKG, "OntologyMapping.BaseURI.Label" ) );
 	    props.setLook( wlBaseURI );
@@ -300,6 +314,33 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	    fdBaseURI.right = new FormAttachment( 100, 0 );
 	    wBaseURI.setLayoutData( fdBaseURI );
 	    wBaseURI.addSelectionListener(inputStepLs);
+	    
+		wlOutputDir=new Label(shell, SWT.RIGHT | SWT.MEDIUM);
+		wlOutputDir.setText( BaseMessages.getString( PKG, "OntologyMapping.OutputDir.Label" ) );
+		props.setLook(wlOutputDir);
+		fdlOutputDir=new FormData();
+		fdlOutputDir.left = new FormAttachment(0, 0);
+		fdlOutputDir.right= new FormAttachment(middle, -margin);
+		fdlOutputDir.top  = new FormAttachment(wBaseURI, margin);
+		wlOutputDir.setLayoutData(fdlOutputDir);		
+		wOutputDir = new Text(shell, SWT.SINGLE | SWT.LEFT | SWT.MEDIUM | SWT.BORDER);
+ 		props.setLook(wOutputDir);
+ 		wOutputDir.addModifyListener(lsMod);
+ 		wOutputDir.setEditable(Boolean.FALSE);
+		fdOutputDir=new FormData();
+		fdOutputDir.left = new FormAttachment(middle, 0);
+		fdOutputDir.top  = new FormAttachment(wBaseURI, margin);
+		fdOutputDir.right= new FormAttachment(98, 0);
+		wOutputDir.setLayoutData(fdOutputDir);
+		
+		wbOutputDir=new Button(shell, SWT.PUSH| SWT.CENTER);
+		props.setLook(wbOutputDir);
+		wbOutputDir.setText( BaseMessages.getString( PKG, "OntologyMapping.OutputDir.Button" ) );
+		fdbOutputDir=new FormData();
+		//fdbOutputDir.left= new FormAttachment(100, margin);
+		fdbOutputDir.right= new FormAttachment(100, 0);
+		fdbOutputDir.top  = new FormAttachment(wBaseURI, margin);
+		wbOutputDir.setLayoutData(fdbOutputDir);
 
 	    // The folders!
 	    wTabFolder = new CTabFolder( shell, SWT.BORDER );
@@ -307,7 +348,7 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	    
 	    fdTabFolder = new FormData();
 	    fdTabFolder.left = new FormAttachment( 0, 0 );
-	    fdTabFolder.top = new FormAttachment( wBaseURI, margin );
+	    fdTabFolder.top = new FormAttachment( wOutputDir, margin );
 	    fdTabFolder.right = new FormAttachment( 100, 0 );
 	    fdTabFolder.bottom = new FormAttachment( 100, -50 );
 	    wTabFolder.setLayoutData( fdTabFolder );
@@ -731,6 +772,22 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	    setButtonPositions( new Button[] { wOK, wCancel }, margin, wTabFolder );
 
 	    // Add listeners
+	    //BROWSER
+  		wbOutputDir.addSelectionListener(
+  			new SelectionAdapter() {
+  				public void widgetSelected(SelectionEvent e) {
+					DirectoryDialog dialog = new DirectoryDialog(shell, SWT.OPEN);
+					if (wOutputDir.getText()!=null && wOutputDir.getText().length() > 0) {
+						dialog.setFilterPath(wOutputDir.getText());
+					}	
+					if (dialog.open()!=null) {
+						String str = dialog.getFilterPath();
+						wOutputDir.setText(str);
+					}	
+  				}
+  			}
+  		);
+	    
 	    lsOK = new Listener() {
 	      public void handleEvent( Event e ) {
 	        ok();
@@ -789,7 +846,7 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	 * Saves Previous Steps Required Metadata into the MetaObject
 	 * 
 	 */
-	private void getPrevStepsMeta() {
+	private void getPrevStepsMeta()throws KettleException {
 		String ontologyStepName = wStep1.getText();
 		meta.setOntologyDbTable(this.stepDBTableLookup(transMeta.findStep(ontologyStepName)));
 		meta.setOntologyStepName(ontologyStepName);		
@@ -798,7 +855,10 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 		meta.setDataStepName(dataStepName);
 		String baseURI = wBaseURI.getText();
 		//baseURI Validation not implemented yet
+		if( !baseURI.matches("^http://.*(/|#)$") ) 
+			throw new KettleException( BaseMessages.getString(PKG, "OntologyMapping.exception.baseURI") );
 		meta.setMapBaseURI(baseURI);
+		meta.setOutputDir(wOutputDir.getText());
 	}
 	
 	/**
@@ -935,14 +995,34 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 		data.setStepName(stepname);
 		try {
 			DatabaseLoader.getConnection();
-			data.queryTable(wClassTable, OntoMapData.CLASSIFICATIONTABLE);
-			data.queryTable(wAnnTable, OntoMapData.ANNOTATIONTABLE);
-			data.queryTable(wRelTable, OntoMapData.RELATIONTABLE);
+			int rowCount = this.queryMappingRules(data);
+			if(rowCount != meta.getSqlStack().size() && meta.getSqlStack().get(0) != null) { 
+				for(String sqlInsert:meta.getSqlStack()) {
+					logBasic( BaseMessages.getString( PKG, "OntologyMapping.log.basic.rules.meta.Insert" ) );
+					DatabaseLoader.executeUpdate(sqlInsert);
+				}
+				this.queryMappingRules(data);
+			}
 			DatabaseLoader.closeConnection();
 		}catch(Exception e){
 			e.printStackTrace();
 			
 		}
+	}
+	
+	/**
+	 * Query mapping rules from Schema
+	 * @param data Step data interface
+	 * @return total number of queried rows
+	 * @throws Exception
+	 */
+	private int queryMappingRules(OntoMapData data) throws Exception {
+		int rowCount = 0;
+		logBasic( BaseMessages.getString( PKG, "OntologyMapping.log.basic.rules.Query" ) );
+		rowCount += data.queryTable(wClassTable, OntoMapData.CLASSIFICATIONTABLE);
+		rowCount += data.queryTable(wAnnTable, OntoMapData.ANNOTATIONTABLE);
+		rowCount += data.queryTable(wRelTable, OntoMapData.RELATIONTABLE);
+		return rowCount;
 	}
 	
 	/**
@@ -958,6 +1038,7 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 			wStep2.setText( Const.NVL( meta.getDataStepName(), "" ) );
 		}
 		wBaseURI.setText( Const.NVL( meta.getMapBaseURI(), "http://" ) );
+		wOutputDir.setText( Const.NVL( meta.getOutputDir(), "" ) );
 	
 	    wStepname.selectAll();
 	    wStepname.setFocus();
@@ -980,33 +1061,35 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	 * Called when the user confirms the dialog
 	 */
 	private void ok() {
+		Boolean error = Boolean.FALSE;
 		if ( Const.isEmpty( wStepname.getText() ) ) {
 	      return;
 	    }
 		stepname = wStepname.getText(); // return value
 		if(meta.hasChanged()) {
-		
-			this.getPrevStepsMeta();
 			try{
+				this.getPrevStepsMeta();
+				List<String> sqlStack = new ArrayList<String>();
 				OntoMapData data = ((OntoMapData)meta.getStepData());
 				data.setTransName(transMeta.getName());
 				data.setStepName(stepname);
 				DatabaseLoader.getConnection();
-				data.saveTable(wClassTable, OntoMapData.CLASSIFICATIONTABLE);
-				data.saveTable(wAnnTable, OntoMapData.ANNOTATIONTABLE);
-				data.saveTable(wRelTable, OntoMapData.RELATIONTABLE);
+				sqlStack.addAll( data.saveTable(wClassTable, OntoMapData.CLASSIFICATIONTABLE) );
+				sqlStack.addAll( data.saveTable(wAnnTable, OntoMapData.ANNOTATIONTABLE) );
+				sqlStack.addAll( data.saveTable(wRelTable, OntoMapData.RELATIONTABLE) );
 				DatabaseLoader.closeConnection();
+				meta.setSqlStack(sqlStack);
+				List<StreamInterface> infoStreams = meta.getStepIOMeta().getInfoStreams();
+				
+			    infoStreams.get( 0 ).setStepMeta( transMeta.findStep( wStep1.getText() ) );
+			    infoStreams.get( 1 ).setStepMeta( transMeta.findStep( wStep2.getText() ) );
 			}catch(Exception e) {
-				e.printStackTrace();
+				error = Boolean.TRUE;
+				this.showErrorMessage(e.getMessage());
 			}
-			
-			List<StreamInterface> infoStreams = meta.getStepIOMeta().getInfoStreams();
-	
-		    infoStreams.get( 0 ).setStepMeta( transMeta.findStep( wStep1.getText() ) );
-		    infoStreams.get( 1 ).setStepMeta( transMeta.findStep( wStep2.getText() ) );
 		}
 
-	    dispose();
+	    if(!error) dispose();
 	}
 	
 	/**
@@ -1026,5 +1109,14 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private void showErrorMessage(String msg) {
+		MessageBox dialog = 
+				  new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
+				dialog.setText("ERROR");						
+		dialog.setMessage(msg);
+	    		    
+	    dialog.open();
 	}
 }
