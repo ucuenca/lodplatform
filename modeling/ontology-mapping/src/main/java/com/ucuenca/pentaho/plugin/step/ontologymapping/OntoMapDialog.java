@@ -22,6 +22,7 @@
 
 package com.ucuenca.pentaho.plugin.step.ontologymapping;
 
+import java.lang.reflect.InvocationTargetException;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -447,7 +448,7 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	    ComboValuesSelectionListener cmbFieldsLs = new ComboValuesSelectionListener() {
 			
 			public String[] getComboValues(TableItem tableItem, int rowNr, int colNr) {
-				int[] filters = colNr == 4 ? new int[]{6,8}:(colNr == 6 ? new int[]{4,8}:new int[]{4,6});
+				int[] filters = colNr == 6 ? new int[]{8,10}:(colNr == 8 ? new int[]{6,10}:new int[]{6,8});
 				
 				String stepName = wStep2.getText();
 				String [] values = new String[]{"No fields found"};
@@ -848,11 +849,11 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	 */
 	private void getPrevStepsMeta()throws KettleException {
 		String ontologyStepName = wStep1.getText();
-		meta.setOntologyDbTable(this.stepDBTableLookup(transMeta.findStep(ontologyStepName)));
+		meta.setOntologyDbTable(this.stepDBTableLookup(transMeta.findStep(ontologyStepName), false, null));
 		meta.setOntologyStepName(ontologyStepName);		
 		String dataStepName = wStep2.getText();
-		meta.setDataDbTable(this.stepDBTableLookup(transMeta.findStep(dataStepName)));
-		meta.setDataStepName(dataStepName);
+		meta.setDataDbTable(this.stepDBTableLookup(transMeta.findStep(dataStepName), true, "setDataStepName"));
+		//meta.setDataStepName(dataStepName);
 		String baseURI = wBaseURI.getText();
 		//baseURI Validation not implemented yet
 		if( !baseURI.matches("^http://.*(/|#)$") ) 
@@ -862,25 +863,76 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	}
 	
 	/**
-	 * Browse DB Table name on Previous Steps 
+	 *  
 	 * @param stepMeta
 	 * @return
 	 */
-	private String stepDBTableLookup(StepMeta stepMeta) {
+	/**
+	 * Browse DB Table name on Previous Steps
+	 * @param stepMeta Data step Meta
+	 * @param lookBackward Boolean.TRUE if the process has to browse across every hop 
+	 * @param stepNameSetter Name of the method in charge to set the data source step Name 
+	 * @return table name for associated step
+	 * @throws KettleException
+	 */
+	private String stepDBTableLookup(StepMeta stepMeta, Boolean lookBackward, String stepNameSetter)throws KettleException {
+		String tableName = this.lookupGetterMethod(stepMeta.getName(), stepMeta.getStepMetaInterface().getStepData());
+		tableName = tableName == null && lookBackward ? 
+				this.getDBTableNameFromPreviousSteps(stepMeta, stepNameSetter):tableName;
+		if(tableName == null) {
+			throw new KettleException("NO 'DBTABLE' FIELD FOUND FROM " + stepMeta.getParentTransMeta().getName() + " STEP");
+		}
+		return tableName;
+	}
+	
+	/**
+	 * Lookup for the DB table name across the hop grid 
+	 * @param stepMeta base step meta
+	 * @param stepNameSetterMethod Name of the method in charge to set the data source step Name
+	 * @return table name
+	 * @throws KettleException
+	 */
+	private String getDBTableNameFromPreviousSteps(StepMeta stepMeta, String stepNameSetterMethod) throws KettleException{
 		String tableName = null;
-		if(stepMeta != null) {
-			StepDataInterface stepData = stepMeta.getStepMetaInterface().getStepData(); 
-			try {
-				tableName = (String)stepData.getClass().getField("DBTABLE").get(stepData);
-			}catch(NoSuchFieldException ne) {
-				logError("NO 'DBTABLE' FIELD FOUND ON " + stepMeta.getName() + " STEP DATA CLASS");
-			}catch(SecurityException se) {
-				logError("NO 'DBTABLE' PUBLIC FIELD FOUND ON " + stepMeta.getName() + " STEP DATA CLASS");
-			}catch(IllegalAccessException ae) {
-				logError(ae.getMessage());
+		for(StepMeta step: stepMeta.getParentTransMeta().findPreviousSteps(stepMeta)) { 
+			tableName = this.lookupGetterMethod(step.getName(), step.getStepMetaInterface().getStepData());
+			if(tableName != null) {
+				if(stepNameSetterMethod != null) {
+					try {
+						meta.getClass().getMethod(stepNameSetterMethod, String.class).invoke(meta, step.getName());
+					}catch(Exception e) {
+						throw new KettleException(e);
+					}
+				}
+				logBasic("DBTABLE FIELD FOUND ON " + step.getName() + " STEP DATA CLASS. VALUE ==> " + tableName);
+				break;
+			}
+			if(step.getParentTransMeta().findPreviousSteps(step).size() > 0) {
+				tableName = this.getDBTableNameFromPreviousSteps(step, stepNameSetterMethod);
+				if(tableName != null) break;
 			}
 		}
 		return tableName;
+	}
+	
+	/**
+	 * Method in charge to lookup and execute the step getter method for DB table name
+	 * @param stepName Name of step involved
+	 * @param stepData step data interface
+	 * @return table name
+	 */
+	private String lookupGetterMethod(String stepName, StepDataInterface stepData) {
+		String value = null;
+		try {
+			value = (String)stepData.getClass().getField("DBTABLE").get(stepData);
+		}catch(NoSuchFieldException ne) {
+			logDebug("NO 'DBTABLE' FIELD FOUND ON " + stepName + " STEP DATA CLASS");
+		}catch(SecurityException se) {
+			logDebug("NO 'DBTABLE' PUBLIC FIELD FOUND ON " + stepName + " STEP DATA CLASS");
+		}catch(IllegalAccessException ae) {
+			logDebug(ae.getMessage());
+		}
+		return value;
 	}
 	
 	/**
