@@ -835,6 +835,9 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	    this.getMappingTableData(stepname);
 	    meta.setChanged( changed );
 
+		wTabFolder.setSelection(1);
+		wTabFolder.setSelection(2);
+		wTabFolder.setSelection(0);
 	    shell.open();
 	    while ( !shell.isDisposed() ) {
 	      if ( !display.readAndDispatch() ) {
