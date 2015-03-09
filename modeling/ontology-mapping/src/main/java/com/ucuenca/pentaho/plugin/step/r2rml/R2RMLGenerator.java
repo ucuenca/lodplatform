@@ -358,7 +358,8 @@ public class R2RMLGenerator {
 	 * @throws Exception
 	 */
 	private void finishProcess() throws Exception{
-		FileOutputStream out = new FileOutputStream("/home/depcc/r2rml.ttl");
+		FileOutputStream out = new FileOutputStream(
+				meta.getOutputDir() + "/" + meta.getParentStepMeta().getName().trim() + "-R2RML.ttl");
 		r2rmlModel.write(out, "TURTLE");
 		DatabaseLoader.closeConnection();
 	}

@@ -77,11 +77,10 @@ public class StepDataLoader {
 	 * @return Row metadata
 	 * @throws KettleException
 	 */
-	@SuppressWarnings(value = { "deprecation" })
 	public RowMetaInterface getMetaFieldsDef(StepMetaInterface smi)throws KettleException {
 		//OAILoaderMeta meta = (OAILoaderMeta) smi;
 		outputRowMeta = new RowMeta();
-		smi.getFields(outputRowMeta, this.stepName, null, null, null);
+		smi.getFields(outputRowMeta, this.stepName, null, null, null, null, null);
 		return outputRowMeta;
 	}
 	
