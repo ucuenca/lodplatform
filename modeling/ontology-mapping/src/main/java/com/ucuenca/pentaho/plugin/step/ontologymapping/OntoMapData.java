@@ -123,13 +123,13 @@ public class OntoMapData extends BaseStepData implements StepDataInterface {
 	    			int count = 1;
 	    			while(count < values.length) {
 	    				sqlInsertion += "?,";
-	    				sqlInsertStack += "\"{" + (count-1) + "}\",";
+	    				sqlInsertStack += "{" + (count-1) + "},";
 	    				count++;
 	    			}
 	    			sqlInsertion += "?)";
-	    			sqlInsertStack += "\"{"+ (values.length-1) +"}\")";
+	    			sqlInsertStack += "{"+ (values.length-1) +"})";
 	    			DatabaseLoader.executeUpdate(sqlInsertion, values);
-	    			sqlInsertList.add( new MessageFormat(sqlInsertStack).format(values) );
+	    			sqlInsertList.add( new MessageFormat(sqlInsertStack).format( this.setValuesFormat(values) ) );
 	    		}catch(Exception e) {
 	    			throw new KettleException("ERROR EXECUTING SQL INSERT: "+ e.getMessage());
 	    		}
@@ -137,6 +137,24 @@ public class OntoMapData extends BaseStepData implements StepDataInterface {
     	}
     	return sqlInsertList;
     }
+	
+	/**
+	 * Set special value format depending on value data type
+	 * @param values set of values
+	 * @return new formatted set of values
+	 * @throws Exception
+	 */
+	private Object[] setValuesFormat(Object[] values)throws Exception {
+		Object[] result = new Object[values.length];
+		for(int i=0;i<values.length;i++) {
+			if(values[i] instanceof String) {
+				result[i] = "'" + values[i] + "'";
+			} else {
+				result[i] = values[i];
+			}
+		}
+		return result;
+	}
 	
 	/**
 	 * Creates the Database table schema
