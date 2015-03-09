@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+
+<project default="build-war" basedir=".">
+	
+	
+<echo message="pulling in property files"/>
+
+<property name="build.dir" value="" />	
+
+<echo message="init build of fuseki.war"/>
+<echo message="build dir $(build.dir)"/>
+  
+	<target name="build-war">
+
+	   <war destfile="${basedir}/fuseki.war" needxmlfile='false'>
+	      <fileset dir="fuseki">
+	         <include name="**/*.*"/>
+	      	<include name="*"/>
+	      </fileset>
+	      
+	    
+	      
+	      <classes dir="fuseki"/>
+	   </war>
+	   
+	</target>	
+</project>

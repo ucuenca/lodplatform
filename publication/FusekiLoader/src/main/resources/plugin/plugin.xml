@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+	id: 			String uniquely identifying the step. Used in serialization. 
+	iconfile:		The step icon used in spoon
+	description: 	The name of the step as it appears in Spoon
+	tooltip:		The tooltip of the step as it appears in Spoon
+	category:		The step category in the tree view in Spoon
+	classname:		The step class implementing StepMetaInterface
+ -->
+<plugin
+   id="FusekiLoader"
+   iconfile="icon.png"
+   description="Fuseki Loader"
+   tooltip="Fuseki Loader Tooltip"
+   category="LODPlatform"
+   classname="com.ucuenca.pentaho.plugin.step.FusekiLoaderMeta">
+		
+		<!-- the list of jar files to include when loading the step -->
+		<libraries>
+			<!-- the classes implementing the step interfaces are in this jar -->
+    		<library name="FusekiLoader-0.0.1-SNAPSHOT.jar"/>
+
+    		
+    		<!-- specify additional jars to be included when loading the step plug-in -->
+    		<!--  
+    			<library name="lib/some-additional-jar.jar"/>
+    		 -->
+    	  			<library name="lib/jena-core-2.12.0.jar"/>
+    		 	<library name="lib/slf4j-api-1.7.6.jar"/>
+    		<library name="lib/jena-arq-2.12.0.jar"/> 
+    		 	<library name="lib/jena-iri-1.1.0.jar"/>
+    		 	<library name="lib/httpclient-4.2.6.jar"/>
+    		 	<library name="lib/httpclient-cache-4.2.6.jar"/>
+    		 	<library name="lib/httpcore-4.2.5.jar"/>
+    		 	<library name="lib/commons-logging.1.0.4.jar"/>
+    		 	<library name="lib/json-20070829.jar"/>
+    		 	<library name="lib/jsonld-java-0.5.1.jar"/>
+    		 	<library name="lib/jackson-core-2.5.0.jar"/>
+    		 	<library name="lib/jackson-databind-2.5.0.jar"/>
+    		 	<library name="lib/jackson-annotations-2.5.0.jar"/>
+    		 		
+    		 		
+				<library name="lib/log4j-1.1.2.17.jar"/>
+				<library name="lib/jena-text-1.0.2.jar"/>
+				<library name="lib/jena-spatial-1.0.2.jar"/>
+				<library name="lib/commons-fileupload-1.3.jar"/>
+				<library name="lib/jena-tdb-1.0.2.jar"/>
+				<library name="lib/jetty-server-8.1.14.v20131031.jar"/> 
+				<!--<library name="lib/jetty-server-8.1.0.v20120127.jar" />-->
+				<library name="lib/jetty-all-server-8.1.14.v20131031.jar" />
+				<library name="lib/jena-fuseki-1.1.1.jar"/>
+				
+				<library name="lib/jetty-servlet-8.1.14.v20131031.jar"/>
+				
+				<library name="lib/jetty-servlets-8.1.14.v20131031.jar"/>
+				<library name="lib/jetty-xml-8.1.14.v20131031.jar"/>
+				<library name="lib/jetty-security-8.1.14.v20131031.jar"/>
+				<library name="lib/jetty-util-8.1.14.v20131031.jar"/>
+				<library name="lib/velocity-1.7.jar"/>
+				<library name="lib/slf4j-log4j12-1.7.6.jar"/>
+				<library name="lib/jcl-over-slf4j-1.7.6.jar"/>
+				<library name="lib/log4j-1.2.17.jar"/>
+				<!--<library name="lib/jetty-all-9.2.7.v20150116.jar"/>-->
+<library name="lib/javax.servlet-3.1.1.jar"/>
+<library name="lib/ant-1.7.1.jar"/>
+<library name="lib/ant-launcher-1.8.4.jar"/>
+
+			
+		</libraries>
+		
+</plugin>
