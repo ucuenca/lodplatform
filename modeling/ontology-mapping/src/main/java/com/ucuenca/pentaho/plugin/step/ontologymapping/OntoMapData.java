@@ -110,7 +110,7 @@ public class OntoMapData extends BaseStepData implements StepDataInterface {
 	public List<String> saveTable(TableView table, String tableName)throws Exception {
 		List<String> sqlInsertList = new ArrayList<String>();
 		this.createDBTable(table, tableName);
-    	Object[] pk = new Object[]{this.getTransName(), this.getStepName()};
+    	Object[] pk = new Object[]{this.getTransName().toUpperCase(), this.getStepName().toUpperCase()};
     	DatabaseLoader.executeUpdate("DELETE FROM " + tableName + " WHERE TRANSID = ? AND STEPID = ?", pk);
     	for(int i=0;i<table.getItemCount();i++) {
     		Object[] tableValues = table.getItem(i);
@@ -123,11 +123,11 @@ public class OntoMapData extends BaseStepData implements StepDataInterface {
 	    			int count = 1;
 	    			while(count < values.length) {
 	    				sqlInsertion += "?,";
-	    				sqlInsertStack += "{" + (count-1) + "},";
+	    				sqlInsertStack += "\"{" + (count-1) + "}\",";
 	    				count++;
 	    			}
 	    			sqlInsertion += "?)";
-	    			sqlInsertStack += "{"+ (values.length-1) +"})";
+	    			sqlInsertStack += "\"{"+ (values.length-1) +"}\")";
 	    			DatabaseLoader.executeUpdate(sqlInsertion, values);
 	    			sqlInsertList.add( new MessageFormat(sqlInsertStack).format(values) );
 	    		}catch(Exception e) {
@@ -165,7 +165,7 @@ public class OntoMapData extends BaseStepData implements StepDataInterface {
     	ColumnInfo[] columns = tableView.getColumns();
     	List<String> tableFields = new ArrayList<String>();
     	for(ColumnInfo column:columns) tableFields.add(column.getName().toUpperCase().replaceAll(" ", "_"));
-    	Object[] pk = new Object[]{this.getTransName(), this.getStepName()};
+    	Object[] pk = new Object[]{this.getTransName().toUpperCase(), this.getStepName().toUpperCase()};
     	ResultSet rs = DatabaseLoader.executeQuery("SELECT " + 
     			tableFields.toString().substring(1, tableFields.toString().length()-1) + 
     			" FROM " + tableName + " WHERE TRANSID = ? AND STEPID = ?", pk);
