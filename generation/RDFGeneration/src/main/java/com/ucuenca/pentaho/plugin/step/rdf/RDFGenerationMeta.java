@@ -49,82 +49,88 @@ import org.pentaho.di.trans.step.StepDialogInterface;
 import org.pentaho.di.trans.step.StepInterface;
 import org.pentaho.di.trans.step.StepMeta;
 import org.pentaho.di.trans.step.StepMetaInterface;
+import org.pentaho.di.trans.steps.edi2xml.grammar.FastSimpleGenericEdifactDirectXMLParser.data_element_payload_return;
 import org.w3c.dom.Node;
 
 /**
- * This class is part of the demo step plug-in implementation.
- * It demonstrates the basics of developing a plug-in step for PDI. 
+ * This class is part of the demo step plug-in implementation. It demonstrates
+ * the basics of developing a plug-in step for PDI.
  * 
- * The demo step adds a new string field to the row stream and sets its
- * value to "Hello World!". The user may select the name of the new field.
- *   
- * This class is the implementation of StepMetaInterface.
- * Classes implementing this interface need to:
+ * The demo step adds a new string field to the row stream and sets its value to
+ * "Hello World!". The user may select the name of the new field.
  * 
- * - keep track of the step settings
- * - serialize step settings both to xml and a repository
- * - provide new instances of objects implementing StepDialogInterface, StepInterface and StepDataInterface
- * - report on how the step modifies the meta-data of the row-stream (row structure and field types)
- * - perform a sanity-check on the settings provided by the user 
+ * This class is the implementation of StepMetaInterface. Classes implementing
+ * this interface need to:
+ * 
+ * - keep track of the step settings - serialize step settings both to xml and a
+ * repository - provide new instances of objects implementing
+ * StepDialogInterface, StepInterface and StepDataInterface - report on how the
+ * step modifies the meta-data of the row-stream (row structure and field types)
+ * - perform a sanity-check on the settings provided by the user
  * 
  */
-public class RDFGenerationMeta extends BaseStepMeta implements StepMetaInterface {
+public class RDFGenerationMeta extends BaseStepMeta implements
+		StepMetaInterface {
 
 	/**
-	 *	The PKG member is used when looking up internationalized strings.
-	 *	The properties file with localized keys is expected to reside in 
-	 *	{the package of the class specified}/messages/messages_{locale}.properties   
+	 * The PKG member is used when looking up internationalized strings. The
+	 * properties file with localized keys is expected to reside in {the package
+	 * of the class specified}/messages/messages_{locale}.properties
 	 */
 	private static Class<?> PKG = RDFGenerationMeta.class; // for i18n purposes
-	
-	/**
-	 * Stores the name of the field added to the row-stream. 
-	 */
-	private String inputFieldr2rml;
-	
-	 
-	    private String sqlvendor;
-	    private String databaseURL;
-	    private String userName;
-	    private String password;
-	    private String baseUri;
-	    private String directorioOutputRDF;
-	    private String format;
 
 	/**
-	 * Constructor should call super() to make sure the base class has a chance to initialize properly.
+	 * Stores the name of the field added to the row-stream.
+	 */
+	private String inputFieldr2rml;
+	private String sqlvendor;
+	private String databaseURL;
+	private String databaseSchema;
+	private String userName;
+	private String password;
+	private String baseUri;
+	private String directorioOutputRDF;
+	private String format;
+	
+	private String stepName;
+
+	/**
+	 * Constructor should call super() to make sure the base class has a chance
+	 * to initialize properly.
 	 */
 	public RDFGenerationMeta() {
-		super(); 
+		super();
+		
 	}
-	
-	/**
-	 * Called by Spoon to get a new instance of the SWT dialog for the step.
-	 * A standard implementation passing the arguments to the constructor of the step dialog is recommended.
-	 * 
-	 * @param shell		an SWT Shell
-	 * @param meta 		description of the step 
-	 * @param transMeta	description of the the transformation 
-	 * @param name		the name of the step
-	 * @return 			new instance of a dialog for this step 
-	 */
-	public StepDialogInterface getDialog(Shell shell, StepMetaInterface meta, TransMeta transMeta, String name) {
+
+	public StepDialogInterface getDialog(Shell shell, StepMetaInterface meta,
+			TransMeta transMeta, String name) {		
+		this.setStepName(name);
 		return new RDFGenerationDialog(shell, meta, transMeta, name);
 	}
 
 	/**
-	 * Called by PDI to get a new instance of the step implementation. 
-	 * A standard implementation passing the arguments to the constructor of the step class is recommended.
+	 * Called by PDI to get a new instance of the step implementation. A
+	 * standard implementation passing the arguments to the constructor of the
+	 * step class is recommended.
 	 * 
-	 * @param stepMeta				description of the step
-	 * @param stepDataInterface		instance of a step data class
-	 * @param cnr					copy number
-	 * @param transMeta				description of the transformation
-	 * @param disp					runtime implementation of the transformation
-	 * @return						the new instance of a step implementation 
+	 * @param stepMeta
+	 *            description of the step
+	 * @param stepDataInterface
+	 *            instance of a step data class
+	 * @param cnr
+	 *            copy number
+	 * @param transMeta
+	 *            description of the transformation
+	 * @param disp
+	 *            runtime implementation of the transformation
+	 * @return the new instance of a step implementation
 	 */
-	public StepInterface getStep(StepMeta stepMeta, StepDataInterface stepDataInterface, int cnr, TransMeta transMeta, Trans disp) {
-		return new RDFGeneration(stepMeta, stepDataInterface, cnr, transMeta, disp);
+	public StepInterface getStep(StepMeta stepMeta,
+			StepDataInterface stepDataInterface, int cnr, TransMeta transMeta,
+			Trans disp) {
+		return new RDFGeneration(stepMeta, stepDataInterface, cnr, transMeta,
+				disp);
 	}
 
 	/**
@@ -132,17 +138,259 @@ public class RDFGenerationMeta extends BaseStepMeta implements StepMetaInterface
 	 */
 	public StepDataInterface getStepData() {
 		return new RDFGenerationData();
-	}	
+	}
 
 	/**
-	 * This method is called every time a new step is created and should allocate/set the step configuration
-	 * to sensible defaults. The values set here will be used by Spoon when a new step is created.    
+	 * This method is called every time a new step is created and should
+	 * allocate/set the step configuration to sensible defaults. The values set
+	 * here will be used by Spoon when a new step is created.
 	 */
 	public void setDefault() {
-		inputFieldr2rml = "demo_field";
+		inputFieldr2rml ="R2rml File";
+		sqlvendor="";
+		databaseURL="";
+		databaseSchema="";
+		userName="";
+		password="";
+		baseUri="";
+		directorioOutputRDF="";
+		format="";
+	}
+
+	/**
+	 * This method is used when a step is duplicated in Spoon. It needs to
+	 * return a deep copy of this step meta object. Be sure to create proper
+	 * deep copies if the step configuration is stored in modifiable objects.
+	 * 
+	 * See org.pentaho.di.trans.steps.rowgenerator.RowGeneratorMeta.clone() for
+	 * an example on creating a deep copy.
+	 * 
+	 * @return a deep copy of this
+	 */
+	public Object clone() {
+		Object retval = super.clone();
+		return retval;
+	}
+
+	/**
+	 * This method is called by Spoon when a step needs to serialize its
+	 * configuration to XML. The expected return value is an XML fragment
+	 * consisting of one or more XML tags.
+	 * 
+	 * Please use org.pentaho.di.core.xml.XMLHandler to conveniently generate
+	 * the XML.
+	 * 
+	 * @return a string containing the XML serialization of this step
+	 */
+	public String getXML() throws KettleValueException {
+
+		// only one field to serialize
+		StringBuffer retval = new StringBuffer(1000);
+		
+		retval.append("    ").append(XMLHandler.addTagValue("nameStep", stepName));
+		retval.append("    ").append(XMLHandler.addTagValue("Fieldr2rml", inputFieldr2rml));
+		retval.append("    ").append(
+				XMLHandler.addTagValue("sqldriver", sqlvendor));
+		retval.append("    ").append(
+				XMLHandler.addTagValue("baseURL", databaseURL));
+		retval.append("    ").append(
+				XMLHandler.addTagValue("baseSchema", databaseSchema));
+		retval.append("    ")
+				.append(XMLHandler.addTagValue("DataSetUri", baseUri));
+		retval.append("    ").append(
+				XMLHandler.addTagValue("user", userName));
+		retval.append("    ").append(
+				XMLHandler.addTagValue("pass", password));
+		retval.append("    ").append(
+				XMLHandler.addTagValue("OutputRDF",
+						directorioOutputRDF));
+		retval.append("    ").append(XMLHandler.addTagValue("formats", format));
+
+		return retval.toString();
+	}
+
+	/**
+	 * This method is called by PDI when a step needs to load its configuration
+	 * from XML.
+	 * 
+	 * Please use org.pentaho.di.core.xml.XMLHandler to conveniently read from
+	 * the XML node passed in.
+	 * 
+	 * @param stepnode
+	 *            the XML node containing the configuration
+	 * @param databases
+	 *            the databases available in the transformation
+	 * @param counters
+	 *            the counters available in the transformation
+	 */
+	public void loadXML(Node stepnode, List<DatabaseMeta> databases,
+			Map<String, Counter> counters) throws KettleXMLException {		
+		readData(stepnode);
 	}
 	
-		public String getInputFieldr2rml() {
+	 private void readData( Node stepnode ) throws KettleXMLException {
+		    
+		      stepName= XMLHandler.getTagValue( stepnode, "nameStep" );
+		      inputFieldr2rml = XMLHandler.getTagValue( stepnode, "Fieldr2rml" );
+		      sqlvendor = XMLHandler.getTagValue( stepnode, "sqldriver" );
+		      databaseURL=XMLHandler.getTagValue( stepnode, "baseURL" ); 
+		      databaseSchema=XMLHandler.getTagValue( stepnode, "baseSchema" );
+		      baseUri=XMLHandler.getTagValue( stepnode, "DataSetUri" );
+		      userName=XMLHandler.getTagValue( stepnode, "user" );
+		      password=XMLHandler.getTagValue( stepnode, "pass" );
+		      directorioOutputRDF=XMLHandler.getTagValue( stepnode, "OutputRDF" );
+		      format=XMLHandler.getTagValue( stepnode, "formats" );
+    }
+		
+
+	/**
+	 * This method is called by Spoon when a step needs to serialize its
+	 * configuration to a repository. The repository implementation provides the
+	 * necessary methods to save the step attributes.
+	 * 
+	 * @param rep
+	 *            the repository to save to
+	 * @param id_transformation
+	 *            the id to use for the transformation when saving
+	 * @param id_step
+	 *            the id to use for the step when saving
+	 */
+	public void saveRep(Repository rep, ObjectId id_transformation,
+			ObjectId id_step) throws KettleException {
+		try {
+			rep.saveStepAttribute(id_transformation, id_step,
+					"inputFieldr2rml", inputFieldr2rml); //$NON-NLS-1$
+			
+//			rep.saveStepAttribute(id_transformation, id_step, "nameontology", nameOntology); //$NON-NLS-1$
+//			rep.saveStepAttribute(id_transformation, id_step, "stepname", stepName); //$NON-NLS-1$
+//			rep.saveStepAttribute(id_transformation, id_step, "outputfield", outputField); //$NON-NLS-1$
+		} catch (Exception e) {
+			throw new KettleException("Unable to save step into repository: "
+					+ id_step, e);
+		}
+	}
+
+	/**
+	 * This method is called by PDI when a step needs to read its configuration
+	 * from a repository. The repository implementation provides the necessary
+	 * methods to read the step attributes.
+	 * 
+	 * @param rep
+	 *            the repository to read from
+	 * @param id_step
+	 *            the id of the step being read
+	 * @param databases
+	 *            the databases available in the transformation
+	 * @param counters
+	 *            the counters available in the transformation
+	 */
+	public void readRep(Repository rep, ObjectId id_step,
+			List<DatabaseMeta> databases, Map<String, Counter> counters)
+			throws KettleException {
+		try {
+			inputFieldr2rml = rep
+					.getStepAttributeString(id_step, "inputFieldr2rml"); //$NON-NLS-1$
+			
+		} catch (Exception e) {
+			throw new KettleException("Unable to load step from repository", e);
+		}
+	}
+	
+
+	/**
+	 * This method is called to determine the changes the step is making to the
+	 * row-stream. To that end a RowMetaInterface object is passed in,
+	 * containing the row-stream structure as it is when entering the step. This
+	 * method must apply any changes the step makes to the row stream. Usually a
+	 * step adds fields to the row-stream.
+	 * 
+	 * @param r
+	 *            the row structure coming in to the step
+	 * @param origin
+	 *            the name of the step making the changes
+	 * @param info
+	 *            row structures of any info steps coming in
+	 * @param nextStep
+	 *            the description of a step this step is passing rows to
+	 * @param space
+	 *            the variable space for resolving variables
+	 */
+	public void getFields(RowMetaInterface r, String origin,
+			RowMetaInterface[] info, StepMeta nextStep, VariableSpace space) {
+
+		/*
+		 * This implementation appends the outputField to the row-stream
+		 */
+
+		// a value meta object contains the meta data for a field
+		ValueMetaInterface v = new ValueMeta();
+
+		// set the name of the new field
+		v.setName(inputFieldr2rml);
+
+		// type is going to be string
+		v.setType(ValueMeta.TYPE_STRING);
+
+		// setting trim type to "both"
+		v.setTrimType(ValueMeta.TRIM_TYPE_BOTH);
+
+		// the name of the step that adds this field
+		v.setOrigin(origin);
+
+		// modify the row structure and add the field this step generates
+		r.addValueMeta(v);
+
+	}
+
+	/**
+	 * This method is called when the user selects the "Verify Transformation"
+	 * option in Spoon. A list of remarks is passed in that this method should
+	 * add to. Each remark is a comment, warning, error, or ok. The method
+	 * should perform as many checks as necessary to catch design-time errors.
+	 * 
+	 * Typical checks include: - verify that all mandatory configuration is
+	 * given - verify that the step receives any input, unless it's a row
+	 * generating step - verify that the step does not receive any input if it
+	 * does not take them into account - verify that the step finds fields it
+	 * relies on in the row-stream
+	 * 
+	 * @param remarks
+	 *            the list of remarks to append to
+	 * @param transmeta
+	 *            the description of the transformation
+	 * @param stepMeta
+	 *            the description of the step
+	 * @param prev
+	 *            the structure of the incoming row-stream
+	 * @param input
+	 *            names of steps sending input to the step
+	 * @param output
+	 *            names of steps this step is sending output to
+	 * @param info
+	 *            fields coming in from info steps
+	 */
+	public void check(List<CheckResultInterface> remarks, TransMeta transmeta,
+			StepMeta stepMeta, RowMetaInterface prev, String input[],
+			String output[], RowMetaInterface info) {
+
+		CheckResult cr;
+
+		// See if there are input streams leading to this step!
+		if (input.length > 0) {
+			cr = new CheckResult(CheckResult.TYPE_RESULT_OK,
+					BaseMessages.getString(PKG,
+							"Demo.CheckResult.ReceivingRows.OK"), stepMeta);
+			remarks.add(cr);
+		} else {
+			cr = new CheckResult(CheckResult.TYPE_RESULT_ERROR,
+					BaseMessages.getString(PKG,
+							"Demo.CheckResult.ReceivingRows.ERROR"), stepMeta);
+			remarks.add(cr);
+		}
+
+	}
+
+	public String getInputFieldr2rml() {
 		return inputFieldr2rml;
 	}
 
@@ -164,6 +412,14 @@ public class RDFGenerationMeta extends BaseStepMeta implements StepMetaInterface
 
 	public void setDatabaseURL(String databaseURL) {
 		this.databaseURL = databaseURL;
+	}
+
+	public String getDatabaseSchema() {
+		return databaseSchema;
+	}
+
+	public void setDatabaseSchema(String databaseSchema) {
+		this.databaseSchema = databaseSchema;
 	}
 
 	public String getUserName() {
@@ -206,162 +462,14 @@ public class RDFGenerationMeta extends BaseStepMeta implements StepMetaInterface
 		this.format = format;
 	}
 
-	/**
-	 * This method is used when a step is duplicated in Spoon. It needs to return a deep copy of this
-	 * step meta object. Be sure to create proper deep copies if the step configuration is stored in
-	 * modifiable objects.
-	 * 
-	 * See org.pentaho.di.trans.steps.rowgenerator.RowGeneratorMeta.clone() for an example on creating
-	 * a deep copy.
-	 * 
-	 * @return a deep copy of this
-	 */
-	public Object clone() {
-		Object retval = super.clone();
-		return retval;
+	public String getStepName() {
+		return stepName;
+	}
+
+	public void setStepName(String stepName) {
+		this.stepName = stepName;
 	}
 	
-	/**
-	 * This method is called by Spoon when a step needs to serialize its configuration to XML. The expected
-	 * return value is an XML fragment consisting of one or more XML tags.  
-	 * 
-	 * Please use org.pentaho.di.core.xml.XMLHandler to conveniently generate the XML.
-	 * 
-	 * @return a string containing the XML serialization of this step
-	 */
-	public String getXML() throws KettleValueException {
-		
-		// only one field to serialize
-		String xml = XMLHandler.addTagValue("outputfield", inputFieldr2rml);
-		return xml;
-	}
-
-	/**
-	 * This method is called by PDI when a step needs to load its configuration from XML.
-	 * 
-	 * Please use org.pentaho.di.core.xml.XMLHandler to conveniently read from the
-	 * XML node passed in.
-	 * 
-	 * @param stepnode	the XML node containing the configuration
-	 * @param databases	the databases available in the transformation
-	 * @param counters	the counters available in the transformation
-	 */
-	public void loadXML(Node stepnode, List<DatabaseMeta> databases, Map<String, Counter> counters) throws KettleXMLException {
-
-		try {
-			setInputFieldr2rml(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "outputfield")));
-		} catch (Exception e) {
-			throw new KettleXMLException("Demo plugin unable to read step info from XML node", e);
-		}
-
-	}	
-	/**
-	 * This method is called by Spoon when a step needs to serialize its configuration to a repository.
-	 * The repository implementation provides the necessary methods to save the step attributes.
-	 *
-	 * @param rep					the repository to save to
-	 * @param id_transformation		the id to use for the transformation when saving
-	 * @param id_step				the id to use for the step  when saving
-	 */
-	public void saveRep(Repository rep, ObjectId id_transformation, ObjectId id_step) throws KettleException
-	{
-		try{
-			rep.saveStepAttribute(id_transformation, id_step, "outputfield", inputFieldr2rml); //$NON-NLS-1$
-		}
-		catch(Exception e){
-			throw new KettleException("Unable to save step into repository: "+id_step, e); 
-		}
-	}		
 	
-	/**
-	 * This method is called by PDI when a step needs to read its configuration from a repository.
-	 * The repository implementation provides the necessary methods to read the step attributes.
-	 * 
-	 * @param rep		the repository to read from
-	 * @param id_step	the id of the step being read
-	 * @param databases	the databases available in the transformation
-	 * @param counters	the counters available in the transformation
-	 */
-	public void readRep(Repository rep, ObjectId id_step, List<DatabaseMeta> databases, Map<String, Counter> counters) throws KettleException {
-		try{
-			inputFieldr2rml  = rep.getStepAttributeString(id_step, "outputfield"); //$NON-NLS-1$
-		}
-		catch(Exception e){
-			throw new KettleException("Unable to load step from repository", e);
-		}
-	}
-
-	/**
-	 * This method is called to determine the changes the step is making to the row-stream.
-	 * To that end a RowMetaInterface object is passed in, containing the row-stream structure as it is when entering
-	 * the step. This method must apply any changes the step makes to the row stream. Usually a step adds fields to the
-	 * row-stream.
-	 * 
-	 * @param r			the row structure coming in to the step
-	 * @param origin	the name of the step making the changes
-	 * @param info		row structures of any info steps coming in
-	 * @param nextStep	the description of a step this step is passing rows to
-	 * @param space		the variable space for resolving variables
-	 */
-	public void getFields(RowMetaInterface r, String origin, RowMetaInterface[] info, StepMeta nextStep, VariableSpace space) {
-
-		/*
-		 * This implementation appends the outputField to the row-stream
-		 */
-
-		// a value meta object contains the meta data for a field
-		ValueMetaInterface v = new ValueMeta();
-
-		// set the name of the new field 
-		v.setName(inputFieldr2rml);
-		
-		// type is going to be string
-		v.setType(ValueMeta.TYPE_STRING);
-		
-		// setting trim type to "both"
-		v.setTrimType(ValueMeta.TRIM_TYPE_BOTH);
-
-		// the name of the step that adds this field
-		v.setOrigin(origin);
-		
-		// modify the row structure and add the field this step generates  
-		r.addValueMeta(v);
-		
-	}
-
-	/**
-	 * This method is called when the user selects the "Verify Transformation" option in Spoon. 
-	 * A list of remarks is passed in that this method should add to. Each remark is a comment, warning, error, or ok.
-	 * The method should perform as many checks as necessary to catch design-time errors.
-	 * 
-	 * Typical checks include:
-	 * - verify that all mandatory configuration is given
-	 * - verify that the step receives any input, unless it's a row generating step
-	 * - verify that the step does not receive any input if it does not take them into account
-	 * - verify that the step finds fields it relies on in the row-stream
-	 * 
-	 *   @param remarks		the list of remarks to append to
-	 *   @param transmeta	the description of the transformation
-	 *   @param stepMeta	the description of the step
-	 *   @param prev		the structure of the incoming row-stream
-	 *   @param input		names of steps sending input to the step
-	 *   @param output		names of steps this step is sending output to
-	 *   @param info		fields coming in from info steps 
-	 */
-	public void check(List<CheckResultInterface> remarks, TransMeta transmeta, StepMeta stepMeta, RowMetaInterface prev, String input[], String output[], RowMetaInterface info) {
-		
-		CheckResult cr;
-
-		// See if there are input streams leading to this step!
-		if (input.length > 0) {
-			cr = new CheckResult(CheckResult.TYPE_RESULT_OK, BaseMessages.getString(PKG, "Demo.CheckResult.ReceivingRows.OK"), stepMeta);
-			remarks.add(cr);
-		} else {
-			cr = new CheckResult(CheckResult.TYPE_RESULT_ERROR, BaseMessages.getString(PKG, "Demo.CheckResult.ReceivingRows.ERROR"), stepMeta);
-			remarks.add(cr);
-		}	
-    	
-	}
-
 
 }

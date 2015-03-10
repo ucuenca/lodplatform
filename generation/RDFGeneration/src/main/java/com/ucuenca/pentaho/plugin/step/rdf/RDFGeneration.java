@@ -22,9 +22,19 @@
 
 package com.ucuenca.pentaho.plugin.step.rdf;
 
+import java.io.File;
+import java.sql.SQLException;
+
+import net.antidot.semantic.rdf.model.impl.sesame.SesameDataSet;
+import net.antidot.semantic.rdf.rdb2rdf.r2rml.core.R2RMLProcessor;
+import net.antidot.sql.model.core.DriverType;
+import net.antidot.sql.model.core.SQLConnector;
+
+import org.openrdf.rio.RDFFormat;
 import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.core.row.RowDataUtil;
-import org.pentaho.di.core.row.RowMetaInterface;
+import org.pentaho.di.core.row.RowMeta;
+
 import org.pentaho.di.trans.Trans;
 import org.pentaho.di.trans.TransMeta;
 import org.pentaho.di.trans.step.BaseStep;
@@ -34,22 +44,21 @@ import org.pentaho.di.trans.step.StepMeta;
 import org.pentaho.di.trans.step.StepMetaInterface;
 
 /**
- * This class is part of the demo step plug-in implementation.
- * It demonstrates the basics of developing a plug-in step for PDI. 
+ * This class is part of the demo step plug-in implementation. It demonstrates
+ * the basics of developing a plug-in step for PDI.
  * 
- * The demo step adds a new string field to the row stream and sets its
- * value to "Hello World!". The user may select the name of the new field.
- *   
- * This class is the implementation of StepInterface.
- * Classes implementing this interface need to:
+ * The demo step adds a new string field to the row stream and sets its value to
+ * "Hello World!". The user may select the name of the new field.
  * 
- * - initialize the step
- * - execute the row processing logic
- * - dispose of the step 
+ * This class is the implementation of StepInterface. Classes implementing this
+ * interface need to:
+ * 
+ * - initialize the step - execute the row processing logic - dispose of the
+ * step
  * 
  * Please do not create any local fields in a StepInterface class. Store any
- * information related to the processing logic in the supplied step data interface
- * instead.  
+ * information related to the processing logic in the supplied step data
+ * interface instead.
  * 
  */
 
@@ -58,34 +67,45 @@ public class RDFGeneration extends BaseStep implements StepInterface {
 	/**
 	 * The constructor should simply pass on its arguments to the parent class.
 	 * 
-	 * @param s 				step description
-	 * @param stepDataInterface	step data class
-	 * @param c					step copy
-	 * @param t					transformation description
-	 * @param dis				transformation executing
+	 * @param s
+	 *            step description
+	 * @param stepDataInterface
+	 *            step data class
+	 * @param c
+	 *            step copy
+	 * @param t
+	 *            transformation description
+	 * @param dis
+	 *            transformation executing
 	 */
-	public RDFGeneration(StepMeta s, StepDataInterface stepDataInterface, int c, TransMeta t, Trans dis) {
+	public RDFGeneration(StepMeta s, StepDataInterface stepDataInterface,
+			int c, TransMeta t, Trans dis) {
 		super(s, stepDataInterface, c, t, dis);
 	}
-	
+
 	/**
-	 * This method is called by PDI during transformation startup. 
+	 * This method is called by PDI during transformation startup.
 	 * 
-	 * It should initialize required for step execution. 
+	 * It should initialize required for step execution.
 	 * 
-	 * The meta and data implementations passed in can safely be cast
-	 * to the step's respective implementations. 
+	 * The meta and data implementations passed in can safely be cast to the
+	 * step's respective implementations.
 	 * 
 	 * It is mandatory that super.init() is called to ensure correct behavior.
 	 * 
-	 * Typical tasks executed here are establishing the connection to a database,
-	 * as wall as obtaining resources, like file handles.
+	 * Typical tasks executed here are establishing the connection to a
+	 * database, as wall as obtaining resources, like file handles.
 	 * 
-	 * @param smi 	step meta interface implementation, containing the step settings
-	 * @param sdi	step data interface implementation, used to store runtime information
+	 * @param smi
+	 *            step meta interface implementation, containing the step
+	 *            settings
+	 * @param sdi
+	 *            step data interface implementation, used to store runtime
+	 *            information
 	 * 
-	 * @return true if initialization completed successfully, false if there was an error preventing the step from working. 
-	 *  
+	 * @return true if initialization completed successfully, false if there was
+	 *         an error preventing the step from working.
+	 * 
 	 */
 	public boolean init(StepMetaInterface smi, StepDataInterface sdi) {
 		// Casting to step-specific implementation classes is safe
@@ -93,91 +113,169 @@ public class RDFGeneration extends BaseStep implements StepInterface {
 		RDFGenerationData data = (RDFGenerationData) sdi;
 
 		return super.init(meta, data);
-	}	
+	}
 
 	/**
-	 * Once the transformation starts executing, the processRow() method is called repeatedly
-	 * by PDI for as long as it returns true. To indicate that a step has finished processing rows
-	 * this method must call setOutputDone() and return false;
+	 * Once the transformation starts executing, the processRow() method is
+	 * called repeatedly by PDI for as long as it returns true. To indicate that
+	 * a step has finished processing rows this method must call setOutputDone()
+	 * and return false;
 	 * 
-	 * Steps which process incoming rows typically call getRow() to read a single row from the
-	 * input stream, change or add row content, call putRow() to pass the changed row on 
-	 * and return true. If getRow() returns null, no more rows are expected to come in, 
-	 * and the processRow() implementation calls setOutputDone() and returns false to
-	 * indicate that it is done too.
+	 * Steps which process incoming rows typically call getRow() to read a
+	 * single row from the input stream, change or add row content, call
+	 * putRow() to pass the changed row on and return true. If getRow() returns
+	 * null, no more rows are expected to come in, and the processRow()
+	 * implementation calls setOutputDone() and returns false to indicate that
+	 * it is done too.
 	 * 
-	 * Steps which generate rows typically construct a new row Object[] using a call to
-	 * RowDataUtil.allocateRowData(numberOfFields), add row content, and call putRow() to
-	 * pass the new row on. Above process may happen in a loop to generate multiple rows,
-	 * at the end of which processRow() would call setOutputDone() and return false;
+	 * Steps which generate rows typically construct a new row Object[] using a
+	 * call to RowDataUtil.allocateRowData(numberOfFields), add row content, and
+	 * call putRow() to pass the new row on. Above process may happen in a loop
+	 * to generate multiple rows, at the end of which processRow() would call
+	 * setOutputDone() and return false;
 	 * 
-	 * @param smi the step meta interface containing the step settings
-	 * @param sdi the step data interface that should be used to store
+	 * @param smi
+	 *            the step meta interface containing the step settings
+	 * @param sdi
+	 *            the step data interface that should be used to store
 	 * 
-	 * @return true to indicate that the function should be called again, false if the step is done
+	 * @return true to indicate that the function should be called again, false
+	 *         if the step is done
 	 */
-	public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws KettleException {
+	public boolean processRow(StepMetaInterface smi, StepDataInterface sdi)
+			throws KettleException {
 
-		// safely cast the step settings (meta) and runtime info (data) to specific implementations 
+		// safely cast the step settings (meta) and runtime info (data) to
+		// specific implementations
 		RDFGenerationMeta meta = (RDFGenerationMeta) smi;
 		RDFGenerationData data = (RDFGenerationData) sdi;
 
-		// get incoming row, getRow() potentially blocks waiting for more rows, returns null if no more rows expected
-		Object[] r = getRow(); 
-		
-		// if no more rows are expected, indicate step is finished and processRow() should not be called again
-		if (r == null){
-			setOutputDone();
-			return false;
-		}
+		// Object[] r = getRow();
+		//
+		// // if no more rows are expected, indicate step is finished and
+		// processRow() should not be called again
+		// if (r == null){
+		// setOutputDone();
+		// return false;
+		// }
 
 		// the "first" flag is inherited from the base step implementation
-		// it is used to guard some processing tasks, like figuring out field indexes
+		// it is used to guard some processing tasks, like figuring out field
+		// indexes
 		// in the row structure that only need to be done once
 		if (first) {
 			first = false;
 			// clone the input row structure and place it in our data object
-			data.outputRowMeta = (RowMetaInterface) getInputRowMeta().clone();
-			// use meta.getFields() to change it, so it reflects the output row structure 
+			data.outputRowMeta = new RowMeta();
+			// use meta.getFields() to change it, so it reflects the output row
+			// structure
 			meta.getFields(data.outputRowMeta, getStepname(), null, null, this);
 		}
 
-		// safely add the string "Hello World!" at the end of the output row
-		// the row array will be resized if necessary 
-		Object[] outputRow = RowDataUtil.addValueData(r, data.outputRowMeta.size() - 1, "Hello World!");
+		// My develop
 
-		// put the row to the output row stream
-		putRow(data.outputRowMeta, outputRow); 
+		// Connect database
+		// conn = SQLConnector.connect(userName, password, url + dbName,
+		// driver);
+
+		try {
+			if (meta.getFormat().equals("TURTLE")) {
+				data.rdfFormat = RDFFormat.TURTLE;
+			} else if (meta.getFormat().equals("RDFXML")) {
+				data.rdfFormat = RDFFormat.RDFXML;
+			} else if (meta.getFormat().equals("NTRIPLES")) {
+				data.rdfFormat = RDFFormat.NTRIPLES;
+			} else if (meta.getFormat().equals("N3")) {
+				data.rdfFormat = RDFFormat.N3;
+			}
+
+			if (meta.getSqlvendor().equals("H2")) {
+				data.sqlDriver = new DriverType("org.h2.Driver");
+			} else if (meta.getSqlvendor().equals("MySql")) {
+				data.sqlDriver = new DriverType("com.mysql.jdbc.Driver");
+			} else if (meta.getSqlvendor().equals("PostgreSql")) {
+				data.sqlDriver = new DriverType("org.postgresql.Driver");
+			}
+			data.conn = SQLConnector.connect(meta.getUserName(),
+					meta.getPassword(),
+					meta.getDatabaseURL() + meta.getDatabaseSchema(),
+					data.sqlDriver);
+
+			SesameDataSet g = null;
+
+			// File outputFile = new File(meta.getDirectorioOutputRDF() + "/"
+			// + meta.getName() + ".ttl");
+			// if (outputFile.exists()) {
+			// // log.error("Output file "
+			// // + outputFile.getAbsolutePath()
+			// // +
+			// //
+			// " already exists. Please remove it or modify ouput name option.");
+			// System.exit(-1);
+			// }
+			// // Extract database model
+			// // if (mode.equals("r2rml")){
+			g = R2RMLProcessor.convertDatabase(data.conn,
+					meta.getInputFieldr2rml(), meta.getBaseUri(),
+					data.sqlDriver);
+
+			g.dumpRDF(meta.getDirectorioOutputRDF() + "/" + meta.getStepName()
+					+ ".ttl", data.rdfFormat);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				// Close db connection
+				data.conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+		// // safely add the string "Hello World!" at the end of the output row
+		// // the row array will be resized if necessary
+		// Object[] outputRow = RowDataUtil.addValueData(r,
+		// data.outputRowMeta.size() - 1, "Hello World!");
+		//
+		// // put the row to the output row stream
+		// putRow(data.outputRowMeta, outputRow);
 
 		// log progress if it is time to to so
 		if (checkFeedback(getLinesRead())) {
-			logBasic("Linenr " + getLinesRead()); // Some basic logging
+			logBasic(meta.getDirectorioOutputRDF()); // Some basic logging
 		}
 
 		// indicate that processRow() should be called again
-		return true;
+		return false;
 	}
 
 	/**
-	 * This method is called by PDI once the step is done processing. 
+	 * This method is called by PDI once the step is done processing.
 	 * 
-	 * The dispose() method is the counterpart to init() and should release any resources
-	 * acquired for step execution like file handles or database connections.
+	 * The dispose() method is the counterpart to init() and should release any
+	 * resources acquired for step execution like file handles or database
+	 * connections.
 	 * 
-	 * The meta and data implementations passed in can safely be cast
-	 * to the step's respective implementations. 
+	 * The meta and data implementations passed in can safely be cast to the
+	 * step's respective implementations.
 	 * 
-	 * It is mandatory that super.dispose() is called to ensure correct behavior.
+	 * It is mandatory that super.dispose() is called to ensure correct
+	 * behavior.
 	 * 
-	 * @param smi 	step meta interface implementation, containing the step settings
-	 * @param sdi	step data interface implementation, used to store runtime information
+	 * @param smi
+	 *            step meta interface implementation, containing the step
+	 *            settings
+	 * @param sdi
+	 *            step data interface implementation, used to store runtime
+	 *            information
 	 */
 	public void dispose(StepMetaInterface smi, StepDataInterface sdi) {
 
 		// Casting to step-specific implementation classes is safe
 		RDFGenerationMeta meta = (RDFGenerationMeta) smi;
 		RDFGenerationData data = (RDFGenerationData) sdi;
-		
+
 		super.dispose(meta, data);
 	}
 

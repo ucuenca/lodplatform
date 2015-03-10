@@ -22,6 +22,13 @@
 
 package com.ucuenca.pentaho.plugin.step.rdf;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
+
+import net.antidot.sql.model.core.DriverType;
+import net.antidot.sql.model.core.SQLConnector;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.ModifyEvent;
@@ -41,6 +48,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.pentaho.di.core.Const;
@@ -81,7 +89,6 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 	// the dialog writes the settings to it when confirmed
 	private RDFGenerationMeta meta;
 
-	
 	private Text txtdatabaseUrl;
 	private Text txtdatabaseSchema;
 	private Text txtuserName;
@@ -122,6 +129,13 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 	// text field holding the name of the field to add to the row stream
 	private Text txtR2rmlfile;
 
+	private String sqlvendor;
+	private String outputFormat;
+
+	private Listener lsTest;
+
+	private Listener lsreuseConecction;
+
 	/**
 	 * The constructor should simply invoke super() and save the incoming meta
 	 * object to a local variable, so it can conveniently read and write
@@ -140,6 +154,7 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 			String sname) {
 		super(parent, (BaseStepMeta) in, transMeta, sname);
 		meta = (RDFGenerationMeta) in;
+
 	}
 
 	/**
@@ -170,20 +185,12 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 		props.setLook(shell);
 		setShellImage(shell, meta);
 
-		// Save the value of the changed flag on the meta object. If the user
-		// cancels
-		// the dialog, it will be restored to this saved value.
-		// The "changed" variable is inherited from BaseStepDialog
-		changed = meta.hasChanged();
-
-		// The ModifyListener used on all controls. It will update the meta
-		// object to
-		// indicate that changes are being made.
 		ModifyListener lsMod = new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				meta.setChanged();
 			}
 		};
+		// changed = meta.hasChanged();
 
 		// ------------------------------------------------------- //
 		// SWT code for building the actual settings dialog //
@@ -231,6 +238,7 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 		lbR2rmlFile.setLayoutData(fdlbR2rmlFile);
 
 		txtR2rmlfile = new Text(shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
+		// txtR2rmlfile.setText(meta.getInputFieldr2rml());
 		props.setLook(txtR2rmlfile);
 		txtR2rmlfile.addModifyListener(lsMod);
 		FormData fdtxtR2rmlfile = new FormData();
@@ -239,7 +247,7 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 		fdtxtR2rmlfile.top = new FormAttachment(wStepname, margin);
 		txtR2rmlfile.setLayoutData(fdtxtR2rmlfile);
 
-		btnloadFile = new Button(shell, SWT.PUSH );
+		btnloadFile = new Button(shell, SWT.PUSH);
 		props.setLook(btnloadFile);
 		btnloadFile.setText(BaseMessages.getString(PKG,
 				"RDFGeneration.button.Filer2rml"));
@@ -248,217 +256,252 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 		btnloadFile.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				LoadFile();
-			}			
+			}
 		});
 		fdloadFile = new FormData();
 		fdloadFile.left = new FormAttachment(txtR2rmlfile, 0);
 		fdloadFile.top = new FormAttachment(wStepname, margin);
 		btnloadFile.setLayoutData(fdloadFile);
-		
-		
-		  lbsqlvendor = new Label(shell, SWT.RIGHT);
-	        lbsqlvendor.setText(BaseMessages.getString(PKG, "RDFGeneration.label.sqlvendor"));
-	        props.setLook(lbsqlvendor);
-	        fdsqlvendor = new FormData();
-	        fdsqlvendor.left = new FormAttachment(0, 0);
-	        fdsqlvendor.right = new FormAttachment(middle, -margin);
-	        fdsqlvendor.top = new FormAttachment(txtR2rmlfile, margin);
-	        lbsqlvendor.setLayoutData(fdsqlvendor);
-	        
-	        cbmsqlvendor = new CCombo(shell,  SWT.SINGLE | SWT.LEFT |  SWT.BORDER);
-	        cbmsqlvendor.setEditable(true);
-	        props.setLook(cbmsqlvendor);
-	        cbmsqlvendor.addModifyListener(lsMod);
-	        fbcbmsqlvendor = new FormData();
-	        fbcbmsqlvendor.left = new FormAttachment(middle, 0);
-	        fbcbmsqlvendor.top = new FormAttachment(btnloadFile, margin);
-	        fbcbmsqlvendor.right = new FormAttachment(80, -margin);
-	        cbmsqlvendor.setLayoutData(fbcbmsqlvendor);
-	        cbmsqlvendor.setEnabled(false);
-	        cbmsqlvendor.addSelectionListener(new SelectionListener() {
 
-	            public void widgetSelected(SelectionEvent selectionevent)
-	            {
-	            }
+		lbsqlvendor = new Label(shell, SWT.RIGHT);
+		lbsqlvendor.setText(BaseMessages.getString(PKG,
+				"RDFGeneration.label.sqlvendor"));
+		props.setLook(lbsqlvendor);
+		fdsqlvendor = new FormData();
+		fdsqlvendor.left = new FormAttachment(0, 0);
+		fdsqlvendor.right = new FormAttachment(middle, -margin);
+		fdsqlvendor.top = new FormAttachment(txtR2rmlfile, margin);
+		lbsqlvendor.setLayoutData(fdsqlvendor);
 
-	            public void widgetDefaultSelected(SelectionEvent selectionevent)
-	            {
-	            }	          
-	        });
-	        
-	        
-	        lbdatabaseUrl = new Label(shell, SWT.RIGHT);
-	        lbdatabaseUrl.setText(BaseMessages.getString(PKG, "RDFGeneration.label.dataBaseUri"));
-	        props.setLook(lbdatabaseUrl);
-	        fddatabaseUrl = new FormData();
-	        fddatabaseUrl.left = new FormAttachment(0, 0);
-	        fddatabaseUrl.right = new FormAttachment(middle, -margin);
-	        fddatabaseUrl.top = new FormAttachment(cbmsqlvendor, margin);
-	        lbdatabaseUrl.setLayoutData(fddatabaseUrl);
-	        
-	        txtdatabaseUrl = new Text(shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
-	        props.setLook(txtdatabaseUrl);
-	        txtdatabaseUrl.addModifyListener(lsMod);         
-	        FormData fdtxtdatabaseUrl = new FormData();
-	        fdtxtdatabaseUrl.left = new FormAttachment(middle, 0);
-	        fdtxtdatabaseUrl.right = new FormAttachment(80, 0);
-	        fdtxtdatabaseUrl.top = new FormAttachment(cbmsqlvendor, margin);
-	        txtdatabaseUrl.setLayoutData(fdtxtdatabaseUrl);
-	        
-	        
-	        
-	        lbdatabaseSchema = new Label(shell, SWT.RIGHT);
-	        lbdatabaseSchema.setText(BaseMessages.getString(PKG, "RDFGeneration.label.dataBaseSchema"));
-	        props.setLook(lbdatabaseSchema);
-	        this.fddatabaseSchema = new FormData();
-	        this.fddatabaseSchema.left = new FormAttachment(0, 0);
-	        this.fddatabaseSchema.right = new FormAttachment(middle, -margin);
-	        this.fddatabaseSchema.top = new FormAttachment(txtdatabaseUrl, margin);
-	        lbdatabaseSchema.setLayoutData(this.fddatabaseSchema);
-	        
-	        txtdatabaseSchema = new Text(shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
-	        props.setLook(txtdatabaseSchema);
-	        txtdatabaseSchema.addModifyListener(lsMod);
-	        FormData fddatabaseSchema = new FormData();
-	        fddatabaseSchema.left = new FormAttachment(middle, 0);
-	        fddatabaseSchema.right = new FormAttachment(80, 0);
-	        fddatabaseSchema.top = new FormAttachment(txtdatabaseUrl, margin);
-	        txtdatabaseSchema.setLayoutData(fddatabaseSchema);
-	        
-	        
-	        lbuserName = new Label(shell,  SWT.RIGHT);
-	        lbuserName.setText(BaseMessages.getString(PKG, "RDFGeneration.label.userName"));
-	        props.setLook(lbuserName);
-	        fduserName = new FormData();
-	        fduserName.left = new FormAttachment(0, 0);
-	        fduserName.right = new FormAttachment(middle, -margin);
-	        fduserName.top = new FormAttachment(txtdatabaseSchema, margin);
-	        lbuserName.setLayoutData(fduserName);
-	        
-	        txtuserName = new Text(shell,  SWT.SINGLE | SWT.LEFT | SWT.BORDER);
-	        props.setLook(txtuserName);
-	        txtuserName.addModifyListener(lsMod);
-	        FormData fbuserName = new FormData();
-	        fbuserName.left = new FormAttachment(middle, 0);
-	        fbuserName.right = new FormAttachment(80, 0);
-	        fbuserName.top = new FormAttachment(txtdatabaseSchema, margin);
-	        txtuserName.setLayoutData(fbuserName);
-	        
-	        lbpassword = new Label(shell, SWT.RIGHT);
-	        lbpassword.setText(BaseMessages.getString(PKG, "RDFGeneration.label.Password"));
-	        props.setLook(lbpassword);
-	        fdpassword = new FormData();
-	        fdpassword.left = new FormAttachment(0, 0);
-	        fdpassword.right = new FormAttachment(middle, -margin);
-	        fdpassword.top = new FormAttachment(txtuserName, margin);
-	        lbpassword.setLayoutData(fdpassword);
-	        
-	        txtpassword = new Text(shell,SWT.SINGLE | SWT.LEFT | SWT.BORDER  | SWT.PASSWORD);
-	        props.setLook(txtpassword);
-	        txtpassword.addModifyListener(lsMod);
-	        FormData fdtxtpassword = new FormData();
-	        fdtxtpassword.left = new FormAttachment(middle, 0);
-	        fdtxtpassword.right = new FormAttachment(80, 0);
-	        fdtxtpassword.top = new FormAttachment(txtuserName, margin);
-	        txtpassword.setLayoutData(fdtxtpassword);
-	        
-	        lbbaseUri = new Label(shell, SWT.RIGHT);
-	        lbbaseUri.setText(BaseMessages.getString(PKG, "RDFGeneration.label.BaseUri"));
-	        props.setLook(lbbaseUri);
-	        fdlbbaseUri = new FormData();
-	        fdlbbaseUri.left = new FormAttachment(0, 0);
-	        fdlbbaseUri.right = new FormAttachment(middle, -margin);
-	        fdlbbaseUri.top = new FormAttachment(txtpassword, margin);
-	        lbbaseUri.setLayoutData(fdlbbaseUri);
-	        
-	        txtbaseUri = new Text(shell,  SWT.SINGLE | SWT.LEFT | SWT.BORDER);
-	        props.setLook(txtbaseUri);
-	        txtbaseUri.addModifyListener(lsMod);
-	        FormData fdbaseUri = new FormData();
-	        fdbaseUri.left = new FormAttachment(middle, 0);
-	        fdbaseUri.right = new FormAttachment(80, 0);
-	        fdbaseUri.top = new FormAttachment(txtpassword, margin);
-	        txtbaseUri.setLayoutData(fdbaseUri);
-	        
-	        lboutputFileRDF = new Label(shell, SWT.RIGHT);
-	        lboutputFileRDF.setText(BaseMessages.getString(PKG, "RDFGeneration.label.outputRDFfiel"));
-	        props.setLook(lboutputFileRDF);
-	        FormData fdloutputrdf = new FormData();
-	        fdloutputrdf.left = new FormAttachment(0, 0);
-	        fdloutputrdf.right = new FormAttachment(middle, -margin);
-	        fdloutputrdf.top = new FormAttachment(txtbaseUri, margin);
-	        lboutputFileRDF.setLayoutData(fdloutputrdf);
-	        
-	        txtoutputFileRDF = new Text(shell,  SWT.SINGLE | SWT.LEFT | SWT.BORDER);
-	        props.setLook(txtoutputFileRDF);
-	        txtoutputFileRDF.addModifyListener(lsMod);
-	        FormData fdtxtoutputrdf = new FormData();
-	        fdtxtoutputrdf.left = new FormAttachment(middle, 0);
-	        fdtxtoutputrdf.right = new FormAttachment(80, 0);
-	        fdtxtoutputrdf.top = new FormAttachment(txtbaseUri, margin);
-	        txtoutputFileRDF.setLayoutData(fdtxtoutputrdf);
-	        
-	        btnloadDirectory = new Button(shell, SWT.PUSH);
-	        props.setLook(btnloadDirectory);
-	        btnloadDirectory.setText(BaseMessages.getString(PKG, "RDFGeneration.button.OutputFileRDF"));
-	        btnloadDirectory.setToolTipText(BaseMessages.getString(PKG, "System.Tooltip.BrowseForFileOrDirAndAdd", new String[0]));
-	        btnloadDirectory.addSelectionListener(new SelectionAdapter() {
+		cbmsqlvendor = new CCombo(shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
+		// cbmsqlvendor.setText(meta.getSqlvendor());
+		props.setLook(cbmsqlvendor);
+		cbmsqlvendor.addModifyListener(lsMod);
+		fbcbmsqlvendor = new FormData();
+		fbcbmsqlvendor.left = new FormAttachment(middle, 0);
+		fbcbmsqlvendor.top = new FormAttachment(btnloadFile, margin);
+		fbcbmsqlvendor.right = new FormAttachment(80, -margin);
+		cbmsqlvendor.setLayoutData(fbcbmsqlvendor);
+		// cbmsqlvendor.setEnabled(false);
+		cbmsqlvendor.addSelectionListener(new SelectionListener() {
 
-	            public void widgetSelected(SelectionEvent e)
-	            {
-	                Directory();
-	            }
-	           
-	        }
-	);
-	        fdloadDirectory = new FormData();
-	        fdloadDirectory.left = new FormAttachment(txtoutputFileRDF, 0);
-	        fdloadDirectory.top = new FormAttachment(txtbaseUri, margin);
-	        btnloadDirectory.setLayoutData(fdloadDirectory);
-	        
-	        lboutputFormat = new Label(shell, SWT.RIGHT);
-	        lboutputFormat.setText(BaseMessages.getString(PKG, "RDFGeneration.label.Formats", new String[0]));
-	        props.setLook(lboutputFormat);
-	        fdlboutputFormat = new FormData();
-	        fdlboutputFormat.left = new FormAttachment(0, 0);
-	        fdlboutputFormat.right = new FormAttachment(middle, -margin);
-	        fdlboutputFormat.top = new FormAttachment(txtoutputFileRDF, margin);
-	        lboutputFormat.setLayoutData(fdlboutputFormat);
-	        
-	        cbmoutputFormat = new CCombo(shell,  SWT.SINGLE | SWT.LEFT | SWT.BORDER);
-	        cbmoutputFormat.setEditable(true);
-	        props.setLook(cbmoutputFormat);
-	        cbmoutputFormat.addModifyListener(lsMod);
-	        fbcbmoutputFormat = new FormData();
-	        fbcbmoutputFormat.left = new FormAttachment(middle, 0);
-	        fbcbmoutputFormat.top = new FormAttachment(btnloadDirectory, margin);
-	        fbcbmoutputFormat.right = new FormAttachment(80, -margin);
-	        cbmoutputFormat.setLayoutData(fbcbmoutputFormat);
-	        cbmoutputFormat.setEnabled(false);
-	        cbmoutputFormat.addSelectionListener(new SelectionListener() {
+			public void widgetSelected(SelectionEvent selectionevent) {
+				sqlvendor = cbmsqlvendor.getText();
+			}
 
-	            public void widgetSelected(SelectionEvent selectionevent)
-	            {
-	            }
+			public void widgetDefaultSelected(SelectionEvent selectionevent) {
+			}
+		});
 
-	            public void widgetDefaultSelected(SelectionEvent selectionevent)
-	            {
-	            }
+		lbdatabaseUrl = new Label(shell, SWT.RIGHT);
+		lbdatabaseUrl.setText(BaseMessages.getString(PKG,
+				"RDFGeneration.label.dataBaseUri"));
+		props.setLook(lbdatabaseUrl);
+		fddatabaseUrl = new FormData();
+		fddatabaseUrl.left = new FormAttachment(0, 0);
+		fddatabaseUrl.right = new FormAttachment(middle, -margin);
+		fddatabaseUrl.top = new FormAttachment(cbmsqlvendor, margin);
+		lbdatabaseUrl.setLayoutData(fddatabaseUrl);
 
-	            
-	        }
-	);
-	        btnTest = new Button(shell, 8);
-	        btnTest.setText(BaseMessages.getString(PKG, "RDFGeneration.button.Test", new String[0]));
-	        btnreuseConection = new Button(shell, 8);
-	        btnreuseConection.setText(BaseMessages.getString(PKG, "RDFGeneration.button.ReuseConection", new String[0]));
-	        BaseStepDialog.positionBottomButtons(shell, new Button[] {
-	            btnTest, btnreuseConection
-	        }, margin, cbmoutputFormat);
-		
-		
-		
+		txtdatabaseUrl = new Text(shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
+		// txtdatabaseUrl.setText(meta.getDatabaseURL());
+		props.setLook(txtdatabaseUrl);
+		txtdatabaseUrl.addModifyListener(lsMod);
+		FormData fdtxtdatabaseUrl = new FormData();
+		fdtxtdatabaseUrl.left = new FormAttachment(middle, 0);
+		fdtxtdatabaseUrl.right = new FormAttachment(80, 0);
+		fdtxtdatabaseUrl.top = new FormAttachment(cbmsqlvendor, margin);
+		txtdatabaseUrl.setLayoutData(fdtxtdatabaseUrl);
 
+		lbdatabaseSchema = new Label(shell, SWT.RIGHT);
+		lbdatabaseSchema.setText(BaseMessages.getString(PKG,
+				"RDFGeneration.label.dataBaseSchema"));
+		props.setLook(lbdatabaseSchema);
+		this.fddatabaseSchema = new FormData();
+		this.fddatabaseSchema.left = new FormAttachment(0, 0);
+		this.fddatabaseSchema.right = new FormAttachment(middle, -margin);
+		this.fddatabaseSchema.top = new FormAttachment(txtdatabaseUrl, margin);
+		lbdatabaseSchema.setLayoutData(this.fddatabaseSchema);
+
+		txtdatabaseSchema = new Text(shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
+		// txtdatabaseSchema.setText(meta.getDatabaseSchema());
+		props.setLook(txtdatabaseSchema);
+		txtdatabaseSchema.addModifyListener(lsMod);
+		FormData fddatabaseSchema = new FormData();
+		fddatabaseSchema.left = new FormAttachment(middle, 0);
+		fddatabaseSchema.right = new FormAttachment(80, 0);
+		fddatabaseSchema.top = new FormAttachment(txtdatabaseUrl, margin);
+		txtdatabaseSchema.setLayoutData(fddatabaseSchema);
+
+		lbuserName = new Label(shell, SWT.RIGHT);
+		lbuserName.setText(BaseMessages.getString(PKG,
+				"RDFGeneration.label.userName"));
+		props.setLook(lbuserName);
+		fduserName = new FormData();
+		fduserName.left = new FormAttachment(0, 0);
+		fduserName.right = new FormAttachment(middle, -margin);
+		fduserName.top = new FormAttachment(txtdatabaseSchema, margin);
+		lbuserName.setLayoutData(fduserName);
+
+		txtuserName = new Text(shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
+		// txtuserName.setText(meta.getUserName());
+		props.setLook(txtuserName);
+		txtuserName.addModifyListener(lsMod);
+		FormData fbuserName = new FormData();
+		fbuserName.left = new FormAttachment(middle, 0);
+		fbuserName.right = new FormAttachment(80, 0);
+		fbuserName.top = new FormAttachment(txtdatabaseSchema, margin);
+		txtuserName.setLayoutData(fbuserName);
+
+		lbpassword = new Label(shell, SWT.RIGHT);
+		lbpassword.setText(BaseMessages.getString(PKG,
+				"RDFGeneration.label.Password"));
+		props.setLook(lbpassword);
+		fdpassword = new FormData();
+		fdpassword.left = new FormAttachment(0, 0);
+		fdpassword.right = new FormAttachment(middle, -margin);
+		fdpassword.top = new FormAttachment(txtuserName, margin);
+		lbpassword.setLayoutData(fdpassword);
+
+		txtpassword = new Text(shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER
+				| SWT.PASSWORD);
+		// txtpassword.setText(meta.getPassword());
+		props.setLook(txtpassword);
+		txtpassword.addModifyListener(lsMod);
+		FormData fdtxtpassword = new FormData();
+		fdtxtpassword.left = new FormAttachment(middle, 0);
+		fdtxtpassword.right = new FormAttachment(80, 0);
+		fdtxtpassword.top = new FormAttachment(txtuserName, margin);
+		txtpassword.setLayoutData(fdtxtpassword);
+
+		lbbaseUri = new Label(shell, SWT.RIGHT);
+		lbbaseUri.setText(BaseMessages.getString(PKG,
+				"RDFGeneration.label.BaseUri"));
+		props.setLook(lbbaseUri);
+		fdlbbaseUri = new FormData();
+		fdlbbaseUri.left = new FormAttachment(0, 0);
+		fdlbbaseUri.right = new FormAttachment(middle, -margin);
+		fdlbbaseUri.top = new FormAttachment(txtpassword, margin);
+		lbbaseUri.setLayoutData(fdlbbaseUri);
+
+		txtbaseUri = new Text(shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
+		// txtbaseUri.setText(meta.getBaseUri());
+		props.setLook(txtbaseUri);
+		txtbaseUri.addModifyListener(lsMod);
+		FormData fdbaseUri = new FormData();
+		fdbaseUri.left = new FormAttachment(middle, 0);
+		fdbaseUri.right = new FormAttachment(80, 0);
+		fdbaseUri.top = new FormAttachment(txtpassword, margin);
+		txtbaseUri.setLayoutData(fdbaseUri);
+
+		lboutputFileRDF = new Label(shell, SWT.RIGHT);
+		lboutputFileRDF.setText(BaseMessages.getString(PKG,
+				"RDFGeneration.label.outputRDFfiel"));
+		props.setLook(lboutputFileRDF);
+		FormData fdloutputrdf = new FormData();
+		fdloutputrdf.left = new FormAttachment(0, 0);
+		fdloutputrdf.right = new FormAttachment(middle, -margin);
+		fdloutputrdf.top = new FormAttachment(txtbaseUri, margin);
+		lboutputFileRDF.setLayoutData(fdloutputrdf);
+
+		txtoutputFileRDF = new Text(shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
+		// txtoutputFileRDF.setText(meta.getDirectorioOutputRDF());
+		props.setLook(txtoutputFileRDF);
+		txtoutputFileRDF.addModifyListener(lsMod);
+		FormData fdtxtoutputrdf = new FormData();
+		fdtxtoutputrdf.left = new FormAttachment(middle, 0);
+		fdtxtoutputrdf.right = new FormAttachment(80, 0);
+		fdtxtoutputrdf.top = new FormAttachment(txtbaseUri, margin);
+		txtoutputFileRDF.setLayoutData(fdtxtoutputrdf);
+
+		btnloadDirectory = new Button(shell, SWT.PUSH);
+		props.setLook(btnloadDirectory);
+		btnloadDirectory.setText(BaseMessages.getString(PKG,
+				"RDFGeneration.button.OutputFileRDF"));
+		btnloadDirectory.setToolTipText(BaseMessages.getString(PKG,
+				"System.Tooltip.BrowseForFileOrDirAndAdd", new String[0]));
+		btnloadDirectory.addSelectionListener(new SelectionAdapter() {
+
+			public void widgetSelected(SelectionEvent e) {
+				Directory();
+			}
+
+		});
+		fdloadDirectory = new FormData();
+		fdloadDirectory.left = new FormAttachment(txtoutputFileRDF, 0);
+		fdloadDirectory.top = new FormAttachment(txtbaseUri, margin);
+		btnloadDirectory.setLayoutData(fdloadDirectory);
+
+		lboutputFormat = new Label(shell, SWT.RIGHT);
+		lboutputFormat.setText(BaseMessages.getString(PKG,
+				"RDFGeneration.label.Formats", new String[0]));
+		props.setLook(lboutputFormat);
+		fdlboutputFormat = new FormData();
+		fdlboutputFormat.left = new FormAttachment(0, 0);
+		fdlboutputFormat.right = new FormAttachment(middle, -margin);
+		fdlboutputFormat.top = new FormAttachment(txtoutputFileRDF, margin);
+		lboutputFormat.setLayoutData(fdlboutputFormat);
+
+		cbmoutputFormat = new CCombo(shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
+		// cbmoutputFormat.setText(meta.getFormat());
+		props.setLook(cbmoutputFormat);
+		cbmoutputFormat.addModifyListener(lsMod);
+		fbcbmoutputFormat = new FormData();
+		fbcbmoutputFormat.left = new FormAttachment(middle, 0);
+		fbcbmoutputFormat.top = new FormAttachment(btnloadDirectory, margin);
+		fbcbmoutputFormat.right = new FormAttachment(80, -margin);
+		cbmoutputFormat.setLayoutData(fbcbmoutputFormat);
+		// cbmoutputFormat.setEnabled(false);
+		cbmoutputFormat.addSelectionListener(new SelectionListener() {
+
+			public void widgetSelected(SelectionEvent selectionevent) {
+				outputFormat = cbmoutputFormat.getText();
+			}
+
+			public void widgetDefaultSelected(SelectionEvent selectionevent) {
+			}
+
+		});
+		btnTest = new Button(shell, SWT.PUSH);
+		btnTest.setText(BaseMessages
+				.getString(PKG, "RDFGeneration.button.Test"));
+		btnreuseConection = new Button(shell, SWT.PUSH);
+		btnreuseConection.setText(BaseMessages.getString(PKG,
+				"RDFGeneration.button.ReuseConection"));
+		BaseStepDialog.positionBottomButtons(shell, new Button[] { btnTest,
+				btnreuseConection }, margin, cbmoutputFormat);
+
+		lsTest = new Listener() {
+			public void handleEvent(Event e) {
+				try {
+					verificarConecction();
+				} catch (InstantiationException e1) {
+					
+					e1.printStackTrace();
+				} catch (IllegalAccessException e1) {
+					
+					e1.printStackTrace();
+				} catch (ClassNotFoundException e1) {
+										e1.printStackTrace();
+				} catch (SQLException e1) {
+					e1.getMessage();
+					MessageBox dialog = new MessageBox(shell, SWT.ICON_ERROR);
+					dialog.setText("ERROR");
+					dialog.setMessage(BaseMessages.getString(PKG,
+							"OAILoader.Manager.ERRORURI"));
+					dialog.open();
+				}
+			}
+		};
+
+		lsreuseConecction = new Listener() {
+			public void handleEvent(Event e) {
+				cancel();
+			}
+		};
+
+		btnTest.addListener(SWT.Selection, lsTest);
+		btnreuseConection.addListener(SWT.Selection, lsreuseConecction);
 		// OK and cancel buttons
 		wOK = new Button(shell, SWT.PUSH);
 		wOK.setText(BaseMessages.getString(PKG, "System.Button.OK"));
@@ -489,8 +532,7 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 				ok();
 			}
 		};
-		wStepname.addSelectionListener(lsDef);
-		txtR2rmlfile.addSelectionListener(lsDef);
+
 
 		// Detect X or ALT-F4 or something that kills this window and cancel the
 		// dialog properly
@@ -530,7 +572,66 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 	 */
 	private void populateDialog() {
 		wStepname.selectAll();
-		txtR2rmlfile.setText(meta.getInputFieldr2rml());
+
+		if (meta.getInputFieldr2rml()==null) {
+			txtR2rmlfile.setText("");
+		} else {
+			txtR2rmlfile.setText(meta.getInputFieldr2rml());
+		}
+		if (meta.getDatabaseURL()==null) {
+			txtdatabaseUrl.setText("");
+		} else {
+			txtdatabaseUrl.setText(meta.getDatabaseURL());
+		}
+		if (meta.getDatabaseSchema()==null) {
+			txtdatabaseSchema.setText("");
+		} else {
+			txtdatabaseSchema.setText(meta.getDatabaseSchema());
+		}
+		if (meta.getUserName()==null) {
+			txtuserName.setText("");
+		} else {
+			txtuserName.setText(meta.getUserName());
+		}
+		if (meta.getPassword()==null) {
+			txtpassword.setText("");
+		} else {
+			txtpassword.setText(meta.getPassword());
+		}
+		if (meta.getBaseUri()==null) {
+			txtbaseUri.setText("");
+		} else {
+			txtbaseUri.setText(meta.getBaseUri());
+		}
+		if (meta.getDirectorioOutputRDF()==null) {
+			txtoutputFileRDF.setText("");
+		} else {
+			txtoutputFileRDF.setText(meta.getDirectorioOutputRDF());
+		}
+		if (meta.getSqlvendor()==null) {
+			cbmsqlvendor.setText("");
+			sqlvendor = "";
+		} else {
+			cbmsqlvendor.setText(meta.getSqlvendor());
+			sqlvendor = meta.getSqlvendor();
+		}
+		if (meta.getFormat()==null) {
+			cbmoutputFormat.setText("");
+			outputFormat ="";
+		} else {
+			cbmoutputFormat.setText(meta.getFormat());
+			outputFormat = meta.getFormat();
+		}		
+		
+
+		for (SqlVendor sql : SqlVendor.values()) {
+			cbmsqlvendor.add(sql.getDriver());
+		}
+
+		for (Format f : Format.values()) {
+			cbmoutputFormat.add(f.getName());
+		}
+
 	}
 
 	/**
@@ -551,37 +652,125 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 	 * Called when the user confirms the dialog
 	 */
 	private void ok() {
-		// The "stepname" variable will be the return value for the open()
-		// method.
-		// Setting to step name from the dialog control
-		stepname = wStepname.getText();
-		// Setting the settings to the meta object
-		meta.setInputFieldr2rml(txtR2rmlfile.getText());
+
+		// stepname = wStepname.getText();
+		//
+		// meta.setInputFieldr2rml(txtR2rmlfile.getText());
+
+		setDialogMetadata();
+
+		// meta.setChanged(true);
 		// close the SWT dialog window
 		dispose();
 	}
-	
-	private void LoadFile()
-    {
-        try
-        {
-            FileDialog dialog = new FileDialog(shell, 4096);
-            dialog.setText(BaseMessages.getString(PKG, "GetPropertiesOWL.FieldName.Choose"));
-            String result = dialog.open();
-            txtR2rmlfile.setText(result);
-        }
-        catch(Exception e) { }
-    }
 
-    private void Directory()
-    {
-        try
-        {
-            DirectoryDialog directorio = new DirectoryDialog(shell, 4096);
-            directorio.setText(BaseMessages.getString(PKG, "GetPropertiesOWL.FieldName.Choose"));
-            String result = directorio.open();
-            txtoutputFileRDF.setText(result);
-        }
-        catch(Exception e) { }
-    }
+	private void setDialogMetadata() {
+		stepname = wStepname.getText();
+		meta.setStepName(stepname);
+		meta.setInputFieldr2rml(txtR2rmlfile.getText());
+		meta.setSqlvendor(cbmsqlvendor.getText());
+		meta.setDatabaseURL(txtdatabaseUrl.getText());
+		meta.setDatabaseSchema(txtdatabaseSchema.getText());
+		meta.setUserName(txtuserName.getText());
+		meta.setPassword(txtpassword.getText());
+		meta.setBaseUri(txtbaseUri.getText());
+		meta.setDirectorioOutputRDF(txtoutputFileRDF.getText());
+		meta.setFormat(cbmoutputFormat.getText());
+		meta.setChanged(true);
+	}
+
+	private void LoadFile() {
+		try {
+			FileDialog dialog = new FileDialog(shell, 4096);
+			dialog.setText(BaseMessages.getString(PKG,
+					"GetPropertiesOWL.FieldName.Choose"));
+			String result = dialog.open();
+			txtR2rmlfile.setText(result);
+		} catch (Exception e) {
+		}
+	}
+
+	private void Directory() {
+		try {
+			DirectoryDialog directorio = new DirectoryDialog(shell, 4096);
+			directorio.setText(BaseMessages.getString(PKG,
+					"GetPropertiesOWL.FieldName.Choose"));
+			String result = directorio.open();
+			txtoutputFileRDF.setText(result);
+		} catch (Exception e) {
+		}
+	}
+
+	public enum SqlVendor {
+		H2("H2", true), MySql("MySql", true), Postgresql("PostgreSql", true);
+
+		private final String nameDriver;
+		private final boolean state;
+
+		SqlVendor(String driver, boolean state) {
+			this.nameDriver = driver;
+			this.state = state;
+		}
+
+		public String getDriver() {
+			return nameDriver;
+		}
+
+		public boolean isState() {
+			return state;
+		}
+	}
+
+	public enum Format {
+		TURTLE("TURTLE", true), RDFXML("RDFXML", true), NTRIPLES("NTRIPLES",
+				true), N3("N3", true);
+
+		private final String name;
+		private final boolean state;
+
+		Format(String name, boolean state) {
+
+			this.name = name;
+			this.state = state;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public boolean isState() {
+			return state;
+		}
+
+	}
+
+	public void verificarConecction() throws InstantiationException,
+			IllegalAccessException, ClassNotFoundException, SQLException {
+
+		DriverType sqlDriver = null;
+		if (sqlvendor.equals("H2")) {
+			sqlDriver = new DriverType("org.h2.Driver");
+		} else if (sqlvendor.equals("MySql")) {
+			sqlDriver = new DriverType("com.mysql.jdbc.Driver");
+		} else if (sqlvendor.equals("PostgreSql")) {
+			sqlDriver = new DriverType("org.postgresql.Driver");
+		}
+
+		// Open test database
+		Connection conn = null;
+
+		// Connect database
+		// conn = SQLConnector.connect(userName, password, url + dbName,
+		// driver);
+		conn = SQLConnector.connect(txtuserName.getText(),
+				txtpassword.getText(), txtdatabaseUrl.getText()+txtdatabaseSchema.getText(), sqlDriver);
+		if (conn != null) {
+			MessageBox dialog = new MessageBox(shell, SWT.OK);
+			dialog.setText("SUCCESS");
+			dialog.setMessage(BaseMessages.getString(PKG,
+					"OAILoader.Manager.ERRORURI"));
+			dialog.open();
+		}
+
+	}
 }

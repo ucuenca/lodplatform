@@ -22,6 +22,11 @@
 
 package com.ucuenca.pentaho.plugin.step.rdf;
 
+import java.sql.Connection;
+
+import net.antidot.sql.model.core.DriverType;
+
+import org.openrdf.rio.RDFFormat;
 import org.pentaho.di.core.row.RowMetaInterface;
 import org.pentaho.di.trans.step.BaseStepData;
 import org.pentaho.di.trans.step.StepDataInterface;
@@ -49,7 +54,10 @@ import org.pentaho.di.trans.step.StepDataInterface;
 public class RDFGenerationData extends BaseStepData implements StepDataInterface {
 
 	public RowMetaInterface outputRowMeta;
-	
+	public Connection conn = null;
+	public boolean forceExistingRep = false;
+	public DriverType sqlDriver = null;
+	RDFFormat rdfFormat = null;
     public RDFGenerationData()
 	{
 		super();
