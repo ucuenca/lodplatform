@@ -190,7 +190,7 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 			             //   System.out.println("The file was build succesfully in "+meta.getDirectory()+"/"+ oldFile.getName());
 			                logBasic("The file was build succesfully in "+meta.getDirectory()+"/"+ oldFile.getName());
 			            } else {
-			            	logBasic("The File was not created.");
+			            	logBasic("ERROR  The File was not created.");
 			                // System.out.println("The File was not created.");
 			             }
 			

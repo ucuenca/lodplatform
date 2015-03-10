@@ -107,7 +107,7 @@ public class FusekiLoaderDialog extends BaseStepDialog implements StepDialogInte
 	// text field holding the name of the field to add to the row stream
 	private Text wHelloFieldName;
 	private Text wChooseOutput;
-	private Button wAddUri;
+
 	private Button wLoadFile;
 	private Button wChooseDirectory;
 	
@@ -223,27 +223,32 @@ public class FusekiLoaderDialog extends BaseStepDialog implements StepDialogInte
 		wHelloFieldName.addModifyListener(lsMod);
 		FormData fdValName = new FormData();
 		fdValName.left = new FormAttachment(middle, 0);
-		fdValName.right = new FormAttachment(100, 0);	
+		//fdValName.right = new FormAttachment(100, 0);	
 		fdValName.top = new FormAttachment(wlStepname, margin+10);
 		wHelloFieldName.setLayoutData(fdValName);
-
-		//------------
-		wAddUri = new Button(shell, SWT.PUSH);
-		wAddUri.setText(BaseMessages.getString(PKG,
-				"FusekiLoader.FieldName.AddUri"));    
+		wHelloFieldName.setEditable(false)
+;		//------------
 		
 		
 		wLoadFile = new Button(shell, SWT.PUSH);
 		wLoadFile.setText(BaseMessages.getString(PKG,
 				"FusekiLoader.FieldName.LoadFile"));
+	
+		wLoadFile.setToolTipText(BaseMessages.getString(PKG,
+				"System.Tooltip.ChooseFile"));
+		FormData fdChooseFile = new FormData();
+		fdChooseFile = new FormData();
+		fdChooseFile.right = new FormAttachment(100, 0);
+		fdChooseFile.top = new FormAttachment(wStepname, margin);
+		wLoadFile.setLayoutData(fdChooseFile);
+		
+		fdValName.right = new FormAttachment(wLoadFile, 0);	
 		// OK and cancel buttons
 		wOK = new Button(shell, SWT.PUSH);
 		wOK.setText(BaseMessages.getString(PKG, "System.Button.OK")); 
 		wCancel = new Button(shell, SWT.PUSH);
 		wCancel.setText(BaseMessages.getString(PKG, "System.Button.Cancel")); 
-		BaseStepDialog.positionBottomButtons(shell, new Button[] {
-				this.wAddUri, wLoadFile }, margin,
-				wHelloFieldName);
+		
 	
 		//text to choose output 
 
@@ -254,7 +259,7 @@ public class FusekiLoaderDialog extends BaseStepDialog implements StepDialogInte
 		FormData fdlValNameO = new FormData();
 		fdlValNameO.left = new FormAttachment(0, 0);
 		fdlValNameO.right = new FormAttachment(middle, -margin);
-		 fdlValNameO.top = new FormAttachment(wAddUri, margin);
+		 fdlValNameO.top = new FormAttachment(wHelloFieldName, margin);
 		//fdlValName.top = new FormAttachment(10, margin);
 
 		wlValNameO.setLayoutData(fdlValNameO);
@@ -265,9 +270,9 @@ public class FusekiLoaderDialog extends BaseStepDialog implements StepDialogInte
 		FormData fdValNameO = new FormData();
 		fdValNameO.left = new FormAttachment(middle, 0);
 		//fdValNameO.right = new FormAttachment(100, 0);	
-		fdValNameO.top = new FormAttachment(wAddUri, margin);
+		fdValNameO.top = new FormAttachment(wHelloFieldName, margin);
 		wChooseOutput.setLayoutData(fdValNameO);
-		
+		wChooseOutput.setEditable(false);
 		//booton to choose directory 
 		wChooseDirectory = new Button(shell, SWT.PUSH | SWT.SINGLE | SWT.MEDIUM | SWT.BORDER);
 		props.setLook(wChooseDirectory);
@@ -279,8 +284,9 @@ public class FusekiLoaderDialog extends BaseStepDialog implements StepDialogInte
 		FormData fdChooseDirectory = new FormData();
 		fdChooseDirectory = new FormData();
 		fdChooseDirectory.right = new FormAttachment(100, 0);
-		fdChooseDirectory.top = new FormAttachment(wAddUri, margin);
+		fdChooseDirectory.top = new FormAttachment(wHelloFieldName, margin);
 		wChooseDirectory.setLayoutData(fdChooseDirectory);
+		
 
 		fdValNameO.right = new FormAttachment(wChooseDirectory, -margin);
 		wChooseOutput.setLayoutData(fdValNameO);
@@ -296,11 +302,7 @@ public class FusekiLoaderDialog extends BaseStepDialog implements StepDialogInte
 		lsOK = new Listener() {
 			public void handleEvent(Event e) {ok();}
 		};
-		lsReadUri = new Listener() {
-			public void handleEvent(Event e) {
-				AddUri();
-			}
-		};
+
 		lsLoadFile = new Listener() {
 			public void handleEvent(Event e) {
 				LoadFile();
@@ -316,7 +318,7 @@ public class FusekiLoaderDialog extends BaseStepDialog implements StepDialogInte
 		wOK.addListener(SWT.Selection, lsOK);
 		wLoadFile.addListener(SWT.Selection, lsLoadFile);
 		this.wChooseDirectory.addListener(SWT.Selection, lsChooseDirectory);
-		this.wAddUri.addListener(SWT.Selection, lsReadUri);
+		
 		// default listener (for hitting "enter")
 		lsDef = new SelectionAdapter() {
 			public void widgetDefaultSelected(SelectionEvent e) {ok();}
@@ -358,6 +360,8 @@ public class FusekiLoaderDialog extends BaseStepDialog implements StepDialogInte
 	private void populateDialog() {
 		wStepname.selectAll();
 		wHelloFieldName.setText(meta.getOutputField());	
+		wChooseOutput.setText(meta.getDirectory());
+	
 	}
 
 	/**
@@ -381,66 +385,28 @@ public class FusekiLoaderDialog extends BaseStepDialog implements StepDialogInte
 		// Setting to step name from the dialog control
 		stepname = wStepname.getText(); 
 		// Setting the  settings to the meta object
+		if (wHelloFieldName.getText().equals("")){
+			MessageBox dialog = 
+					  new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
+					dialog.setText("ERROR");						
+			dialog.setMessage(BaseMessages.getString(PKG,"FusekiLoader.input.empty"));   		    
+		    dialog.open();
+		}
+		
+		if (wChooseOutput.equals("")){
+			MessageBox dialog = 
+					  new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
+					dialog.setText("ERROR");						
+			dialog.setMessage(BaseMessages.getString(PKG,"FusekiLoader.output.empty"));   		    
+		    dialog.open();
+		}
+		// close the SWT dialog window
 		meta.setOutputField(wHelloFieldName.getText());
 		meta.setDirectory(wChooseOutput.getText());
-		// close the SWT dialog window
 		dispose();
 	}
 	
-	private void AddUri() {
-		 
-		String data = wHelloFieldName.getText().trim();// read contents of text
-		wHelloFieldName.setText(data);// to save without spaces
-		if (data.equals("")) {  // si est vacio presente un error y no ejecuta nada
 
-			MessageBox dialog = 
-					  new MessageBox(shell, SWT.ICON_QUESTION | SWT.OK);
-					dialog.setText(BaseMessages.getString(PKG,"FusekiLoader.FieldName.AddUri"));
-					dialog.setMessage(BaseMessages.getString(PKG,
-					"FusekiLoader.FieldName.NoUri"));
-
-					// open dialog and await user selection
-					int returnCode = dialog.open(); 
-			//
-		} else {
-			Pattern pat = Pattern.compile("^http.*");
-			Matcher mat = pat.matcher(wHelloFieldName.getText());
-			
-		String myresult = ConsultUri(wHelloFieldName.getText().trim());// search
-				// in
-
-				if (myresult != null) {
-					this.wHelloFieldName.setText(myresult);
-					/**
-					TableItem item = new TableItem(table, SWT.NONE, numt++);
-					item.setText(0, String.valueOf(numt));
-					item.setText(1, wHelloFieldName.getText().trim());
-					item.setText(2, myresult);
-					item.setText(3, BaseMessages.getString(PKG,
-							"FusekiLoader.FieldName.mt2"));
-					setNameOnto(wHelloFieldName.getText(),numt); //para guardar el nombre y no la busqueda
-				*/
-				}else { // solo aqui es el error pues si es una noUri como bibo que no se valida
-					
-					MessageBox dialog = 
-							  new MessageBox(shell, SWT.ICON_QUESTION | SWT.OK);
-							dialog.setText(BaseMessages.getString(PKG,"FusekiLoader.FieldName.AddUri"));
-							dialog.setMessage(BaseMessages.getString(PKG,
-							"FusekiLoader.FieldName.NoUri"));
-
-							// open dialog and await user selection
-							int returnCode = dialog.open(); 
-					
-
-				}
-				
-				
-				
-
-	
-
-		}
-	}// fin add URI
 	
 	
 	private String ConsultUri(String mysearching) {
@@ -523,12 +489,7 @@ public class FusekiLoaderDialog extends BaseStepDialog implements StepDialogInte
 			DirectoryDialog dialog = new DirectoryDialog(shell, SWT.OPEN);
 			dialog.setText(BaseMessages.getString(PKG, "FusekiLoader.FieldName.LabelOutput"));
 			String result = dialog.open();
-			/**
-			TableItem item = new TableItem(table, SWT.NONE, numt++);
-			item.setText(0, String.valueOf(numt));
-			item.setText(1, dialog.getFileName());  //nombre del archivo
-			item.setText(2, dialog.getFilterPath() + "/" + dialog.getFileName());
-			item.setText(3, BaseMessages.getString(PKG, "FusekiLoader.FieldName.mt3"));*/
+
 			this.wChooseOutput.setText(dialog.getFilterPath());
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.toString(), e);
@@ -536,3 +497,4 @@ public class FusekiLoaderDialog extends BaseStepDialog implements StepDialogInte
 
 	}
 }
+
