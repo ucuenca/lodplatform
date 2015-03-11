@@ -181,6 +181,15 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 				e.printStackTrace();
 				logBasic(" ERROR " + e );
 			}
+			 File oldFile1 = new File("plugins/steps/FusekiLoader/lib/fuseki-server.jar");
+		 	 
+	            if (oldFile1.renameTo(new File("plugins/steps/FusekiLoader/fuseki/fuseki-server.jar"))) {
+	             //   System.out.println("The file was build succesfully in "+meta.getDirectory()+"/"+ oldFile.getName());
+	                logBasic("copy fuseki-server.jar in resources , ready");
+	            } else {
+	            	logBasic("ERROR  no fuseki-server.jar in resources.");
+	                // System.out.println("The File was not created.");
+	             }
 			
 			compile(meta.getDirectory());
 			
