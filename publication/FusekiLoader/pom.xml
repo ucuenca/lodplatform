@@ -394,6 +394,16 @@
 									<overWrite>false</overWrite>
 									<outputDirectory>${project.build.directory}/lib</outputDirectory>
 								</artifactItem>
+
+
+								<artifactItem>
+									<groupId>com.ibm.icu</groupId>
+									<artifactId>icu4j</artifactId>
+									<version>3.4.4</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+									<outputDirectory>${project.build.directory}/lib</outputDirectory>
+								</artifactItem>
 							</artifactItems>
 						</configuration>
 
@@ -649,6 +659,11 @@
 			<groupId>com.hp.hpl.jena</groupId>
 			<artifactId>iri</artifactId>
 			<version>0.6</version>
+		</dependency>
+		<dependency>
+			<groupId>com.ibm.icu</groupId>
+			<artifactId>icu4j</artifactId>
+			<version>3.4.4</version>
 		</dependency>
 
 	</dependencies>
