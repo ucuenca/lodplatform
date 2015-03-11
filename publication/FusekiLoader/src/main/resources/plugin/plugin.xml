@@ -64,7 +64,9 @@
 <library name="lib/javax.servlet-3.1.1.jar"/>
 <library name="lib/ant-1.7.1.jar"/>
 <library name="lib/ant-launcher-1.8.4.jar"/>
-
+ <library name="lib/jena-2.6.0.jar"/> 
+ <library name="lib/iri-0.6.jar"/>
+  <library name="lib/icu4j-3.4.4.jar"/>
 			
 		</libraries>
 		
