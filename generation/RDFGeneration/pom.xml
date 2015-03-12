@@ -539,6 +539,17 @@
 									<outputDirectory>${project.build.directory}/lib</outputDirectory>
 								</artifactItem>
 
+
+								<artifactItem>
+									<groupId>com.ucuenca</groupId>
+									<artifactId>misctools</artifactId>
+									<version>0.0.1-SNAPSHOT</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+									<outputDirectory>${project.build.directory}/lib</outputDirectory>
+								</artifactItem>
+								
+
 							</artifactItems>
 						</configuration>
 
@@ -895,6 +906,10 @@
 			<version>9.1-901.jdbc4</version>
 		</dependency>
 
-
+		<dependency>
+			<groupId>com.ucuenca</groupId>
+			<artifactId>misctools</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 </project>

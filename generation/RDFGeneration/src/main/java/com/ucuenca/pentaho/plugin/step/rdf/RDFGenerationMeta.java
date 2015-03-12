@@ -152,7 +152,7 @@ public class RDFGenerationMeta extends BaseStepMeta implements
 		databaseSchema="";
 		userName="";
 		password="";
-		baseUri="";
+		baseUri="http://foo.example/DB/";
 		directorioOutputRDF="";
 		format="";
 	}

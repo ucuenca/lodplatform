@@ -22,6 +22,7 @@
 
 package com.ucuenca.pentaho.plugin.step.rdf;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
@@ -57,6 +58,8 @@ import org.pentaho.di.trans.TransMeta;
 import org.pentaho.di.ui.trans.step.BaseStepDialog;
 import org.pentaho.di.trans.step.BaseStepMeta;
 import org.pentaho.di.trans.step.StepDialogInterface;
+
+import com.ucuenca.misctools.StepDataLoader;
 
 /**
  * This class is part of the demo step plug-in implementation. It demonstrates
@@ -246,6 +249,7 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 		fdtxtR2rmlfile.right = new FormAttachment(80, 0);
 		fdtxtR2rmlfile.top = new FormAttachment(wStepname, margin);
 		txtR2rmlfile.setLayoutData(fdtxtR2rmlfile);
+		txtR2rmlfile.setEditable(false);
 
 		btnloadFile = new Button(shell, SWT.PUSH);
 		props.setLook(btnloadFile);
@@ -282,11 +286,19 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 		fbcbmsqlvendor.top = new FormAttachment(btnloadFile, margin);
 		fbcbmsqlvendor.right = new FormAttachment(80, -margin);
 		cbmsqlvendor.setLayoutData(fbcbmsqlvendor);
+		cbmsqlvendor.setEditable(false);
 		// cbmsqlvendor.setEnabled(false);
 		cbmsqlvendor.addSelectionListener(new SelectionListener() {
 
 			public void widgetSelected(SelectionEvent selectionevent) {
 				sqlvendor = cbmsqlvendor.getText();
+				if (sqlvendor.equals("H2")) {
+					txtdatabaseUrl.setText("jdbc:h2:~/");
+				} else if (sqlvendor.equals("MySql")) {
+					txtdatabaseUrl.setText("jdbc:mysql://localhost/");
+				} else if (sqlvendor.equals("PostgreSql")) {
+					txtdatabaseUrl.setText("jdbc:postgresql://localhost:5432/");
+				}
 			}
 
 			public void widgetDefaultSelected(SelectionEvent selectionevent) {
@@ -312,6 +324,7 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 		fdtxtdatabaseUrl.right = new FormAttachment(80, 0);
 		fdtxtdatabaseUrl.top = new FormAttachment(cbmsqlvendor, margin);
 		txtdatabaseUrl.setLayoutData(fdtxtdatabaseUrl);
+		
 
 		lbdatabaseSchema = new Label(shell, SWT.RIGHT);
 		lbdatabaseSchema.setText(BaseMessages.getString(PKG,
@@ -393,6 +406,7 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 		fdbaseUri.right = new FormAttachment(80, 0);
 		fdbaseUri.top = new FormAttachment(txtpassword, margin);
 		txtbaseUri.setLayoutData(fdbaseUri);
+		txtbaseUri.setEditable(false);
 
 		lboutputFileRDF = new Label(shell, SWT.RIGHT);
 		lboutputFileRDF.setText(BaseMessages.getString(PKG,
@@ -413,6 +427,7 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 		fdtxtoutputrdf.right = new FormAttachment(80, 0);
 		fdtxtoutputrdf.top = new FormAttachment(txtbaseUri, margin);
 		txtoutputFileRDF.setLayoutData(fdtxtoutputrdf);
+		txtoutputFileRDF.setEditable(false);
 
 		btnloadDirectory = new Button(shell, SWT.PUSH);
 		props.setLook(btnloadDirectory);
@@ -451,6 +466,7 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 		fbcbmoutputFormat.top = new FormAttachment(btnloadDirectory, margin);
 		fbcbmoutputFormat.right = new FormAttachment(80, -margin);
 		cbmoutputFormat.setLayoutData(fbcbmoutputFormat);
+		cbmoutputFormat.setEditable(false);
 		// cbmoutputFormat.setEnabled(false);
 		cbmoutputFormat.addSelectionListener(new SelectionListener() {
 
@@ -488,15 +504,16 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 					MessageBox dialog = new MessageBox(shell, SWT.ICON_ERROR);
 					dialog.setText("ERROR");
 					dialog.setMessage(BaseMessages.getString(PKG,
-							"OAILoader.Manager.ERRORURI"));
+							"RDFGeneration.ERROR.Connection"));
 					dialog.open();
+					logBasic("exception" + e1);
 				}
 			}
 		};
 
 		lsreuseConecction = new Listener() {
 			public void handleEvent(Event e) {
-				cancel();
+				StepDataLoader dataloader;	
 			}
 		};
 
@@ -748,8 +765,20 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 			IllegalAccessException, ClassNotFoundException, SQLException {
 
 		DriverType sqlDriver = null;
+		boolean helpFlag=true;
 		if (sqlvendor.equals("H2")) {
 			sqlDriver = new DriverType("org.h2.Driver");
+//			File dbFileSchema = new File("..\\..\\"+txtdatabaseSchema.getText()+".h2.db");
+//			if(!dbFileSchema.exists())
+//			{
+//				MessageBox dialog = new MessageBox(shell, SWT.ERROR);
+//				dialog.setText("ERROR");
+//				dialog.setMessage(BaseMessages.getString(PKG,
+//						"RDFGeneration.ERROR.FileSchema"));
+//				dialog.open();
+//				helpFlag=false;
+//			}
+			
 		} else if (sqlvendor.equals("MySql")) {
 			sqlDriver = new DriverType("com.mysql.jdbc.Driver");
 		} else if (sqlvendor.equals("PostgreSql")) {
@@ -762,14 +791,17 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 		// Connect database
 		// conn = SQLConnector.connect(userName, password, url + dbName,
 		// driver);
+		if(helpFlag){		
 		conn = SQLConnector.connect(txtuserName.getText(),
 				txtpassword.getText(), txtdatabaseUrl.getText()+txtdatabaseSchema.getText(), sqlDriver);
 		if (conn != null) {
 			MessageBox dialog = new MessageBox(shell, SWT.OK);
 			dialog.setText("SUCCESS");
 			dialog.setMessage(BaseMessages.getString(PKG,
-					"OAILoader.Manager.ERRORURI"));
+					"RDFGeneration.SUCCESS.Connection"));
 			dialog.open();
+			
+		}
 		}
 
 	}

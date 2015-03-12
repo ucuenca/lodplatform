@@ -228,8 +228,8 @@ public class RDFGeneration extends BaseStep implements StepInterface {
 			try {
 				// Close db connection
 				data.conn.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
+			} catch (SQLException e) {				
+				logBasic("expection"+ e.getMessage());
 			}
 		}
 
