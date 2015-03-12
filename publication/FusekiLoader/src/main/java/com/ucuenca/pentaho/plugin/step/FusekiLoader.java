@@ -185,15 +185,7 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 				e.printStackTrace();
 				logBasic(" ERROR " + e );
 			}
-			try {
-				File source=new File("plugins/steps/FusekiLoader/fuseki/fuseki-server.jars");
-				File destination=new File("plugins/steps/FusekiLoader/fuseki/fuseki-server.jar");
-				
-				copyFile(source,destination);
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				logBasic(" ERROR " + e1);
-			}
+
 			
 			/**
 			
