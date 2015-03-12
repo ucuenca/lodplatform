@@ -8,16 +8,16 @@
 	<property file="build/build.properties" />
 
 	<!-- set global properties for this build -->
-	<property name="kettle-local-dir" location="/home/depcc/MEGA/Investigación/Pentaho/data-integration" />
+	<property name="kettle-local-dir" location="/home/otakusf/data-integration" />
 	<!--
 	<property name="src" location="src" />
 	<property name="classes" location="classes" />
 	-->
 	<property name="dist" location="target" />
-	<property name="pluginname" value="data-precatching" />
+	<property name="pluginname" value="RDFGeneration" />
 	<property name="diststep" location="${dist}/steps/${pluginname}" />
 	
-	<property name="jarfilename" value="demo-step.jar" />
+	<property name="jarfilename" value="RDFGeneration.jar" />
 
 	<!-- used to compile code -->
 	<!--

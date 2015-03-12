@@ -59,6 +59,7 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.h2.jdbc.JdbcSQLException;
 import org.pentaho.di.core.Const;
 import org.pentaho.di.core.Props;
 import org.pentaho.di.core.exception.KettleException;
@@ -834,6 +835,9 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	    this.getMappingTableData(stepname);
 	    meta.setChanged( changed );
 
+		wTabFolder.setSelection(1);
+		wTabFolder.setSelection(2);
+		wTabFolder.setSelection(0);
 	    shell.open();
 	    while ( !shell.isDisposed() ) {
 	      if ( !display.readAndDispatch() ) {
@@ -1048,7 +1052,7 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 		try {
 			DatabaseLoader.getConnection();
 			int rowCount = this.queryMappingRules(data);
-			if(rowCount != meta.getSqlStack().size() && meta.getSqlStack().get(0) != null) { 
+			if(rowCount != meta.getSqlStack().size() && meta.getSqlStack().get(0) != null) {
 				for(String sqlInsert:meta.getSqlStack()) {
 					logBasic( BaseMessages.getString( PKG, "OntologyMapping.log.basic.rules.meta.Insert" ) );
 					DatabaseLoader.executeUpdate(sqlInsert);
@@ -1070,10 +1074,17 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	 */
 	private int queryMappingRules(OntoMapData data) throws Exception {
 		int rowCount = 0;
-		logBasic( BaseMessages.getString( PKG, "OntologyMapping.log.basic.rules.Query" ) );
-		rowCount += data.queryTable(wClassTable, OntoMapData.CLASSIFICATIONTABLE);
-		rowCount += data.queryTable(wAnnTable, OntoMapData.ANNOTATIONTABLE);
-		rowCount += data.queryTable(wRelTable, OntoMapData.RELATIONTABLE);
+		try {
+			logBasic( BaseMessages.getString( PKG, "OntologyMapping.log.basic.rules.Query" ) );
+			rowCount += data.queryTable(wClassTable, OntoMapData.CLASSIFICATIONTABLE);
+			rowCount += data.queryTable(wAnnTable, OntoMapData.ANNOTATIONTABLE);
+			rowCount += data.queryTable(wRelTable, OntoMapData.RELATIONTABLE);
+		}catch(JdbcSQLException e) {
+			logDebug(e.getMessage());
+			data.createDBTable(wClassTable, OntoMapData.CLASSIFICATIONTABLE);
+			data.createDBTable(wAnnTable, OntoMapData.ANNOTATIONTABLE);
+			data.createDBTable(wRelTable, OntoMapData.RELATIONTABLE);
+		}
 		return rowCount;
 	}
 	

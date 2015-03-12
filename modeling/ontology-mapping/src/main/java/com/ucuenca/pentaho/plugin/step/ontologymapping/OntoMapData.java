@@ -109,14 +109,8 @@ public class OntoMapData extends BaseStepData implements StepDataInterface {
 	 */
 	public List<String> saveTable(TableView table, String tableName)throws Exception {
 		List<String> sqlInsertList = new ArrayList<String>();
-    	ColumnInfo[] columns = table.getColumns();
-    	Map<String, String> tableFields = new LinkedHashMap<String, String>();
-    	tableFields.put("TRANSID", "VARCHAR(50)");
-		tableFields.put("STEPID", "VARCHAR(50)");
-    	for(ColumnInfo column:columns) tableFields.put(column.getName().toUpperCase().replaceAll(" ", "_"), "VARCHAR(100)");
-    	tableFields.put("PRIMARY KEY", "(TRANSID, STEPID, "+ columns[0].getName().toUpperCase().replaceAll(" ", "_") + ")");
-    	DatabaseLoader.createTable(tableName, tableFields);
-    	Object[] pk = new Object[]{this.getTransName(), this.getStepName()};
+		this.createDBTable(table, tableName);
+    	Object[] pk = new Object[]{this.getTransName().toUpperCase(), this.getStepName().toUpperCase()};
     	DatabaseLoader.executeUpdate("DELETE FROM " + tableName + " WHERE TRANSID = ? AND STEPID = ?", pk);
     	for(int i=0;i<table.getItemCount();i++) {
     		Object[] tableValues = table.getItem(i);
@@ -135,7 +129,7 @@ public class OntoMapData extends BaseStepData implements StepDataInterface {
 	    			sqlInsertion += "?)";
 	    			sqlInsertStack += "{"+ (values.length-1) +"})";
 	    			DatabaseLoader.executeUpdate(sqlInsertion, values);
-	    			sqlInsertList.add( new MessageFormat(sqlInsertStack).format(values) );
+	    			sqlInsertList.add( new MessageFormat(sqlInsertStack).format( this.setValuesFormat(values) ) );
 	    		}catch(Exception e) {
 	    			throw new KettleException("ERROR EXECUTING SQL INSERT: "+ e.getMessage());
 	    		}
@@ -143,6 +137,40 @@ public class OntoMapData extends BaseStepData implements StepDataInterface {
     	}
     	return sqlInsertList;
     }
+	
+	/**
+	 * Set special value format depending on value data type
+	 * @param values set of values
+	 * @return new formatted set of values
+	 * @throws Exception
+	 */
+	private Object[] setValuesFormat(Object[] values)throws Exception {
+		Object[] result = new Object[values.length];
+		for(int i=0;i<values.length;i++) {
+			if(values[i] instanceof String) {
+				result[i] = "'" + values[i] + "'";
+			} else {
+				result[i] = values[i];
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * Creates the Database table schema
+	 * @param table TableView metadata
+	 * @param tableName Database Table Name
+	 * @throws Exception
+	 */
+	protected void createDBTable(TableView table, String tableName) throws Exception {
+    	ColumnInfo[] columns = table.getColumns();
+    	Map<String, String> tableFields = new LinkedHashMap<String, String>();
+    	tableFields.put("TRANSID", "VARCHAR(50)");
+		tableFields.put("STEPID", "VARCHAR(50)");
+    	for(ColumnInfo column:columns) tableFields.put(column.getName().toUpperCase().replaceAll(" ", "_"), "VARCHAR(100)");
+    	tableFields.put("PRIMARY KEY", "(TRANSID, STEPID, "+ columns[0].getName().toUpperCase().replaceAll(" ", "_") + ")");
+    	DatabaseLoader.createTable(tableName, tableFields);
+	}
 
 	/**
 	 * Query DB Table data and load into the TableView
@@ -155,7 +183,7 @@ public class OntoMapData extends BaseStepData implements StepDataInterface {
     	ColumnInfo[] columns = tableView.getColumns();
     	List<String> tableFields = new ArrayList<String>();
     	for(ColumnInfo column:columns) tableFields.add(column.getName().toUpperCase().replaceAll(" ", "_"));
-    	Object[] pk = new Object[]{this.getTransName(), this.getStepName()};
+    	Object[] pk = new Object[]{this.getTransName().toUpperCase(), this.getStepName().toUpperCase()};
     	ResultSet rs = DatabaseLoader.executeQuery("SELECT " + 
     			tableFields.toString().substring(1, tableFields.toString().length()-1) + 
     			" FROM " + tableName + " WHERE TRANSID = ? AND STEPID = ?", pk);
