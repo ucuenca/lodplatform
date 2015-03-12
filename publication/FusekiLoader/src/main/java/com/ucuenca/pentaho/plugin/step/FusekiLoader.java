@@ -27,6 +27,9 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
+
 
 import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.core.row.RowDataUtil;
@@ -166,8 +169,9 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 		} catch (Exception eox) {
 		logBasic(" ERROR " + eox +" Unload model " +meta.getOutputField() );
 		}
-
 			
+
+		
 			
 			
 			try{
@@ -181,28 +185,53 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 				e.printStackTrace();
 				logBasic(" ERROR " + e );
 			}
-			 File oldFile1 = new File("plugins/steps/FusekiLoader/lib/fuseki-server.jar");
-		 	 
-	            if (oldFile1.renameTo(new File("plugins/steps/FusekiLoader/fuseki/fuseki-server.jar"))) {
+			try {
+				File source=new File("plugins/steps/FusekiLoader/fuseki/fuseki-server.jars");
+				File destination=new File("plugins/steps/FusekiLoader/fuseki/fuseki-server.jar");
+				
+				copyFile(source,destination);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				logBasic(" ERROR " + e1);
+			}
+			
+			/**
+			
+			 File oldFile1 = new File("plugins/steps/FusekiLoader/fuseki/fuseki-server2.jars");
+			
+			    if (oldFile1.renameTo(new File("plugins/steps/FusekiLoader/fuseki/fuseki-server.jar"))) {
 	             //   System.out.println("The file was build succesfully in "+meta.getDirectory()+"/"+ oldFile.getName());
 	                logBasic("copy fuseki-server.jar in resources , ready");
 	            } else {
 	            	logBasic("ERROR  no fuseki-server.jar in resources.");
 	                // System.out.println("The File was not created.");
 	             }
-			
+			*/
 			compile(meta.getDirectory());
 			
+			try {
+				File source=new File("plugins/steps/FusekiLoader/fuseki.war");
+				File destination=new File(meta.getDirectory()+"/fuseki.war");
+				
+				copyFile(source,destination);
+			       logBasic("The file was build succesfully in "+meta.getDirectory()+"/"+ "fuseki.war");
+			          
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				logBasic(" ERROR " + e1 +"The File was not created. in "+meta.getDirectory()+"/"+ "fuseki.war");
+			}
+			/**
 			 File oldFile = new File("plugins/steps/FusekiLoader/fuseki.war");
-			 	 
-			            if (oldFile.renameTo(new File(meta.getDirectory()+"/"+ oldFile.getName()))) {
+			  
+			 
+			            if (oldFile.renameTo(new File(meta.getDirectory()+"/"+oldFile.getName()))) {
 			             //   System.out.println("The file was build succesfully in "+meta.getDirectory()+"/"+ oldFile.getName());
 			                logBasic("The file was build succesfully in "+meta.getDirectory()+"/"+ oldFile.getName());
 			            } else {
-			            	logBasic("ERROR  The File was not created.");
+			            	logBasic("ERROR  The File was not created. in "+meta.getDirectory()+"/"+ oldFile.getName());
 			                // System.out.println("The File was not created.");
 			             }
-			
+			*/
 		}
 
 		// safely add the string "Hello World!" at the end of the output row
@@ -278,5 +307,32 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 	    }
 	        
 	       }
+	
+	
+	public  void copyFile(File sourceFile, File destFile) throws IOException {
+	     if(!destFile.exists()) {
+	      destFile.createNewFile();
+	     }
+
+	     FileChannel source = null;
+	     FileChannel destination = null;
+	     try {
+	      source = new RandomAccessFile(sourceFile,"rw").getChannel();
+	      destination = new RandomAccessFile(destFile,"rw").getChannel();
+
+	      long position = 0;
+	      long count    = source.size();
+
+	      source.transferTo(position, count, destination);
+	     }
+	     finally {
+	      if(source != null) {
+	       source.close();
+	      }
+	      if(destination != null) {
+	       destination.close();
+	      }
+	    }
+	 }
 
 }
