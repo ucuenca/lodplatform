@@ -67,6 +67,10 @@
  <library name="lib/jena-2.6.0.jar"/> 
  <library name="lib/iri-0.6.jar"/>
   <library name="lib/icu4j-3.4.4.jar"/>
+  
+  
+  
+ 
 			
 		</libraries>
 		
