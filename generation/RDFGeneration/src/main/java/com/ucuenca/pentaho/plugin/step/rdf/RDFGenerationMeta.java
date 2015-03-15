@@ -374,6 +374,16 @@ public class RDFGenerationMeta extends BaseStepMeta implements
 			String output[], RowMetaInterface info) {
 
 		CheckResult cr;
+		
+//		inputFieldr2rml ="R2rml File";
+//		sqlvendor="";
+//		databaseURL="";
+//		databaseSchema="";
+//		userName="";
+//		password="";
+//		baseUri="http://foo.example/DB/";
+//		directorioOutputRDF="";
+//		format="";
 
 		// See if there are input streams leading to this step!
 		if (input.length > 0) {

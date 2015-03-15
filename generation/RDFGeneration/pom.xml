@@ -548,8 +548,16 @@
 									<overWrite>false</overWrite>
 									<outputDirectory>${project.build.directory}/lib</outputDirectory>
 								</artifactItem>
-								
 
+
+								<artifactItem>
+									<groupId>com.h2database</groupId>
+									<artifactId>h2</artifactId>
+									<version>1.4.184</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+									<outputDirectory>${project.build.directory}/lib</outputDirectory>
+								</artifactItem>
 							</artifactItems>
 						</configuration>
 
@@ -910,6 +918,12 @@
 			<groupId>com.ucuenca</groupId>
 			<artifactId>misctools</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>1.4.184</version>
 		</dependency>
 	</dependencies>
 </project>

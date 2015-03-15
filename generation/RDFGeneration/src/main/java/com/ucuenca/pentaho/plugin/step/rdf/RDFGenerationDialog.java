@@ -324,7 +324,6 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 		fdtxtdatabaseUrl.right = new FormAttachment(80, 0);
 		fdtxtdatabaseUrl.top = new FormAttachment(cbmsqlvendor, margin);
 		txtdatabaseUrl.setLayoutData(fdtxtdatabaseUrl);
-		
 
 		lbdatabaseSchema = new Label(shell, SWT.RIGHT);
 		lbdatabaseSchema.setText(BaseMessages.getString(PKG,
@@ -492,13 +491,13 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 				try {
 					verificarConecction();
 				} catch (InstantiationException e1) {
-					
+
 					e1.printStackTrace();
 				} catch (IllegalAccessException e1) {
-					
+
 					e1.printStackTrace();
 				} catch (ClassNotFoundException e1) {
-										e1.printStackTrace();
+					e1.printStackTrace();
 				} catch (SQLException e1) {
 					e1.getMessage();
 					MessageBox dialog = new MessageBox(shell, SWT.ICON_ERROR);
@@ -513,7 +512,7 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 
 		lsreuseConecction = new Listener() {
 			public void handleEvent(Event e) {
-				StepDataLoader dataloader;	
+				StepDataLoader dataloader;
 			}
 		};
 
@@ -549,7 +548,6 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 				ok();
 			}
 		};
-
 
 		// Detect X or ALT-F4 or something that kills this window and cancel the
 		// dialog properly
@@ -590,56 +588,55 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 	private void populateDialog() {
 		wStepname.selectAll();
 
-		if (meta.getInputFieldr2rml()==null) {
+		if (meta.getInputFieldr2rml() == null) {
 			txtR2rmlfile.setText("");
 		} else {
 			txtR2rmlfile.setText(meta.getInputFieldr2rml());
 		}
-		if (meta.getDatabaseURL()==null) {
+		if (meta.getDatabaseURL() == null) {
 			txtdatabaseUrl.setText("");
 		} else {
 			txtdatabaseUrl.setText(meta.getDatabaseURL());
 		}
-		if (meta.getDatabaseSchema()==null) {
+		if (meta.getDatabaseSchema() == null) {
 			txtdatabaseSchema.setText("");
 		} else {
 			txtdatabaseSchema.setText(meta.getDatabaseSchema());
 		}
-		if (meta.getUserName()==null) {
+		if (meta.getUserName() == null) {
 			txtuserName.setText("");
 		} else {
 			txtuserName.setText(meta.getUserName());
 		}
-		if (meta.getPassword()==null) {
+		if (meta.getPassword() == null) {
 			txtpassword.setText("");
 		} else {
 			txtpassword.setText(meta.getPassword());
 		}
-		if (meta.getBaseUri()==null) {
+		if (meta.getBaseUri() == null) {
 			txtbaseUri.setText("");
 		} else {
 			txtbaseUri.setText(meta.getBaseUri());
 		}
-		if (meta.getDirectorioOutputRDF()==null) {
+		if (meta.getDirectorioOutputRDF() == null) {
 			txtoutputFileRDF.setText("");
 		} else {
 			txtoutputFileRDF.setText(meta.getDirectorioOutputRDF());
 		}
-		if (meta.getSqlvendor()==null) {
+		if (meta.getSqlvendor() == null) {
 			cbmsqlvendor.setText("");
 			sqlvendor = "";
 		} else {
 			cbmsqlvendor.setText(meta.getSqlvendor());
 			sqlvendor = meta.getSqlvendor();
 		}
-		if (meta.getFormat()==null) {
+		if (meta.getFormat() == null) {
 			cbmoutputFormat.setText("");
-			outputFormat ="";
+			outputFormat = "";
 		} else {
 			cbmoutputFormat.setText(meta.getFormat());
 			outputFormat = meta.getFormat();
-		}		
-		
+		}
 
 		for (SqlVendor sql : SqlVendor.values()) {
 			cbmsqlvendor.add(sql.getDriver());
@@ -765,43 +762,43 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 			IllegalAccessException, ClassNotFoundException, SQLException {
 
 		DriverType sqlDriver = null;
-		boolean helpFlag=true;
-		if (sqlvendor.equals("H2")) {
-			sqlDriver = new DriverType("org.h2.Driver");
-//			File dbFileSchema = new File("..\\..\\"+txtdatabaseSchema.getText()+".h2.db");
-//			if(!dbFileSchema.exists())
-//			{
-//				MessageBox dialog = new MessageBox(shell, SWT.ERROR);
-//				dialog.setText("ERROR");
-//				dialog.setMessage(BaseMessages.getString(PKG,
-//						"RDFGeneration.ERROR.FileSchema"));
-//				dialog.open();
-//				helpFlag=false;
-//			}
-			
-		} else if (sqlvendor.equals("MySql")) {
-			sqlDriver = new DriverType("com.mysql.jdbc.Driver");
-		} else if (sqlvendor.equals("PostgreSql")) {
-			sqlDriver = new DriverType("org.postgresql.Driver");
-		}
 
+		boolean helpFlag = true;
+
+		if (txtuserName.getText().equals("")
+				|| txtpassword.getText().equals("")
+				|| cbmsqlvendor.getText().equals("")) {
+			
+			helpFlag = false;
+			MessageBox dialog = new MessageBox(shell, SWT.ERROR);
+			dialog.setText("ERROR");
+			dialog.setMessage(BaseMessages.getString(PKG,
+					"RDFGeneration.ERROR.MissingFileConnection"));
+			dialog.open();
+		} else {
+			if (sqlvendor.equals("H2")) {
+				sqlDriver = new DriverType("org.h2.Driver");
+			} else if (sqlvendor.equals("MySql")) {
+				sqlDriver = new DriverType("com.mysql.jdbc.Driver");
+			} else if (sqlvendor.equals("PostgreSql")) {
+				sqlDriver = new DriverType("org.postgresql.Driver");
+			}
+		}
 		// Open test database
 		Connection conn = null;
 
-		// Connect database
-		// conn = SQLConnector.connect(userName, password, url + dbName,
-		// driver);
-		if(helpFlag){		
-		conn = SQLConnector.connect(txtuserName.getText(),
-				txtpassword.getText(), txtdatabaseUrl.getText()+txtdatabaseSchema.getText(), sqlDriver);
-		if (conn != null) {
-			MessageBox dialog = new MessageBox(shell, SWT.OK);
-			dialog.setText("SUCCESS");
-			dialog.setMessage(BaseMessages.getString(PKG,
-					"RDFGeneration.SUCCESS.Connection"));
-			dialog.open();
-			
-		}
+		if (helpFlag) {
+			conn = SQLConnector.connect(txtuserName.getText(),
+					txtpassword.getText(), txtdatabaseUrl.getText()
+							+ txtdatabaseSchema.getText(), sqlDriver);
+			if (conn != null) {
+				MessageBox dialog = new MessageBox(shell, SWT.OK);
+				dialog.setText("SUCCESS");
+				dialog.setMessage(BaseMessages.getString(PKG,
+						"RDFGeneration.SUCCESS.Connection"));
+				dialog.open();
+
+			}
 		}
 
 	}
