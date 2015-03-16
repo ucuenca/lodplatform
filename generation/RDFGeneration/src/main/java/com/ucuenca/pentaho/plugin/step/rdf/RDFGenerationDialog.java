@@ -59,6 +59,7 @@ import org.pentaho.di.ui.trans.step.BaseStepDialog;
 import org.pentaho.di.trans.step.BaseStepMeta;
 import org.pentaho.di.trans.step.StepDialogInterface;
 
+import com.ucuenca.misctools.DatabaseLoader;
 import com.ucuenca.misctools.StepDataLoader;
 
 /**
@@ -244,12 +245,16 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 		// txtR2rmlfile.setText(meta.getInputFieldr2rml());
 		props.setLook(txtR2rmlfile);
 		txtR2rmlfile.addModifyListener(lsMod);
+		txtR2rmlfile.setToolTipText(BaseMessages.getString(PKG,
+				"RDFGeneration.tooltip.FileR2rml"));
 		FormData fdtxtR2rmlfile = new FormData();
 		fdtxtR2rmlfile.left = new FormAttachment(middle, 0);
 		fdtxtR2rmlfile.right = new FormAttachment(80, 0);
 		fdtxtR2rmlfile.top = new FormAttachment(wStepname, margin);
 		txtR2rmlfile.setLayoutData(fdtxtR2rmlfile);
 		txtR2rmlfile.setEditable(false);
+		
+	
 
 		btnloadFile = new Button(shell, SWT.PUSH);
 		props.setLook(btnloadFile);
@@ -293,12 +298,20 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 			public void widgetSelected(SelectionEvent selectionevent) {
 				sqlvendor = cbmsqlvendor.getText();
 				if (sqlvendor.equals("H2")) {
-					txtdatabaseUrl.setText("jdbc:h2:~/");
+					txtdatabaseUrl.setText("jdbc:h2:~/");					
+					
 				} else if (sqlvendor.equals("MySql")) {
 					txtdatabaseUrl.setText("jdbc:mysql://localhost/");
 				} else if (sqlvendor.equals("PostgreSql")) {
 					txtdatabaseUrl.setText("jdbc:postgresql://localhost:5432/");
 				}
+				txtdatabaseUrl.setEditable(true);
+				txtdatabaseSchema.setText("");
+				txtdatabaseSchema.setEditable(true);
+				txtuserName.setText("");
+				txtuserName.setEditable(true);
+				txtpassword.setText("");		
+				txtpassword.setEditable(true);
 			}
 
 			public void widgetDefaultSelected(SelectionEvent selectionevent) {
@@ -319,6 +332,8 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 		// txtdatabaseUrl.setText(meta.getDatabaseURL());
 		props.setLook(txtdatabaseUrl);
 		txtdatabaseUrl.addModifyListener(lsMod);
+		txtdatabaseUrl.setToolTipText(BaseMessages.getString(PKG,
+				"RDFGeneration.tooltip.BaseUrl"));
 		FormData fdtxtdatabaseUrl = new FormData();
 		fdtxtdatabaseUrl.left = new FormAttachment(middle, 0);
 		fdtxtdatabaseUrl.right = new FormAttachment(80, 0);
@@ -338,6 +353,8 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 		txtdatabaseSchema = new Text(shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
 		// txtdatabaseSchema.setText(meta.getDatabaseSchema());
 		props.setLook(txtdatabaseSchema);
+		txtdatabaseSchema.setToolTipText(BaseMessages.getString(PKG,
+				"RDFGeneration.tooltip.BaseSchema"));
 		txtdatabaseSchema.addModifyListener(lsMod);
 		FormData fddatabaseSchema = new FormData();
 		fddatabaseSchema.left = new FormAttachment(middle, 0);
@@ -512,7 +529,15 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 
 		lsreuseConecction = new Listener() {
 			public void handleEvent(Event e) {
-				StepDataLoader dataloader;
+		    cbmsqlvendor.select(0);
+			txtdatabaseUrl.setText(DatabaseLoader.SQL_URI_CONNECTION);
+			txtdatabaseUrl.setEditable(false);
+			txtdatabaseSchema.setText(DatabaseLoader.SQL_SCHEMA);
+			txtdatabaseSchema.setEditable(false);
+			txtuserName.setText(DatabaseLoader.SQL_USERNAME);
+			txtuserName.setEditable(false);
+			txtpassword.setText(DatabaseLoader.SQL_PASSWORD);		
+			txtpassword.setEditable(false);
 			}
 		};
 
@@ -767,8 +792,10 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 
 		if (txtuserName.getText().equals("")
 				|| txtpassword.getText().equals("")
-				|| cbmsqlvendor.getText().equals("") || txtdatabaseUrl.getText().equals("") || txtdatabaseSchema.getText().equals("")) {
-			
+				|| cbmsqlvendor.getText().equals("")
+				|| txtdatabaseUrl.getText().equals("")
+				|| txtdatabaseSchema.getText().equals("")) {
+
 			helpFlag = false;
 			MessageBox dialog = new MessageBox(shell, SWT.ERROR);
 			dialog.setText("ERROR");
