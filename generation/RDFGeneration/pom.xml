@@ -415,15 +415,6 @@
 
 								<artifactItem>
 									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-sail-memory</artifactId>
-									<version>2.6.10</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
 									<artifactId>sesame-sail-nativerdf</artifactId>
 									<version>2.6.10</version>
 									<type>jar</type>
@@ -539,6 +530,25 @@
 									<outputDirectory>${project.build.directory}/lib</outputDirectory>
 								</artifactItem>
 
+
+								<artifactItem>
+									<groupId>com.ucuenca</groupId>
+									<artifactId>misctools</artifactId>
+									<version>0.0.1-SNAPSHOT</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+									<outputDirectory>${project.build.directory}/lib</outputDirectory>
+								</artifactItem>
+
+
+								<artifactItem>
+									<groupId>com.h2database</groupId>
+									<artifactId>h2</artifactId>
+									<version>1.4.184</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+									<outputDirectory>${project.build.directory}/lib</outputDirectory>
+								</artifactItem>
 							</artifactItems>
 						</configuration>
 
@@ -574,25 +584,25 @@
 		<dependency>
 			<groupId>pentaho-kettle</groupId>
 			<artifactId>kettle-core</artifactId>
-			<version>5.1.preview.506</version>
+			<version>5.1.0.0-752</version>
 		</dependency>
 
 		<dependency>
 			<groupId>pentaho-kettle</groupId>
 			<artifactId>kettle-dbdialog</artifactId>
-			<version>5.1.preview.506</version>
+			<version>5.1.0.0-752</version>
 		</dependency>
 
 		<dependency>
 			<groupId>pentaho-kettle</groupId>
 			<artifactId>kettle-engine</artifactId>
-			<version>5.1.preview.506</version>
+			<version>5.1.0.0-752</version>
 		</dependency>
 
 		<dependency>
 			<groupId>pentaho-kettle</groupId>
 			<artifactId>kettle-ui-swt</artifactId>
-			<version>5.1.preview.506</version>
+			<version>5.1.0.0-752</version>
 		</dependency>
 
 		<dependency>
@@ -831,12 +841,6 @@
 
 		<dependency>
 			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-sail-memory</artifactId>
-			<version>2.6.10</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
 			<artifactId>sesame-queryalgebra-evaluation</artifactId>
 			<version>2.6.10</version>
 		</dependency>
@@ -895,6 +899,16 @@
 			<version>9.1-901.jdbc4</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.ucuenca</groupId>
+			<artifactId>misctools</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>1.4.184</version>
+		</dependency>
 	</dependencies>
 </project>
