@@ -767,7 +767,7 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 
 		if (txtuserName.getText().equals("")
 				|| txtpassword.getText().equals("")
-				|| cbmsqlvendor.getText().equals("")) {
+				|| cbmsqlvendor.getText().equals("") || txtdatabaseUrl.getText().equals("") || txtdatabaseSchema.getText().equals("")) {
 			
 			helpFlag = false;
 			MessageBox dialog = new MessageBox(shell, SWT.ERROR);

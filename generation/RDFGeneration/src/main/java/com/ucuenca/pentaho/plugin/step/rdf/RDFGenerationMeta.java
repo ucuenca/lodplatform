@@ -49,7 +49,6 @@ import org.pentaho.di.trans.step.StepDialogInterface;
 import org.pentaho.di.trans.step.StepInterface;
 import org.pentaho.di.trans.step.StepMeta;
 import org.pentaho.di.trans.step.StepMetaInterface;
-import org.pentaho.di.trans.steps.edi2xml.grammar.FastSimpleGenericEdifactDirectXMLParser.data_element_payload_return;
 import org.w3c.dom.Node;
 
 /**
@@ -91,7 +90,7 @@ public class RDFGenerationMeta extends BaseStepMeta implements
 	private String baseUri;
 	private String directorioOutputRDF;
 	private String format;
-	
+
 	private String stepName;
 
 	/**
@@ -100,11 +99,11 @@ public class RDFGenerationMeta extends BaseStepMeta implements
 	 */
 	public RDFGenerationMeta() {
 		super();
-		
+
 	}
 
 	public StepDialogInterface getDialog(Shell shell, StepMetaInterface meta,
-			TransMeta transMeta, String name) {		
+			TransMeta transMeta, String name) {
 		this.setStepName(name);
 		return new RDFGenerationDialog(shell, meta, transMeta, name);
 	}
@@ -146,15 +145,15 @@ public class RDFGenerationMeta extends BaseStepMeta implements
 	 * here will be used by Spoon when a new step is created.
 	 */
 	public void setDefault() {
-		inputFieldr2rml ="R2rml File";
-		sqlvendor="";
-		databaseURL="";
-		databaseSchema="";
-		userName="";
-		password="";
-		baseUri="http://foo.example/DB/";
-		directorioOutputRDF="";
-		format="";
+		inputFieldr2rml = "R2rml File";
+		sqlvendor = "";
+		databaseURL = "";
+		databaseSchema = "";
+		userName = "";
+		password = "";
+		baseUri = "http://foo.example/DB/";
+		directorioOutputRDF = "";
+		format = "";
 	}
 
 	/**
@@ -186,24 +185,23 @@ public class RDFGenerationMeta extends BaseStepMeta implements
 
 		// only one field to serialize
 		StringBuffer retval = new StringBuffer(1000);
-		
-		retval.append("    ").append(XMLHandler.addTagValue("nameStep", stepName));
-		retval.append("    ").append(XMLHandler.addTagValue("Fieldr2rml", inputFieldr2rml));
+
+		retval.append("    ").append(
+				XMLHandler.addTagValue("nameStep", stepName));
+		retval.append("    ").append(
+				XMLHandler.addTagValue("Fieldr2rml", inputFieldr2rml));
 		retval.append("    ").append(
 				XMLHandler.addTagValue("sqldriver", sqlvendor));
 		retval.append("    ").append(
 				XMLHandler.addTagValue("baseURL", databaseURL));
 		retval.append("    ").append(
 				XMLHandler.addTagValue("baseSchema", databaseSchema));
-		retval.append("    ")
-				.append(XMLHandler.addTagValue("DataSetUri", baseUri));
 		retval.append("    ").append(
-				XMLHandler.addTagValue("user", userName));
+				XMLHandler.addTagValue("DataSetUri", baseUri));
+		retval.append("    ").append(XMLHandler.addTagValue("user", userName));
+		retval.append("    ").append(XMLHandler.addTagValue("pass", password));
 		retval.append("    ").append(
-				XMLHandler.addTagValue("pass", password));
-		retval.append("    ").append(
-				XMLHandler.addTagValue("OutputRDF",
-						directorioOutputRDF));
+				XMLHandler.addTagValue("OutputRDF", directorioOutputRDF));
 		retval.append("    ").append(XMLHandler.addTagValue("formats", format));
 
 		return retval.toString();
@@ -224,24 +222,23 @@ public class RDFGenerationMeta extends BaseStepMeta implements
 	 *            the counters available in the transformation
 	 */
 	public void loadXML(Node stepnode, List<DatabaseMeta> databases,
-			Map<String, Counter> counters) throws KettleXMLException {		
+			Map<String, Counter> counters) throws KettleXMLException {
 		readData(stepnode);
 	}
-	
-	 private void readData( Node stepnode ) throws KettleXMLException {
-		    
-		      stepName= XMLHandler.getTagValue( stepnode, "nameStep" );
-		      inputFieldr2rml = XMLHandler.getTagValue( stepnode, "Fieldr2rml" );
-		      sqlvendor = XMLHandler.getTagValue( stepnode, "sqldriver" );
-		      databaseURL=XMLHandler.getTagValue( stepnode, "baseURL" ); 
-		      databaseSchema=XMLHandler.getTagValue( stepnode, "baseSchema" );
-		      baseUri=XMLHandler.getTagValue( stepnode, "DataSetUri" );
-		      userName=XMLHandler.getTagValue( stepnode, "user" );
-		      password=XMLHandler.getTagValue( stepnode, "pass" );
-		      directorioOutputRDF=XMLHandler.getTagValue( stepnode, "OutputRDF" );
-		      format=XMLHandler.getTagValue( stepnode, "formats" );
-    }
-		
+
+	private void readData(Node stepnode) throws KettleXMLException {
+
+		stepName = XMLHandler.getTagValue(stepnode, "nameStep");
+		inputFieldr2rml = XMLHandler.getTagValue(stepnode, "Fieldr2rml");
+		sqlvendor = XMLHandler.getTagValue(stepnode, "sqldriver");
+		databaseURL = XMLHandler.getTagValue(stepnode, "baseURL");
+		databaseSchema = XMLHandler.getTagValue(stepnode, "baseSchema");
+		baseUri = XMLHandler.getTagValue(stepnode, "DataSetUri");
+		userName = XMLHandler.getTagValue(stepnode, "user");
+		password = XMLHandler.getTagValue(stepnode, "pass");
+		directorioOutputRDF = XMLHandler.getTagValue(stepnode, "OutputRDF");
+		format = XMLHandler.getTagValue(stepnode, "formats");
+	}
 
 	/**
 	 * This method is called by Spoon when a step needs to serialize its
@@ -260,10 +257,10 @@ public class RDFGenerationMeta extends BaseStepMeta implements
 		try {
 			rep.saveStepAttribute(id_transformation, id_step,
 					"inputFieldr2rml", inputFieldr2rml); //$NON-NLS-1$
-			
-//			rep.saveStepAttribute(id_transformation, id_step, "nameontology", nameOntology); //$NON-NLS-1$
-//			rep.saveStepAttribute(id_transformation, id_step, "stepname", stepName); //$NON-NLS-1$
-//			rep.saveStepAttribute(id_transformation, id_step, "outputfield", outputField); //$NON-NLS-1$
+
+			//			rep.saveStepAttribute(id_transformation, id_step, "nameontology", nameOntology); //$NON-NLS-1$
+			//			rep.saveStepAttribute(id_transformation, id_step, "stepname", stepName); //$NON-NLS-1$
+			//			rep.saveStepAttribute(id_transformation, id_step, "outputfield", outputField); //$NON-NLS-1$
 		} catch (Exception e) {
 			throw new KettleException("Unable to save step into repository: "
 					+ id_step, e);
@@ -288,14 +285,13 @@ public class RDFGenerationMeta extends BaseStepMeta implements
 			List<DatabaseMeta> databases, Map<String, Counter> counters)
 			throws KettleException {
 		try {
-			inputFieldr2rml = rep
-					.getStepAttributeString(id_step, "inputFieldr2rml"); //$NON-NLS-1$
-			
+			inputFieldr2rml = rep.getStepAttributeString(id_step,
+					"inputFieldr2rml"); //$NON-NLS-1$
+
 		} catch (Exception e) {
 			throw new KettleException("Unable to load step from repository", e);
 		}
 	}
-	
 
 	/**
 	 * This method is called to determine the changes the step is making to the
@@ -374,30 +370,88 @@ public class RDFGenerationMeta extends BaseStepMeta implements
 			String output[], RowMetaInterface info) {
 
 		CheckResult cr;
-		
-//		inputFieldr2rml ="R2rml File";
-//		sqlvendor="";
-//		databaseURL="";
-//		databaseSchema="";
-//		userName="";
-//		password="";
-//		baseUri="http://foo.example/DB/";
-//		directorioOutputRDF="";
-//		format="";
 
 		// See if there are input streams leading to this step!
 		if (input.length > 0) {
 			cr = new CheckResult(CheckResult.TYPE_RESULT_OK,
 					BaseMessages.getString(PKG,
-							"Demo.CheckResult.ReceivingRows.OK"), stepMeta);
+							"RDFGeneration.CheckResult.ReceivingRows.OK"),
+					stepMeta);
 			remarks.add(cr);
 		} else {
 			cr = new CheckResult(CheckResult.TYPE_RESULT_ERROR,
 					BaseMessages.getString(PKG,
-							"Demo.CheckResult.ReceivingRows.ERROR"), stepMeta);
+							"RDFGeneration.CheckResult.ReceivingRows.ERROR"),
+					stepMeta);
 			remarks.add(cr);
 		}
 
+		// validacion de campos
+
+		if (inputFieldr2rml==null || inputFieldr2rml.equals("R2rml File")  ) {
+			cr = new CheckResult(CheckResult.TYPE_RESULT_ERROR,
+					BaseMessages.getString(PKG,
+							"RDFGeneration.CheckResult.FileR2rml"),
+					stepMeta);
+			remarks.add(cr);
+		}
+
+		if ( sqlvendor==null ||  sqlvendor.equals("") ) {
+			cr = new CheckResult(CheckResult.TYPE_RESULT_ERROR,
+					BaseMessages.getString(PKG,
+							"RDFGeneration.CheckResult.SQLVendor"),
+					stepMeta);
+			remarks.add(cr);
+		}
+
+		if ( databaseURL==null || databaseURL.equals("") ) {
+			cr = new CheckResult(CheckResult.TYPE_RESULT_ERROR,
+					BaseMessages.getString(PKG,
+							"RDFGeneration.CheckResult.DataBaseUri"),
+					stepMeta);
+			remarks.add(cr);
+		}
+
+		if (databaseSchema==null || databaseSchema.equals("")  ) {
+			cr = new CheckResult(CheckResult.TYPE_RESULT_ERROR,
+					BaseMessages.getString(PKG,
+							"RDFGeneration.CheckResult.dataBaseSchema"),
+					stepMeta);
+			remarks.add(cr);
+		}
+
+		if (userName==null || userName.equals("")  ) {
+			cr = new CheckResult(CheckResult.TYPE_RESULT_ERROR,
+					BaseMessages.getString(PKG,
+							"RDFGeneration.CheckResult.userName"),
+					stepMeta);
+			remarks.add(cr);
+		}
+
+		if (password==null || password.equals("")) {
+			cr = new CheckResult(CheckResult.TYPE_RESULT_ERROR,
+					BaseMessages.getString(PKG,
+							"RDFGeneration.CheckResult.Password"),
+					stepMeta);
+			remarks.add(cr);
+		}
+
+		if (directorioOutputRDF==null || directorioOutputRDF.equals("") ) {
+			cr = new CheckResult(CheckResult.TYPE_RESULT_ERROR,
+					BaseMessages.getString(PKG,
+							"RDFGeneration.CheckResult.outputRDFfiel"),
+					stepMeta);
+			remarks.add(cr);
+		}
+
+		if (format==null || format.equals("")) {
+			cr = new CheckResult(CheckResult.TYPE_RESULT_ERROR,
+					BaseMessages.getString(PKG,
+							"RDFGeneration.CheckResult.Formats"),
+					stepMeta);
+			remarks.add(cr);
+		}
+		
 	}
 
 	public String getInputFieldr2rml() {
@@ -479,7 +533,5 @@ public class RDFGenerationMeta extends BaseStepMeta implements
 	public void setStepName(String stepName) {
 		this.stepName = stepName;
 	}
-	
-	
 
 }
