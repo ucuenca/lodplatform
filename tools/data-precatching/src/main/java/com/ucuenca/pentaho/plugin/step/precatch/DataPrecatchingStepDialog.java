@@ -40,11 +40,14 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.pentaho.di.core.Const;
+import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.i18n.BaseMessages;
 import org.pentaho.di.trans.TransMeta;
 import org.pentaho.di.ui.trans.step.BaseStepDialog;
 import org.pentaho.di.trans.step.BaseStepMeta;
+import org.pentaho.di.trans.step.StepDataInterface;
 import org.pentaho.di.trans.step.StepDialogInterface;
+import org.pentaho.di.trans.step.StepMeta;
 
 import com.ucuenca.misctools.DatabaseLoader;
 
@@ -78,7 +81,9 @@ public class DataPrecatchingStepDialog extends BaseStepDialog implements StepDia
 	private DataPrecatchingStepMeta meta;
 
 	// text field holding the name of the field to add to the row stream
-	private Text wHelloFieldName;
+	private Text wHelloFieldName, wTableNameField; 
+	
+	private String dataStepName;
 
 	/**
 	 * The constructor should simply invoke super() and save the incoming meta
@@ -166,7 +171,7 @@ public class DataPrecatchingStepDialog extends BaseStepDialog implements StepDia
 		fdStepname.top = new FormAttachment(0, margin);
 		fdStepname.right = new FormAttachment(100, 0);
 		wStepname.setLayoutData(fdStepname);
-
+		
 		// output field value
 		Label wlValName = new Label(shell, SWT.RIGHT);
 		wlValName.setText(BaseMessages.getString(PKG, "DataPrecatching.FieldName.Label")); 
@@ -179,7 +184,7 @@ public class DataPrecatchingStepDialog extends BaseStepDialog implements StepDia
 
 		wHelloFieldName = new Text(shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
 		props.setLook(wHelloFieldName);
-		wHelloFieldName.setEnabled(false);
+		wHelloFieldName.setEditable(false);
 		wHelloFieldName.setText(DatabaseLoader.SQL_URI_CONNECTION + DatabaseLoader.SQL_SCHEMA);
 		wHelloFieldName.addModifyListener(lsMod);
 		FormData fdValName = new FormData();
@@ -187,6 +192,25 @@ public class DataPrecatchingStepDialog extends BaseStepDialog implements StepDia
 		fdValName.right = new FormAttachment(100, 0);
 		fdValName.top = new FormAttachment(wStepname, margin);
 		wHelloFieldName.setLayoutData(fdValName);
+		
+		// Database table name
+		Label wlTableName = new Label(shell, SWT.RIGHT);
+		wlTableName.setText(BaseMessages.getString(PKG, "DataPrecatching.TableName.Label")); 
+		props.setLook(wlTableName);
+		FormData fdlTableName = new FormData();
+		fdlTableName.left = new FormAttachment(0, 0);
+		fdlTableName.right = new FormAttachment(middle, -margin);
+		fdlTableName.top = new FormAttachment(wHelloFieldName, margin);
+		wlTableName.setLayoutData(fdlTableName);
+
+		wTableNameField = new Text(shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
+		props.setLook(wTableNameField);
+		wTableNameField.addModifyListener(lsMod);
+		FormData fdTableName = new FormData();
+		fdTableName.left = new FormAttachment(middle, 0);
+		fdTableName.right = new FormAttachment(100, 0);
+		fdTableName.top = new FormAttachment(wHelloFieldName, margin);
+		wTableNameField.setLayoutData(fdTableName);
 		      
 		// OK and cancel buttons
 		wOK = new Button(shell, SWT.PUSH);
@@ -194,7 +218,7 @@ public class DataPrecatchingStepDialog extends BaseStepDialog implements StepDia
 		wCancel = new Button(shell, SWT.PUSH);
 		wCancel.setText(BaseMessages.getString(PKG, "System.Button.Cancel")); 
 
-		BaseStepDialog.positionBottomButtons(shell, new Button[] { wOK, wCancel }, margin, wHelloFieldName);
+		BaseStepDialog.positionBottomButtons(shell, new Button[] { wOK, wCancel }, margin, wTableNameField);
 
 		// Add listeners for cancel and OK
 		lsCancel = new Listener() {
@@ -247,6 +271,15 @@ public class DataPrecatchingStepDialog extends BaseStepDialog implements StepDia
 	 */
 	private void populateDialog() {
 		wStepname.selectAll();
+		String[] dbResult = new String[2];
+		try {
+			dbResult =  this.getDBTableNameFromPreviousSteps(stepMeta);
+		}catch(KettleException e) {
+			
+		}
+		wTableNameField.setText( Const.nullToEmpty(dbResult[0]) );
+		wTableNameField.setEnabled( dbResult[0] == null );
+		this.dataStepName = dbResult[1];
 		//wHelloFieldName.setText(meta.getOutputField());	
 	}
 
@@ -269,10 +302,59 @@ public class DataPrecatchingStepDialog extends BaseStepDialog implements StepDia
 	private void ok() {
 		// The "stepname" variable will be the return value for the open() method. 
 		// Setting to step name from the dialog control
-		stepname = wStepname.getText(); 
+		if(changed) {
+			stepname = wStepname.getText();
+			meta.setDbTable( wTableNameField.getText() );
+		}
+		meta.setChanged(!dataStepName.equals(meta.getDataStepName()));
+		meta.setDataStepName(this.dataStepName);
 		// Setting the  settings to the meta object
 		//meta.setOutputField(wHelloFieldName.getText());
 		// close the SWT dialog window
 		dispose();
+	}
+	
+	/**
+	 * Lookup for the DB table name across the hop grid 
+	 * @param stepMeta base step meta
+	 * @param stepNameSetterMethod Name of the method in charge to set the data source step Name
+	 * @return table name
+	 * @throws KettleException
+	 */
+	private String[] getDBTableNameFromPreviousSteps(StepMeta stepMeta) throws KettleException{
+		String [] dbResult = new String[2];
+		for(StepMeta step: stepMeta.getParentTransMeta().findPreviousSteps(stepMeta)) { 
+			dbResult[0] = this.lookupGetterMethod(step.getName(), step.getStepMetaInterface().getStepData());
+			if(dbResult[0] != null) {
+				dbResult[1] = step.getName();
+				logBasic("DBTABLE FIELD FOUND ON " + dbResult[1] + " STEP DATA CLASS. VALUE ==> " + dbResult[0]);
+				break;
+			}
+			if(step.getParentTransMeta().findPreviousSteps(step).size() > 0) {
+				dbResult = this.getDBTableNameFromPreviousSteps(step);
+				if(dbResult[0] != null) break;
+			}
+		}
+		return dbResult;
+	}
+	
+	/**
+	 * Method in charge to lookup and execute the step getter method for DB table name
+	 * @param stepName Name of step involved
+	 * @param stepData step data interface
+	 * @return table name
+	 */
+	private String lookupGetterMethod(String stepName, StepDataInterface stepData) {
+		String value = null;
+		try {
+			value = (String)stepData.getClass().getField("DBTABLE").get(stepData);
+		}catch(NoSuchFieldException ne) {
+			logDebug("NO 'DBTABLE' FIELD FOUND ON " + stepName + " STEP DATA CLASS");
+		}catch(SecurityException se) {
+			logDebug("NO 'DBTABLE' PUBLIC FIELD FOUND ON " + stepName + " STEP DATA CLASS");
+		}catch(IllegalAccessException ae) {
+			logDebug(ae.getMessage());
+		}
+		return value;
 	}
 }

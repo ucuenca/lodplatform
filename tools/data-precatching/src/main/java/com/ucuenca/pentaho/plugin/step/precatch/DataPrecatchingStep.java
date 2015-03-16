@@ -136,7 +136,7 @@ public class DataPrecatchingStep extends BaseStep implements StepInterface {
 			first = false;
 			data.outputRowMeta = getInputRowMeta();
 			meta.getFields(data.outputRowMeta, getStepname(), null, null, null, null, null);
-			data.dataLoader = new StepDataLoader(this.stepDBTableLookup(this.getStepMeta()));
+			data.dataLoader = new StepDataLoader(meta.getDbTable());
 		}
 	    // no more input to be expected...
 	    if ( data.row == null ) {
@@ -173,6 +173,7 @@ public class DataPrecatchingStep extends BaseStep implements StepInterface {
 	 * @throws KettleException
 	 */
 	public void saveDataRow(DataPrecatchingStepMeta meta, DataPrecatchingStepData data) throws KettleException {
+		data.dataLoader.sequence++;
 		int dataIndex = 3;
 		Object[] outputRow = new Object[data.outputRowMeta.size() + dataIndex];
 		try {
@@ -184,58 +185,13 @@ public class DataPrecatchingStep extends BaseStep implements StepInterface {
 				}
 			}
 			outputRow[0] = this.getTransMeta().getName().toUpperCase();
-			outputRow[1] = meta.getParentStepMeta().getName().toUpperCase();
+			outputRow[1] = meta.getDataStepName() != null ? meta.getDataStepName().toUpperCase():
+				meta.getParentStepMeta().getName().toUpperCase();
 			outputRow[2] = Integer.valueOf(data.dataLoader.sequence);
 			data.dataLoader.insertTableRow(meta, outputRow);
 		} catch (Exception e) {
 			throw new KettleException(e);
 		}
-	}
-	
-	/**
-	 * Browse DB Table name on Previous Steps 
-	 * @param stepMeta
-	 * @return
-	 */
-	private String stepDBTableLookup(StepMeta stepMeta)throws KettleException {
-		String tableName = this.lookupGetterMethod(stepMeta.getName(), stepMeta.getStepMetaInterface().getStepData());
-		tableName = tableName == null ? this.getDBTableNameFromPreviousSteps(stepMeta):tableName;
-		if(tableName == null) {
-			throw new KettleException("NO 'DBTABLE' FIELD FOUND FROM " + stepMeta.getParentTransMeta().getName() + " STEP");
-		}
-		return tableName;
-	}
-	
-	private String getDBTableNameFromPreviousSteps(StepMeta stepMeta) {
-		String tableName = null;
-		for(StepMeta step: stepMeta.getParentTransMeta().findPreviousSteps(stepMeta)) { 
-			tableName = this.lookupGetterMethod(step.getName(), step.getStepMetaInterface().getStepData());
-			if(tableName != null) {
-				logBasic("DBTABLE FIELD FOUND ON " + step.getName() + " STEP DATA CLASS. VALUE ==> " + tableName);
-				break;
-			}
-			if(step.getParentTransMeta().findPreviousSteps(step).size() > 0) {
-				tableName = this.getDBTableNameFromPreviousSteps(step);
-				if(tableName != null) break;
-			}
-		}
-		return tableName;
-	}
-	
-	private String lookupGetterMethod(String stepName, StepDataInterface stepData) {
-		String value = null;
-		try {
-			value = (String)stepData.getClass().getField("DBTABLE").get(stepData);
-		}catch(NoSuchFieldException ne) {
-			//logError("NO 'DBTABLE' FIELD FOUND ON " + stepMeta.getName() + " STEP DATA CLASS");
-			logDebug("NO 'DBTABLE' FIELD FOUND ON " + stepName + " STEP DATA CLASS");
-		}catch(SecurityException se) {
-			//logError("NO 'DBTABLE' PUBLIC FIELD FOUND ON " + stepMeta.getName() + " STEP DATA CLASS");
-			logDebug("NO 'DBTABLE' PUBLIC FIELD FOUND ON " + stepName + " STEP DATA CLASS");
-		}catch(IllegalAccessException ae) {
-			logDebug(ae.getMessage());
-		}
-		return value;
 	}
 
 	/**
