@@ -22,6 +22,7 @@
 
 package com.ucuenca.pentaho.plugin.step.precatch;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -50,6 +51,7 @@ import org.pentaho.di.trans.step.StepDialogInterface;
 import org.pentaho.di.trans.step.StepInterface;
 import org.pentaho.di.trans.step.StepMeta;
 import org.pentaho.di.trans.step.StepMetaInterface;
+import org.pentaho.di.trans.step.errorhandling.StreamInterface;
 import org.pentaho.metastore.api.IMetaStore;
 import org.w3c.dom.Node;
 
@@ -81,6 +83,26 @@ public class DataPrecatchingStepMeta extends BaseStepMeta implements StepMetaInt
 
 	private RowMetaInterface rowMeta;
 	
+	private String dbTable;
+	
+	private String dataStepName;
+	
+	public String getDataStepName() {
+		return dataStepName;
+	}
+
+	public void setDataStepName(String dataStepName) {
+		this.dataStepName = dataStepName;
+	}
+
+	public String getDbTable() {
+		return dbTable;
+	}
+
+	public void setDbTable(String dbTable) {
+		this.dbTable = dbTable;
+	}
+
 	/**
 	 * Constructor should call super() to make sure the base class has a chance to initialize properly.
 	 */
@@ -97,16 +119,66 @@ public class DataPrecatchingStepMeta extends BaseStepMeta implements StepMetaInt
 	    return retval;
 	  }
 
-	  private void readData( Node stepnode ) {
+	  private void readData( Node stepnode ) throws KettleXMLException {
+		  try {
+				this.setDbTable( XMLHandler.getTagValue( stepnode, "DBTABLE" ));
+				this.setDataStepName( XMLHandler.getTagValue( stepnode, "dataStepName" ));
+		    } catch ( Exception e ) {
+		      throw new KettleXMLException( "Unable to load step info from XML", e );
+		    }
 	  }
+	  
+	  /**
+	 * This method is called by Spoon when a step needs to serialize its configuration to XML. The expected
+	 * return value is an XML fragment consisting of one or more XML tags.  
+	 * 
+	 * Please use org.pentaho.di.core.xml.XMLHandler to conveniently generate the XML.
+	 * 
+	 * @return a string containing the XML serialization of this step
+	 */
+	public String getXML() throws KettleValueException {
+		
+		StringBuffer retval = new StringBuffer( 300 );
+		retval.append( XMLHandler.addTagValue( "DBTABLE", this.getDbTable() ));
+		retval.append( XMLHandler.addTagValue( "dataStepName", this.getDataStepName() ));
+	    return retval.toString();
+	}
+	
+	/**
+	 * This method is called by PDI when a step needs to load its configuration from XML.
+	 * 
+	 * Please use org.pentaho.di.core.xml.XMLHandler to conveniently read from the
+	 * XML node passed in.
+	 * 
+	 * @param stepnode	the XML node containing the configuration
+	 * @param databases	the databases available in the transformation
+	 * @param counters	the counters available in the transformation
+	 */
+	public void loadXML(Node stepnode, List<DatabaseMeta> databases, Map<String, Counter> counters) throws KettleXMLException {
+		readData( stepnode );
+	}
 
 	  public void setDefault() {
 	  }
 
 	  public void readRep( Repository rep, IMetaStore metaStore, ObjectId id_step, List<DatabaseMeta> databases ) throws KettleException {
+		  try {
+				this.setDbTable( rep.getStepAttributeString( id_step, "DBTABLE" ));
+				this.setDataStepName( rep.getStepAttributeString( id_step, "dataStepName" ));
+				
+		    } catch ( Exception e ) {
+		      throw new KettleException( "Unexpected error reading step information from the repository", e );
+		    }
 	  }
 
 	  public void saveRep( Repository rep, IMetaStore metaStore, ObjectId id_transformation, ObjectId id_step ) throws KettleException {
+		  try {
+		      rep.saveStepAttribute( id_transformation, id_step, "DBTABLE", this.getDbTable() );
+		      rep.saveStepAttribute( id_transformation, id_step, "dataStepName", this.getDataStepName() );
+		      
+			} catch ( Exception e ) {
+			  throw new KettleException( "Unable to save step information to the repository for id_step=" + id_step, e );
+			}
 	  }
 
 	  public void getFields( RowMetaInterface rowMeta, String origin, RowMetaInterface[] info, StepMeta nextStep,
@@ -161,7 +233,7 @@ public class DataPrecatchingStepMeta extends BaseStepMeta implements StepMetaInt
 	  }
 
 	  public StepDataInterface getStepData() {
-	    return new DataPrecatchingStepData();
+	    return new DataPrecatchingStepData(this.dbTable);
 	  }
 
 
