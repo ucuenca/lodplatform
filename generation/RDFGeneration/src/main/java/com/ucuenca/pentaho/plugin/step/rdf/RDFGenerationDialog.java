@@ -23,6 +23,8 @@
 package com.ucuenca.pentaho.plugin.step.rdf;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
@@ -58,6 +60,8 @@ import org.pentaho.di.trans.TransMeta;
 import org.pentaho.di.ui.trans.step.BaseStepDialog;
 import org.pentaho.di.trans.step.BaseStepMeta;
 import org.pentaho.di.trans.step.StepDialogInterface;
+import org.pentaho.di.trans.step.StepMeta;
+import org.pentaho.di.trans.step.StepMetaInterface;
 
 import com.ucuenca.misctools.DatabaseLoader;
 import com.ucuenca.misctools.StepDataLoader;
@@ -133,12 +137,11 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 	// text field holding the name of the field to add to the row stream
 	private Text txtR2rmlfile;
 
-	private String sqlvendor;
-	private String outputFormat;
-
 	private Listener lsTest;
 
 	private Listener lsreuseConecction;
+
+	private TransMeta transMeta;
 
 	/**
 	 * The constructor should simply invoke super() and save the incoming meta
@@ -158,7 +161,7 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 			String sname) {
 		super(parent, (BaseStepMeta) in, transMeta, sname);
 		meta = (RDFGenerationMeta) in;
-
+		this.transMeta = transMeta;
 	}
 
 	/**
@@ -253,8 +256,6 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 		fdtxtR2rmlfile.top = new FormAttachment(wStepname, margin);
 		txtR2rmlfile.setLayoutData(fdtxtR2rmlfile);
 		txtR2rmlfile.setEditable(false);
-		
-	
 
 		btnloadFile = new Button(shell, SWT.PUSH);
 		props.setLook(btnloadFile);
@@ -296,13 +297,13 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 		cbmsqlvendor.addSelectionListener(new SelectionListener() {
 
 			public void widgetSelected(SelectionEvent selectionevent) {
-				sqlvendor = cbmsqlvendor.getText();
-				if (sqlvendor.equals("H2")) {
-					txtdatabaseUrl.setText("jdbc:h2:~/");					
-					
-				} else if (sqlvendor.equals("MySql")) {
+
+				if (cbmsqlvendor.getText().equals("H2")) {
+					txtdatabaseUrl.setText("jdbc:h2:~/");
+
+				} else if (cbmsqlvendor.getText().equals("MySql")) {
 					txtdatabaseUrl.setText("jdbc:mysql://localhost/");
-				} else if (sqlvendor.equals("PostgreSql")) {
+				} else if (cbmsqlvendor.getText().equals("PostgreSql")) {
 					txtdatabaseUrl.setText("jdbc:postgresql://localhost:5432/");
 				}
 				txtdatabaseUrl.setEditable(true);
@@ -310,7 +311,7 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 				txtdatabaseSchema.setEditable(true);
 				txtuserName.setText("");
 				txtuserName.setEditable(true);
-				txtpassword.setText("");		
+				txtpassword.setText("");
 				txtpassword.setEditable(true);
 			}
 
@@ -487,7 +488,7 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 		cbmoutputFormat.addSelectionListener(new SelectionListener() {
 
 			public void widgetSelected(SelectionEvent selectionevent) {
-				outputFormat = cbmoutputFormat.getText();
+				cbmoutputFormat.getText();
 			}
 
 			public void widgetDefaultSelected(SelectionEvent selectionevent) {
@@ -529,15 +530,16 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 
 		lsreuseConecction = new Listener() {
 			public void handleEvent(Event e) {
-		    cbmsqlvendor.select(0);
-			txtdatabaseUrl.setText(DatabaseLoader.SQL_URI_CONNECTION);
-			txtdatabaseUrl.setEditable(false);
-			txtdatabaseSchema.setText(DatabaseLoader.SQL_SCHEMA);
-			txtdatabaseSchema.setEditable(false);
-			txtuserName.setText(DatabaseLoader.SQL_USERNAME);
-			txtuserName.setEditable(false);
-			txtpassword.setText(DatabaseLoader.SQL_PASSWORD);		
-			txtpassword.setEditable(false);
+				cbmsqlvendor.select(0);
+				txtdatabaseUrl.setText(DatabaseLoader.SQL_URI_CONNECTION);
+				txtdatabaseUrl.setEditable(false);
+				txtdatabaseSchema.setText(DatabaseLoader.SQL_SCHEMA);
+				txtdatabaseSchema.setEditable(false);
+				txtuserName.setText(DatabaseLoader.SQL_USERNAME);
+				txtuserName.setEditable(false);
+				txtpassword.setText(DatabaseLoader.SQL_PASSWORD);
+				txtpassword.setEditable(false);
+				txtbaseUri.setText(lookupGetterMethod());
 			}
 		};
 
@@ -644,23 +646,23 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 			txtbaseUri.setText(meta.getBaseUri());
 		}
 		if (meta.getDirectorioOutputRDF() == null) {
-			txtoutputFileRDF.setText("");
+			txtoutputFileRDF.setText(lookupGetterMethod());
 		} else {
 			txtoutputFileRDF.setText(meta.getDirectorioOutputRDF());
 		}
 		if (meta.getSqlvendor() == null) {
 			cbmsqlvendor.setText("");
-			sqlvendor = "";
+
 		} else {
 			cbmsqlvendor.setText(meta.getSqlvendor());
-			sqlvendor = meta.getSqlvendor();
+
 		}
 		if (meta.getFormat() == null) {
 			cbmoutputFormat.setText("");
-			outputFormat = "";
+
 		} else {
 			cbmoutputFormat.setText(meta.getFormat());
-			outputFormat = meta.getFormat();
+
 		}
 
 		for (SqlVendor sql : SqlVendor.values()) {
@@ -722,7 +724,7 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 		try {
 			FileDialog dialog = new FileDialog(shell, 4096);
 			dialog.setText(BaseMessages.getString(PKG,
-					"GetPropertiesOWL.FieldName.Choose"));
+					"RDFGeneration.FileName.Choose"));
 			String result = dialog.open();
 			txtR2rmlfile.setText(result);
 		} catch (Exception e) {
@@ -733,7 +735,7 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 		try {
 			DirectoryDialog directorio = new DirectoryDialog(shell, 4096);
 			directorio.setText(BaseMessages.getString(PKG,
-					"GetPropertiesOWL.FieldName.Choose"));
+					"RDFGeneration.DirectoryName.Choose"));
 			String result = directorio.open();
 			txtoutputFileRDF.setText(result);
 		} catch (Exception e) {
@@ -803,11 +805,12 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 					"RDFGeneration.ERROR.MissingFileConnection"));
 			dialog.open();
 		} else {
-			if (sqlvendor.equals("H2")) {
+
+			if (cbmsqlvendor.getText().equals("H2")) {
 				sqlDriver = new DriverType("org.h2.Driver");
-			} else if (sqlvendor.equals("MySql")) {
+			} else if (cbmsqlvendor.getText().equals("MySql")) {
 				sqlDriver = new DriverType("com.mysql.jdbc.Driver");
-			} else if (sqlvendor.equals("PostgreSql")) {
+			} else if (cbmsqlvendor.getText().equals("PostgreSql")) {
 				sqlDriver = new DriverType("org.postgresql.Driver");
 			}
 		}
@@ -824,9 +827,39 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 				dialog.setMessage(BaseMessages.getString(PKG,
 						"RDFGeneration.SUCCESS.Connection"));
 				dialog.open();
-
+				logBasic("Succesful Connection");
 			}
 		}
 
+	}
+
+	private String lookupGetterMethod() {
+		String value = "";
+		for (StepMeta stepMeta : this.transMeta.findPreviousSteps(this.stepMeta)) {
+
+			StepMetaInterface stepMetaIn = stepMeta.getStepMetaInterface();
+
+			try {
+				for (Method method : stepMetaIn.getClass().getDeclaredMethods()) {
+					if (method.getName().equals("getMapBaseURI")) {
+						value = (String) method.invoke(stepMetaIn);
+						break;
+					}
+				}
+			} catch (IllegalAccessException ne) {
+				logBasic(ne.getMessage());
+				value="";
+			} catch (IllegalArgumentException se) {
+				logBasic(se.getMessage());
+				value="";
+			} catch (InvocationTargetException ae) {
+				logBasic(ae.getMessage());
+				value="";
+			} finally {
+				if (value != null)
+					break;			
+			}
+		}
+		return value;
 	}
 }
