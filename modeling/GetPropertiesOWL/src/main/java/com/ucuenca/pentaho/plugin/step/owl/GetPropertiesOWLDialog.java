@@ -23,7 +23,6 @@
 package com.ucuenca.pentaho.plugin.step.owl;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -46,9 +45,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
@@ -59,63 +56,19 @@ import org.eclipse.swt.widgets.Text;
 import org.pentaho.di.core.Const;
 import org.pentaho.di.i18n.BaseMessages;
 import org.pentaho.di.trans.TransMeta;
+import org.pentaho.di.ui.core.dialog.ErrorDialog;
 import org.pentaho.di.ui.core.widget.ColumnInfo;
 import org.pentaho.di.ui.core.widget.TableView;
 import org.pentaho.di.ui.trans.step.BaseStepDialog;
 import org.pentaho.di.trans.step.BaseStepMeta;
 import org.pentaho.di.trans.step.StepDialogInterface;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.ShellAdapter;
-import org.eclipse.swt.events.ShellEvent;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.swt.widgets.Text;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.pentaho.di.core.Const;
 import org.pentaho.di.core.exception.KettleException;
-import org.pentaho.di.core.row.RowMeta;
-import org.pentaho.di.core.row.RowMetaInterface;
-import org.pentaho.di.core.row.ValueMeta;
-import org.pentaho.di.core.row.ValueMetaInterface;
-import org.pentaho.di.i18n.BaseMessages;
-import org.pentaho.di.trans.TransMeta;
-import org.pentaho.di.ui.core.widget.ColumnInfo;
-import org.pentaho.di.ui.core.widget.TableView;
 import org.pentaho.di.ui.core.widget.TextVar;
-import org.pentaho.di.ui.trans.step.BaseStepDialog;
-import org.pentaho.di.trans.step.BaseStepMeta;
-import org.pentaho.di.trans.step.StepDialogInterface;
-
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import javax.net.ssl.HttpsURLConnection;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
@@ -337,12 +290,26 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 				data.getDataLoader().setStepName("GetPropertiesOWl");
 				data.getDataLoader().setDatabaseLoad(Boolean.TRUE);
 				
-				
-		
-			
-				//data.initOAIHarvester(meta, data);
-				new Thread(new DBLoader(data)).start();
-				
+				MessageBox dialog1 = new MessageBox(shell, SWT.ICON_WORKING | SWT.OK);
+				dialog1.setText("Dialog");						
+				dialog1.setMessage( BaseMessages.getString( PKG, "Precatching.StartDialog.Text") );   		    
+			    dialog1.open();
+				DBLoader dbloader = new DBLoader(data);
+				Thread thread = new Thread(dbloader);
+				thread.start();
+				try {
+					thread.join();
+					if( dbloader.status != null ) {
+						MessageBox dialog = new MessageBox(shell, SWT.ICON_INFORMATION | SWT.OK);
+						dialog.setText("Dialog");						
+						dialog.setMessage( BaseMessages.getString( PKG, "Precatching.FinishDialog.Text") );   		    
+					    dialog.open();
+					} else if(dbloader.exception != null){
+						new ErrorDialog(shell, "Dialog", "Message: ", dbloader.exception);
+					}
+				}catch(InterruptedException ie) {
+					ie.printStackTrace();
+				}
 			}
 		});
 		
@@ -502,6 +469,10 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 
 		private GetPropertiesOWLData data;
 		
+		String status;
+		
+		Exception exception;
+		
 		private DBLoader(GetPropertiesOWLData data) {
 			this.data = data;
 		}
@@ -514,13 +485,10 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 				}
 				data.getDataLoader().logBasic(BaseMessages.getString(PKG,
 						"GetPropertiesOWL.Dialog.TotalRequests.Label") + x);
+				status = "OK";
 			}catch(KettleException ex) {
 				ex.printStackTrace();
-				MessageBox dialog = 
-						  new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
-						dialog.setText("ERROR");						
-				dialog.setMessage(ex.getMessage());   		    
-			    dialog.open();
+				exception = ex;
 			}
 		}
 	}
