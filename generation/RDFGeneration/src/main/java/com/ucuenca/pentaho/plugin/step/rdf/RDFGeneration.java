@@ -22,7 +22,6 @@
 
 package com.ucuenca.pentaho.plugin.step.rdf;
 
-import java.io.File;
 import java.sql.SQLException;
 
 import net.antidot.semantic.rdf.model.impl.sesame.SesameDataSet;
@@ -32,8 +31,8 @@ import net.antidot.sql.model.core.SQLConnector;
 
 import org.openrdf.rio.RDFFormat;
 import org.pentaho.di.core.exception.KettleException;
-import org.pentaho.di.core.row.RowDataUtil;
 import org.pentaho.di.core.row.RowMeta;
+import org.pentaho.di.i18n.BaseMessages;
 
 import org.pentaho.di.trans.Trans;
 import org.pentaho.di.trans.TransMeta;
@@ -78,6 +77,9 @@ public class RDFGeneration extends BaseStep implements StepInterface {
 	 * @param dis
 	 *            transformation executing
 	 */
+
+	private static Class<?> PKG = RDFGenerationMeta.class;
+
 	public RDFGeneration(StepMeta s, StepDataInterface stepDataInterface,
 			int c, TransMeta t, Trans dis) {
 		super(s, stepDataInterface, c, t, dis);
@@ -172,76 +174,65 @@ public class RDFGeneration extends BaseStep implements StepInterface {
 			meta.getFields(data.outputRowMeta, getStepname(), null, null, this);
 		}
 
-		// My develop
+		if (meta.getInputFieldr2rml() == null || meta.getSqlvendor() == null
+				|| meta.getDatabaseURL() == null
+				|| meta.getDatabaseSchema() == null
+				|| meta.getUserName() == null || meta.getPassword() == null
+				|| meta.getDirectorioOutputRDF() == null
+				|| meta.getFormat() == null) {
+			logBasic(BaseMessages.getString(PKG,
+					"RDFGeneration.ERROR.MissingField"));
 
-		// Connect database
-		// conn = SQLConnector.connect(userName, password, url + dbName,
-		// driver);
-
-		try {
-			if (meta.getFormat().equals("TURTLE")) {
-				data.rdfFormat = RDFFormat.TURTLE;
-			} else if (meta.getFormat().equals("RDFXML")) {
-				data.rdfFormat = RDFFormat.RDFXML;
-			} else if (meta.getFormat().equals("NTRIPLES")) {
-				data.rdfFormat = RDFFormat.NTRIPLES;
-			} else if (meta.getFormat().equals("N3")) {
-				data.rdfFormat = RDFFormat.N3;
+		} else {
+			if (meta.getBaseUri() == null) {
+				meta.setBaseUri("");
 			}
-
-			if (meta.getSqlvendor().equals("H2")) {
-				data.sqlDriver = new DriverType("org.h2.Driver");
-			} else if (meta.getSqlvendor().equals("MySql")) {
-				data.sqlDriver = new DriverType("com.mysql.jdbc.Driver");
-			} else if (meta.getSqlvendor().equals("PostgreSql")) {
-				data.sqlDriver = new DriverType("org.postgresql.Driver");
-			}
-			data.conn = SQLConnector.connect(meta.getUserName(),
-					meta.getPassword(),
-					meta.getDatabaseURL() + meta.getDatabaseSchema(),
-					data.sqlDriver);
-
-			SesameDataSet g = null;
-
-			// File outputFile = new File(meta.getDirectorioOutputRDF() + "/"
-			// + meta.getName() + ".ttl");
-			// if (outputFile.exists()) {
-			// // log.error("Output file "
-			// // + outputFile.getAbsolutePath()
-			// // +
-			// //
-			// " already exists. Please remove it or modify ouput name option.");
-			// System.exit(-1);
-			// }
-			// // Extract database model
-			// // if (mode.equals("r2rml")){
-			g = R2RMLProcessor.convertDatabase(data.conn,
-					meta.getInputFieldr2rml(), meta.getBaseUri(),
-					data.sqlDriver);
-
-			g.dumpRDF(meta.getDirectorioOutputRDF() + "/" + meta.getStepName()
-					+ ".ttl", data.rdfFormat);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
 			try {
-				// Close db connection
-				data.conn.close();
-			} catch (SQLException e) {
+
+				if (meta.getFormat().equals("TURTLE")) {
+					data.rdfFormat = RDFFormat.TURTLE;
+				} else if (meta.getFormat().equals("RDFXML")) {
+					data.rdfFormat = RDFFormat.RDFXML;
+				} else if (meta.getFormat().equals("NTRIPLES")) {
+					data.rdfFormat = RDFFormat.NTRIPLES;
+				} else if (meta.getFormat().equals("N3")) {
+					data.rdfFormat = RDFFormat.N3;
+				}
+
+				if (meta.getSqlvendor().equals("H2")) {
+					data.sqlDriver = new DriverType("org.h2.Driver");
+				} else if (meta.getSqlvendor().equals("MySql")) {
+					data.sqlDriver = new DriverType("com.mysql.jdbc.Driver");
+				} else if (meta.getSqlvendor().equals("PostgreSql")) {
+					data.sqlDriver = new DriverType("org.postgresql.Driver");
+				}
+				data.conn = SQLConnector.connect(meta.getUserName(),
+						meta.getPassword(),
+						meta.getDatabaseURL() + meta.getDatabaseSchema(),
+						data.sqlDriver);
+
+				SesameDataSet g = null;
+
+				g = R2RMLProcessor.convertDatabase(data.conn,
+						meta.getInputFieldr2rml(), meta.getBaseUri(),
+						data.sqlDriver);
+
+				g.dumpRDF(
+						meta.getDirectorioOutputRDF() + "/"
+								+ meta.getStepName() + ".ttl", data.rdfFormat);
+
+			} catch (Exception e) {
 				e.printStackTrace();
+			} finally {
+				try {
+					// Close db connection
+					data.conn.close();
+				} catch (SQLException e) {
+					logBasic("expection" + e.getMessage());
+				}
 			}
 		}
 
-		// // safely add the string "Hello World!" at the end of the output row
-		// // the row array will be resized if necessary
-		// Object[] outputRow = RowDataUtil.addValueData(r,
-		// data.outputRowMeta.size() - 1, "Hello World!");
-		//
-		// // put the row to the output row stream
-		// putRow(data.outputRowMeta, outputRow);
-
-		// log progress if it is time to to so
 		if (checkFeedback(getLinesRead())) {
 			logBasic(meta.getDirectorioOutputRDF()); // Some basic logging
 		}

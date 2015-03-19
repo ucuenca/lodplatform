@@ -69,7 +69,8 @@
     		<library name="lib/slf4j-simple-1.6.1.jar"/>
     		<library name="lib/mysql-connector-java-5.1.25.jar"/>
     		<library name="lib/postgresql-9.1-901.jdbc4.jar"/>
-    		
+    		 <library name="lib/misctools-0.0.1-SNAPSHOT.jar"/>
+    		 <library name="lib/h2-1.4.184.jar"/>
     		
     		
 		<!-- specify additional jars to be included when loading the step plug-in -->

@@ -22,6 +22,9 @@
 
 package com.ucuenca.pentaho.plugin.step.rdf;
 
+import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
@@ -57,6 +60,11 @@ import org.pentaho.di.trans.TransMeta;
 import org.pentaho.di.ui.trans.step.BaseStepDialog;
 import org.pentaho.di.trans.step.BaseStepMeta;
 import org.pentaho.di.trans.step.StepDialogInterface;
+import org.pentaho.di.trans.step.StepMeta;
+import org.pentaho.di.trans.step.StepMetaInterface;
+
+import com.ucuenca.misctools.DatabaseLoader;
+import com.ucuenca.misctools.StepDataLoader;
 
 /**
  * This class is part of the demo step plug-in implementation. It demonstrates
@@ -129,12 +137,11 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 	// text field holding the name of the field to add to the row stream
 	private Text txtR2rmlfile;
 
-	private String sqlvendor;
-	private String outputFormat;
-
 	private Listener lsTest;
 
 	private Listener lsreuseConecction;
+
+	private TransMeta transMeta;
 
 	/**
 	 * The constructor should simply invoke super() and save the incoming meta
@@ -154,7 +161,7 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 			String sname) {
 		super(parent, (BaseStepMeta) in, transMeta, sname);
 		meta = (RDFGenerationMeta) in;
-
+		this.transMeta = transMeta;
 	}
 
 	/**
@@ -241,11 +248,14 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 		// txtR2rmlfile.setText(meta.getInputFieldr2rml());
 		props.setLook(txtR2rmlfile);
 		txtR2rmlfile.addModifyListener(lsMod);
+		txtR2rmlfile.setToolTipText(BaseMessages.getString(PKG,
+				"RDFGeneration.tooltip.FileR2rml"));
 		FormData fdtxtR2rmlfile = new FormData();
 		fdtxtR2rmlfile.left = new FormAttachment(middle, 0);
 		fdtxtR2rmlfile.right = new FormAttachment(80, 0);
 		fdtxtR2rmlfile.top = new FormAttachment(wStepname, margin);
 		txtR2rmlfile.setLayoutData(fdtxtR2rmlfile);
+		txtR2rmlfile.setEditable(false);
 
 		btnloadFile = new Button(shell, SWT.PUSH);
 		props.setLook(btnloadFile);
@@ -282,11 +292,27 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 		fbcbmsqlvendor.top = new FormAttachment(btnloadFile, margin);
 		fbcbmsqlvendor.right = new FormAttachment(80, -margin);
 		cbmsqlvendor.setLayoutData(fbcbmsqlvendor);
+		cbmsqlvendor.setEditable(false);
 		// cbmsqlvendor.setEnabled(false);
 		cbmsqlvendor.addSelectionListener(new SelectionListener() {
 
 			public void widgetSelected(SelectionEvent selectionevent) {
-				sqlvendor = cbmsqlvendor.getText();
+
+				if (cbmsqlvendor.getText().equals("H2")) {
+					txtdatabaseUrl.setText("jdbc:h2:~/");
+
+				} else if (cbmsqlvendor.getText().equals("MySql")) {
+					txtdatabaseUrl.setText("jdbc:mysql://localhost/");
+				} else if (cbmsqlvendor.getText().equals("PostgreSql")) {
+					txtdatabaseUrl.setText("jdbc:postgresql://localhost:5432/");
+				}
+				txtdatabaseUrl.setEditable(true);
+				txtdatabaseSchema.setText("");
+				txtdatabaseSchema.setEditable(true);
+				txtuserName.setText("");
+				txtuserName.setEditable(true);
+				txtpassword.setText("");
+				txtpassword.setEditable(true);
 			}
 
 			public void widgetDefaultSelected(SelectionEvent selectionevent) {
@@ -307,6 +333,8 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 		// txtdatabaseUrl.setText(meta.getDatabaseURL());
 		props.setLook(txtdatabaseUrl);
 		txtdatabaseUrl.addModifyListener(lsMod);
+		txtdatabaseUrl.setToolTipText(BaseMessages.getString(PKG,
+				"RDFGeneration.tooltip.BaseUrl"));
 		FormData fdtxtdatabaseUrl = new FormData();
 		fdtxtdatabaseUrl.left = new FormAttachment(middle, 0);
 		fdtxtdatabaseUrl.right = new FormAttachment(80, 0);
@@ -326,6 +354,8 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 		txtdatabaseSchema = new Text(shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
 		// txtdatabaseSchema.setText(meta.getDatabaseSchema());
 		props.setLook(txtdatabaseSchema);
+		txtdatabaseSchema.setToolTipText(BaseMessages.getString(PKG,
+				"RDFGeneration.tooltip.BaseSchema"));
 		txtdatabaseSchema.addModifyListener(lsMod);
 		FormData fddatabaseSchema = new FormData();
 		fddatabaseSchema.left = new FormAttachment(middle, 0);
@@ -393,6 +423,7 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 		fdbaseUri.right = new FormAttachment(80, 0);
 		fdbaseUri.top = new FormAttachment(txtpassword, margin);
 		txtbaseUri.setLayoutData(fdbaseUri);
+		txtbaseUri.setEditable(false);
 
 		lboutputFileRDF = new Label(shell, SWT.RIGHT);
 		lboutputFileRDF.setText(BaseMessages.getString(PKG,
@@ -413,6 +444,7 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 		fdtxtoutputrdf.right = new FormAttachment(80, 0);
 		fdtxtoutputrdf.top = new FormAttachment(txtbaseUri, margin);
 		txtoutputFileRDF.setLayoutData(fdtxtoutputrdf);
+		txtoutputFileRDF.setEditable(false);
 
 		btnloadDirectory = new Button(shell, SWT.PUSH);
 		props.setLook(btnloadDirectory);
@@ -451,11 +483,12 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 		fbcbmoutputFormat.top = new FormAttachment(btnloadDirectory, margin);
 		fbcbmoutputFormat.right = new FormAttachment(80, -margin);
 		cbmoutputFormat.setLayoutData(fbcbmoutputFormat);
+		cbmoutputFormat.setEditable(false);
 		// cbmoutputFormat.setEnabled(false);
 		cbmoutputFormat.addSelectionListener(new SelectionListener() {
 
 			public void widgetSelected(SelectionEvent selectionevent) {
-				outputFormat = cbmoutputFormat.getText();
+				cbmoutputFormat.getText();
 			}
 
 			public void widgetDefaultSelected(SelectionEvent selectionevent) {
@@ -476,27 +509,37 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 				try {
 					verificarConecction();
 				} catch (InstantiationException e1) {
-					
+
 					e1.printStackTrace();
 				} catch (IllegalAccessException e1) {
-					
+
 					e1.printStackTrace();
 				} catch (ClassNotFoundException e1) {
-										e1.printStackTrace();
+					e1.printStackTrace();
 				} catch (SQLException e1) {
 					e1.getMessage();
 					MessageBox dialog = new MessageBox(shell, SWT.ICON_ERROR);
 					dialog.setText("ERROR");
 					dialog.setMessage(BaseMessages.getString(PKG,
-							"OAILoader.Manager.ERRORURI"));
+							"RDFGeneration.ERROR.Connection"));
 					dialog.open();
+					logBasic("exception" + e1);
 				}
 			}
 		};
 
 		lsreuseConecction = new Listener() {
 			public void handleEvent(Event e) {
-				cancel();
+				cbmsqlvendor.select(0);
+				txtdatabaseUrl.setText(DatabaseLoader.SQL_URI_CONNECTION);
+				txtdatabaseUrl.setEditable(false);
+				txtdatabaseSchema.setText(DatabaseLoader.SQL_SCHEMA);
+				txtdatabaseSchema.setEditable(false);
+				txtuserName.setText(DatabaseLoader.SQL_USERNAME);
+				txtuserName.setEditable(false);
+				txtpassword.setText(DatabaseLoader.SQL_PASSWORD);
+				txtpassword.setEditable(false);
+				txtbaseUri.setText(lookupGetterMethod());
 			}
 		};
 
@@ -532,7 +575,6 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 				ok();
 			}
 		};
-
 
 		// Detect X or ALT-F4 or something that kills this window and cancel the
 		// dialog properly
@@ -573,56 +615,55 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 	private void populateDialog() {
 		wStepname.selectAll();
 
-		if (meta.getInputFieldr2rml()==null) {
+		if (meta.getInputFieldr2rml() == null) {
 			txtR2rmlfile.setText("");
 		} else {
 			txtR2rmlfile.setText(meta.getInputFieldr2rml());
 		}
-		if (meta.getDatabaseURL()==null) {
+		if (meta.getDatabaseURL() == null) {
 			txtdatabaseUrl.setText("");
 		} else {
 			txtdatabaseUrl.setText(meta.getDatabaseURL());
 		}
-		if (meta.getDatabaseSchema()==null) {
+		if (meta.getDatabaseSchema() == null) {
 			txtdatabaseSchema.setText("");
 		} else {
 			txtdatabaseSchema.setText(meta.getDatabaseSchema());
 		}
-		if (meta.getUserName()==null) {
+		if (meta.getUserName() == null) {
 			txtuserName.setText("");
 		} else {
 			txtuserName.setText(meta.getUserName());
 		}
-		if (meta.getPassword()==null) {
+		if (meta.getPassword() == null) {
 			txtpassword.setText("");
 		} else {
 			txtpassword.setText(meta.getPassword());
 		}
-		if (meta.getBaseUri()==null) {
+		if (meta.getBaseUri() == null) {
 			txtbaseUri.setText("");
 		} else {
 			txtbaseUri.setText(meta.getBaseUri());
 		}
-		if (meta.getDirectorioOutputRDF()==null) {
-			txtoutputFileRDF.setText("");
+		if (meta.getDirectorioOutputRDF() == null) {
+			txtoutputFileRDF.setText(lookupGetterMethod());
 		} else {
 			txtoutputFileRDF.setText(meta.getDirectorioOutputRDF());
 		}
-		if (meta.getSqlvendor()==null) {
+		if (meta.getSqlvendor() == null) {
 			cbmsqlvendor.setText("");
-			sqlvendor = "";
+
 		} else {
 			cbmsqlvendor.setText(meta.getSqlvendor());
-			sqlvendor = meta.getSqlvendor();
+
 		}
-		if (meta.getFormat()==null) {
+		if (meta.getFormat() == null) {
 			cbmoutputFormat.setText("");
-			outputFormat ="";
+
 		} else {
 			cbmoutputFormat.setText(meta.getFormat());
-			outputFormat = meta.getFormat();
-		}		
-		
+
+		}
 
 		for (SqlVendor sql : SqlVendor.values()) {
 			cbmsqlvendor.add(sql.getDriver());
@@ -683,7 +724,7 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 		try {
 			FileDialog dialog = new FileDialog(shell, 4096);
 			dialog.setText(BaseMessages.getString(PKG,
-					"GetPropertiesOWL.FieldName.Choose"));
+					"RDFGeneration.FileName.Choose"));
 			String result = dialog.open();
 			txtR2rmlfile.setText(result);
 		} catch (Exception e) {
@@ -694,7 +735,7 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 		try {
 			DirectoryDialog directorio = new DirectoryDialog(shell, 4096);
 			directorio.setText(BaseMessages.getString(PKG,
-					"GetPropertiesOWL.FieldName.Choose"));
+					"RDFGeneration.DirectoryName.Choose"));
 			String result = directorio.open();
 			txtoutputFileRDF.setText(result);
 		} catch (Exception e) {
@@ -748,29 +789,77 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 			IllegalAccessException, ClassNotFoundException, SQLException {
 
 		DriverType sqlDriver = null;
-		if (sqlvendor.equals("H2")) {
-			sqlDriver = new DriverType("org.h2.Driver");
-		} else if (sqlvendor.equals("MySql")) {
-			sqlDriver = new DriverType("com.mysql.jdbc.Driver");
-		} else if (sqlvendor.equals("PostgreSql")) {
-			sqlDriver = new DriverType("org.postgresql.Driver");
-		}
 
+		boolean helpFlag = true;
+
+		if (txtuserName.getText().equals("")
+				|| txtpassword.getText().equals("")
+				|| cbmsqlvendor.getText().equals("")
+				|| txtdatabaseUrl.getText().equals("")
+				|| txtdatabaseSchema.getText().equals("")) {
+
+			helpFlag = false;
+			MessageBox dialog = new MessageBox(shell, SWT.ERROR);
+			dialog.setText("ERROR");
+			dialog.setMessage(BaseMessages.getString(PKG,
+					"RDFGeneration.ERROR.MissingFileConnection"));
+			dialog.open();
+		} else {
+
+			if (cbmsqlvendor.getText().equals("H2")) {
+				sqlDriver = new DriverType("org.h2.Driver");
+			} else if (cbmsqlvendor.getText().equals("MySql")) {
+				sqlDriver = new DriverType("com.mysql.jdbc.Driver");
+			} else if (cbmsqlvendor.getText().equals("PostgreSql")) {
+				sqlDriver = new DriverType("org.postgresql.Driver");
+			}
+		}
 		// Open test database
 		Connection conn = null;
 
-		// Connect database
-		// conn = SQLConnector.connect(userName, password, url + dbName,
-		// driver);
-		conn = SQLConnector.connect(txtuserName.getText(),
-				txtpassword.getText(), txtdatabaseUrl.getText()+txtdatabaseSchema.getText(), sqlDriver);
-		if (conn != null) {
-			MessageBox dialog = new MessageBox(shell, SWT.OK);
-			dialog.setText("SUCCESS");
-			dialog.setMessage(BaseMessages.getString(PKG,
-					"OAILoader.Manager.ERRORURI"));
-			dialog.open();
+		if (helpFlag) {
+			conn = SQLConnector.connect(txtuserName.getText(),
+					txtpassword.getText(), txtdatabaseUrl.getText()
+							+ txtdatabaseSchema.getText(), sqlDriver);
+			if (conn != null) {
+				MessageBox dialog = new MessageBox(shell, SWT.OK);
+				dialog.setText("SUCCESS");
+				dialog.setMessage(BaseMessages.getString(PKG,
+						"RDFGeneration.SUCCESS.Connection"));
+				dialog.open();
+				logBasic("Succesful Connection");
+			}
 		}
 
+	}
+
+	private String lookupGetterMethod() {
+		String value = "";
+		for (StepMeta stepMeta : this.transMeta.findPreviousSteps(this.stepMeta)) {
+
+			StepMetaInterface stepMetaIn = stepMeta.getStepMetaInterface();
+
+			try {
+				for (Method method : stepMetaIn.getClass().getDeclaredMethods()) {
+					if (method.getName().equals("getMapBaseURI")) {
+						value = (String) method.invoke(stepMetaIn);
+						break;
+					}
+				}
+			} catch (IllegalAccessException ne) {
+				logBasic(ne.getMessage());
+				value="";
+			} catch (IllegalArgumentException se) {
+				logBasic(se.getMessage());
+				value="";
+			} catch (InvocationTargetException ae) {
+				logBasic(ae.getMessage());
+				value="";
+			} finally {
+				if (value != null)
+					break;			
+			}
+		}
+		return value;
 	}
 }
