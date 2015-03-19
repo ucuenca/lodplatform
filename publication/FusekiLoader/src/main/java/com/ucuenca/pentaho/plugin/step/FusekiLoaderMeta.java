@@ -82,6 +82,59 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 	 */
 	private String outputField;
 	private String directory;
+	private String inputName;
+	private String serviceName;
+	private String PortName;
+	private String fuQuery;
+	private String fuGraph;
+	private String fuDataset;
+	public String getPortName() {
+		return PortName;
+	}
+
+	public void setPortName(String portName) {
+		PortName = portName;
+	}
+
+	public String getInputName() {
+		return inputName;
+	}
+
+	public void setInputName(String inputName) {
+		this.inputName = inputName;
+	}
+
+	public String getServiceName() {
+		return serviceName;
+	}
+
+	public void setServiceName(String serviceName) {
+		this.serviceName = serviceName;
+	}
+
+	public String getFuQuery() {
+		return fuQuery;
+	}
+
+	public void setFuQuery(String fuQuery) {
+		this.fuQuery = fuQuery;
+	}
+
+	public String getFuGraph() {
+		return fuGraph;
+	}
+
+	public void setFuGraph(String fuGraph) {
+		this.fuGraph = fuGraph;
+	}
+
+	public String getFuDataset() {
+		return fuDataset;
+	}
+
+	public void setFuDataset(String fuDataset) {
+		this.fuDataset = fuDataset;
+	}
 
 	/**
 	 * Constructor should call super() to make sure the base class has a chance to initialize properly.
@@ -141,6 +194,10 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 	public void setDefault() {
 		outputField = " ";
 		directory = " ";
+		this.serviceName = "myservice";
+		this.inputName = "";
+		this.setPortName("3030");
+		
 	}
 	
 	/**
@@ -188,6 +245,14 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 		StringBuffer retval = new StringBuffer( 400 );
 		retval.append( "    " ).append( XMLHandler.addTagValue("outputfield", outputField));
 		retval.append( "    " ).append( XMLHandler.addTagValue("directory", directory));
+		retval.append( "    " ).append( XMLHandler.addTagValue("serviceName", serviceName));
+		retval.append( "    " ).append( XMLHandler.addTagValue("inputName", inputName));
+		retval.append( "    " ).append( XMLHandler.addTagValue("fuDataset",fuDataset));
+		retval.append( "    " ).append( XMLHandler.addTagValue("fuGraph",fuGraph));
+		retval.append( "    " ).append( XMLHandler.addTagValue("fuQuery",fuQuery));
+		retval.append( "    " ).append( XMLHandler.addTagValue("PortName",PortName));
+		
+	
 		return retval.toString();
 	}
 
@@ -206,6 +271,14 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 		try {
 			setOutputField(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "outputfield")));
 			setDirectory(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "directory")));
+			setServiceName(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "serviceName")));
+			setInputName(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "inputName")));
+			setFuDataset(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "fuDataset")));
+			setFuGraph(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "fuGraph")));
+			setFuQuery(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "fuQuery")));
+			setPortName(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "PortName")));
+			
+
 		} catch (Exception e) {
 			throw new KettleXMLException("FusekiLoader plugin unable to read step info from XML node", e);
 		}
@@ -224,6 +297,11 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 		try{
 			rep.saveStepAttribute(id_transformation, id_step, "outputfield", outputField); //$NON-NLS-1$
 			rep.saveStepAttribute(id_transformation, id_step, "directory", directory); //$NON-NLS-1$
+			rep.saveStepAttribute(id_transformation, id_step, "serviceName", serviceName); //$NON-NLS-1$
+			rep.saveStepAttribute(id_transformation, id_step, "fuDataset", fuDataset); //$NON-NLS-1$
+			rep.saveStepAttribute(id_transformation, id_step, "fuGraph", fuGraph); //$NON-NLS-1$
+			rep.saveStepAttribute(id_transformation, id_step, "fuQuery", fuQuery); //$NON-NLS-1$
+			rep.saveStepAttribute(id_transformation, id_step, "PortName", PortName);
 			
 		}
 		catch(Exception e){
@@ -244,6 +322,15 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 		try{
 			outputField  = rep.getStepAttributeString(id_step, "outputfield"); //$NON-NLS-1$
 			directory= rep.getStepAttributeString(id_step, "directory");
+			inputName= rep.getStepAttributeString(id_step, "inputName");
+			serviceName= rep.getStepAttributeString(id_step, "serviceName");
+			
+			fuDataset  = rep.getStepAttributeString(id_step, "fuDataset");
+			
+			
+			fuGraph  = rep.getStepAttributeString(id_step, "fuGraph");
+			fuQuery  = rep.getStepAttributeString(id_step, "fuQuery");
+			PortName = rep.getStepAttributeString(id_step, "PortName");
 		}
 		catch(Exception e){
 			throw new KettleException("Unable to load step from repository", e);

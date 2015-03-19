@@ -22,10 +22,16 @@
 
 package com.ucuenca.pentaho.plugin.step;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
@@ -176,9 +182,9 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 			
 			try{
 				
-			FileWriter out = new FileWriter("plugins/steps/FusekiLoader/fuseki/Data/myrdf.rdf" );
-			data.model.write(out, "RDF/XML");
-			logBasic("mapping RDf is Ok" );
+			FileWriter out = new FileWriter("plugins/steps/FusekiLoader/fuseki/Data/"+meta.getInputName() );
+			data.model.write(out, "TTL");
+			logBasic("mapping from "+meta.getOutputField()+" is Ok in "+"plugins/steps/FusekiLoader/fuseki/Data/"+meta.getInputName() );
 			}
         	catch (FileNotFoundException e) { System.out.println(e); } catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -186,8 +192,40 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 				logBasic(" ERROR " + e );
 			}
 
-			
+			//create mapping.ttl-------------------------------------
+			createmapping(meta);
+
+			logBasic(" config.ttl is ok " );
+
 			/**
+			try{
+		        String verify, putData;
+		        File file = new File("plugins/steps/FusekiLoader/fuseki/config.ttl");
+		        file.createNewFile();
+		        FileWriter fw = new FileWriter(file);
+		        BufferedWriter bw = new BufferedWriter(fw);
+		        bw.write("Some text here for a reason");
+		        bw.flush();
+
+		        FileReader fr = new FileReader(file);
+		        BufferedReader br = new BufferedReader(fr);
+
+		        while( (verify=br.readLine()) != null )
+		        { 
+		            if(verify != null)
+		            {
+		                putData = verify.replaceAll("here", "there");
+		                bw.write(putData);
+		            }
+		        }
+		        br.close();
+		        bw.close();
+
+		    }catch(IOException e){
+		    e.printStackTrace();
+		    }
+			*/
+			/**--------------------------------------------------
 			
 			 File oldFile1 = new File("plugins/steps/FusekiLoader/fuseki/fuseki-server2.jars");
 			
@@ -199,18 +237,28 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 	                // System.out.println("The File was not created.");
 	             }
 			*/
-			compile(meta.getDirectory());
+			//compile(meta.getDirectory());
 			
 			try {
+				/**
 				File source=new File("plugins/steps/FusekiLoader/fuseki.war");
 				File destination=new File(meta.getDirectory()+"/fuseki.war");
+				*/
 				
-				copyFile(source,destination);
-			       logBasic("The file was build succesfully in "+meta.getDirectory()+"/"+ "fuseki.war");
+				//create destination
+				File dir = new File(meta.getDirectory()+"/fuseki");
+				dir.mkdir();
+				//
+				File source=new File("plugins/steps/FusekiLoader/fuseki");
+				File destination=new File(meta.getDirectory()+"/fuseki");
+				
+				recursiveCopy(source, destination);
+				//copyFile(source,destination);
+			       logBasic("The file was build succesfully in "+meta.getDirectory()+"/"+ "fuseki");
 			          
-			} catch (IOException e1) {
+			} catch (Exception e1) {
 				// TODO Auto-generated catch block
-				logBasic(" ERROR " + e1 +"The File was not created. in "+meta.getDirectory()+"/"+ "fuseki.war");
+				logBasic(" ERROR " + e1 +"The File was not created. in "+meta.getDirectory()+"/"+ "fuseki");
 			}
 			/**
 			 File oldFile = new File("plugins/steps/FusekiLoader/fuseki.war");
@@ -242,6 +290,44 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 		return false;
 	}
 
+	private void createmapping(FusekiLoaderMeta meta) {
+		try
+	    {
+	    File file = new File("plugins/steps/FusekiLoader/fuseki/configO.ttl");
+	    BufferedReader reader = new BufferedReader(new FileReader(file));
+	    String line = "", oldtext = "";
+	    while((line = reader.readLine()) != null)
+	        {
+	        oldtext += line + "\r\n";
+	    }
+	    reader.close();
+	    // replace a word in a file
+	    String newtext = oldtext.replaceAll("mymodelname",meta.getServiceName());oldtext=newtext;
+	    newtext = oldtext.replaceAll("queryName",meta.getFuQuery());oldtext=newtext;
+	     newtext = oldtext.replaceAll("dataGraph",meta.getFuGraph());oldtext=newtext;
+	     newtext = oldtext.replaceAll("myds",meta.getFuDataset());oldtext=newtext;
+	     newtext = oldtext.replaceAll("books.ttl",meta.getInputName());oldtext=newtext;
+	     newtext = oldtext.replaceAll("myrdf.rdf",meta.getInputName());
+	
+	   
+	    //To replace a line in a file
+	    //String newtext = oldtext.replaceAll("This is test string 20000", "blah blah blah");
+	   
+	    FileWriter writer = new FileWriter("plugins/steps/FusekiLoader/fuseki/config.ttl");
+	    writer.write(newtext);writer.close();
+	}
+	catch (IOException ioe)
+	    {
+		logBasic(" ERROR " + ioe +"The File config.ttl was not created. ");
+	    ioe.printStackTrace();
+		
+		
+	}
+	
+
+		
+	}
+
 	/**
 	 * This method is called by PDI once the step is done processing. 
 	 * 
@@ -264,67 +350,61 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 		
 		super.dispose(meta, data);
 	}
-	private void compile(String direc)
-	   {
-		
-	        
-	       File buildFile = new File("\\plugins\\steps\\FusekiLoader\\axis_bujava.xml");
-	       //File buildFile = new File("/plugins/steps/FusekiLoader/axis_bujava.xml");
-		     
-	       Project antProject = new Project();
-	       
-	       DefaultLogger consoleLogger = new DefaultLogger();
-	       consoleLogger.setErrorPrintStream(System.err);
-	       consoleLogger.setOutputPrintStream(System.out);
-	       consoleLogger.setMessageOutputLevel(Project.MSG_INFO);
-	       antProject.addBuildListener(consoleLogger);
-	      try { 
-	    	  antProject.fireBuildStarted();
-	    	  
-	       antProject.setUserProperty("ant.file", buildFile.getAbsolutePath());
-	       antProject.init();
-	       ProjectHelper helper = ProjectHelper.getProjectHelper();
-	       antProject.addReference("ant.ProjectHelper", helper);
-	       helper.parse(antProject, buildFile);
-	       String target = "build-war";
-	       antProject.setUserProperty("build.dir", direc);
-	       antProject.executeTarget(target);
-	     
-	     
-	       antProject.fireBuildFinished(null);
-	   } catch (BuildException e) {
-		   antProject.fireBuildFinished(e);
-		   logBasic(" ERROR " + e );
-		  
-	    }
-	        
-	       }
-	
-	
-	public  void copyFile(File sourceFile, File destFile) throws IOException {
-	     if(!destFile.exists()) {
-	      destFile.createNewFile();
-	     }
 
-	     FileChannel source = null;
-	     FileChannel destination = null;
+	
+	
+	
+	private void recursiveCopy(File fSource, File fDest) {
 	     try {
-	      source = new RandomAccessFile(sourceFile,"rw").getChannel();
-	      destination = new RandomAccessFile(destFile,"rw").getChannel();
-
-	      long position = 0;
-	      long count    = source.size();
-
-	      source.transferTo(position, count, destination);
+	          if (fSource.isDirectory()) {
+	          // A simple validation, if the destination is not exist then create it
+	               if (!fDest.exists()) {
+	                    fDest.mkdirs();
+	               }
+	 
+	               // Create list of files and directories on the current source
+	               // Note: with the recursion 'fSource' changed accordingly
+	               String[] fList = fSource.list();
+	 
+	               for (int index = 0; index < fList.length; index++) {
+	                    File dest = new File(fDest, fList[index]);
+	                    File source = new File(fSource, fList[index]);
+	 
+	                    // Recursion call take place here
+	                    recursiveCopy(source, dest);
+	               }
+	          }
+	          else {
+	               // Found a file. Copy it into the destination, which is already created in 'if' condition above
+	 
+	               // Open a file for read and write (copy)
+	               FileInputStream fInStream = new FileInputStream(fSource);
+	               FileOutputStream fOutStream = new FileOutputStream(fDest);
+	 
+	               // Read 2K at a time from the file
+	               byte[] buffer = new byte[2048];
+	               int iBytesReads;
+	 
+	               // In each successful read, write back to the source
+	               while ((iBytesReads = fInStream.read(buffer)) >= 0) {
+	                    fOutStream.write(buffer, 0, iBytesReads);
+	               }
+	 
+	               // Safe exit
+	               if (fInStream != null) {
+	                    fInStream.close();
+	               }
+	 
+	               if (fOutStream != null) {
+	                    fOutStream.close();
+	               }
+	          }
 	     }
-	     finally {
-	      if(source != null) {
-	       source.close();
-	      }
-	      if(destination != null) {
-	       destination.close();
-	      }
-	    }
-	 }
+	     catch (Exception ex) {
+	          // Please handle all the relevant exceptions here
+	     }
+	}
+	
+
 
 }
