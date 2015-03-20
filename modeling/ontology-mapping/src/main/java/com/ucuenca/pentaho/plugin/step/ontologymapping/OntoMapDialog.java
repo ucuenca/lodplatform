@@ -22,7 +22,6 @@
 
 package com.ucuenca.pentaho.plugin.step.ontologymapping;
 
-import java.lang.reflect.InvocationTargetException;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,7 +51,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
@@ -63,18 +61,25 @@ import org.h2.jdbc.JdbcSQLException;
 import org.pentaho.di.core.Const;
 import org.pentaho.di.core.Props;
 import org.pentaho.di.core.exception.KettleException;
-import org.pentaho.di.core.row.RowMetaInterface;
 import org.pentaho.di.core.row.ValueMeta;
 import org.pentaho.di.i18n.BaseMessages;
+import org.pentaho.di.trans.Trans;
 import org.pentaho.di.trans.TransMeta;
+import org.pentaho.di.trans.TransPreviewFactory;
+import org.pentaho.di.ui.core.dialog.EnterNumberDialog;
+import org.pentaho.di.ui.core.dialog.EnterTextDialog;
+import org.pentaho.di.ui.core.dialog.ErrorDialog;
+import org.pentaho.di.ui.core.dialog.PreviewRowsDialog;
 import org.pentaho.di.ui.core.widget.ColumnInfo;
 import org.pentaho.di.ui.core.widget.ComboValuesSelectionListener;
 import org.pentaho.di.ui.core.widget.TableView;
+import org.pentaho.di.ui.trans.dialog.TransPreviewProgressDialog;
 import org.pentaho.di.ui.trans.step.BaseStepDialog;
 import org.pentaho.di.trans.step.BaseStepMeta;
 import org.pentaho.di.trans.step.StepDataInterface;
 import org.pentaho.di.trans.step.StepDialogInterface;
 import org.pentaho.di.trans.step.StepMeta;
+import org.pentaho.di.trans.step.StepMetaInterface;
 import org.pentaho.di.trans.step.errorhandling.StreamInterface;
 
 import com.ucuenca.misctools.DatabaseLoader;
@@ -109,10 +114,14 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	// the dialog writes the settings to it when confirmed 
 	private OntoMapMeta meta;
 	
+	String[] previousSteps;
+	
+	StepMeta rootDataStep;
+	
 	private Label wlStep1;
 	  private CCombo wStep1;
 	  private FormData fdlStep1, fdStep1;
-
+	
 	  private Label wlStep2;
 	  private CCombo wStep2;
 	  private FormData fdlStep2, fdStep2;
@@ -125,25 +134,25 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	  private Text wOutputDir;
 	  private FormData fdlOutputDir, fdOutputDir;
 	
-	private CTabFolder wTabFolder;
+	  private CTabFolder wTabFolder;
 	  private FormData fdTabFolder;
-
+	
 	  private CTabItem wClassifyTab, wAnnotateTab, wRelationTab;
-
+	
 	  private Composite wClassifyComp, wAnnotateComp, wRelationComp;
 	  private FormData fdClassifyComp, fdAnnotateComp, fdRelationComp;
 	  
 	  private Label wlAnnotate;
 	  private TableView wAnnTable;
 	  private FormData fdlAnnotate, fdAnnotate;
-
+	
 	  private Label wlRelation;
 	  private TableView wRelTable;
 	  private FormData fdlMeta, fdRelation;
 	  
-	  private Button wDelClassTable, wDelAnnTable, wDelRelTable;
-	  private FormData fdDelClassTable, fdDelAnnTable, fdDelRelTable;
-
+	  private Button wDelClassTable, wDelAnnTable, wDelRelTable, wFindOntStep, wPreview;
+	  private FormData fdDelClassTable, fdDelAnnTable, fdDelRelTable, fdFindOntStep, fdPreview;
+	
 	  private Label wlFields;
 	  private TableView wClassTable;
 	  private FormData fdlFields, fdFields;
@@ -248,7 +257,8 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 		};
 	    
 	 // Get the previous steps...
-	    String[] previousSteps = transMeta.getPrevStepNames( stepname );
+	    //String[] previousSteps = transMeta.getPrevStepNames( stepname );
+		this.setStepNames("");
 	    
 	    // First step
 	    wlStep1 = new Label( shell, SWT.RIGHT );
@@ -270,9 +280,28 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	    fdStep1 = new FormData();
 	    fdStep1.left = new FormAttachment( middle, 0 );
 	    fdStep1.top = new FormAttachment( wStepname, margin );
-	    fdStep1.right = new FormAttachment( 100, 0 );
+	    fdStep1.right = new FormAttachment( 80, 0 );
 	    wStep1.setLayoutData( fdStep1 );
 	    wStep1.addSelectionListener(inputStepLs);
+	    
+	    wFindOntStep = new Button( shell, SWT.PUSH );
+	    wFindOntStep.setText( BaseMessages.getString( PKG, "OntologyMapping.FindOntStep.Button" ) );
+	    fdFindOntStep = new FormData();
+	    fdFindOntStep.left = new FormAttachment( wStep1, 0 );
+	    fdFindOntStep.top = new FormAttachment( wStepname, margin );
+	    wFindOntStep.setLayoutData( fdFindOntStep );
+	    
+	    Listener lsFindOntStep = new Listener() {
+	      public void handleEvent( Event e ) {
+	    	  wStep1.setText("");
+	    	  findOntologyStep(stepMeta);
+	    	  if(wStep1.getText().equals("")) 
+	    		  new ErrorDialog(shell, BaseMessages.getString(PKG, "OntologyStep.ErrorDialog.Title"), 
+	    			  BaseMessages.getString(PKG, "OntologyStep.ErrorDialog.Label"), 
+	    			  new KettleException(BaseMessages.getString( PKG, "OntologyMapping.FindOntStep.Exception")));
+	      }
+	    };
+	    wFindOntStep.addListener( SWT.Selection, lsFindOntStep );
 
 	    // Second step
 	    wlStep2 = new Label( shell, SWT.RIGHT );
@@ -294,9 +323,23 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	    fdStep2 = new FormData();
 	    fdStep2.top = new FormAttachment( wStep1, margin );
 	    fdStep2.left = new FormAttachment( middle, 0 );
-	    fdStep2.right = new FormAttachment( 100, 0 );
+	    fdStep2.right = new FormAttachment( 80, 0 );
 	    wStep2.setLayoutData( fdStep2 );
 	    wStep2.addSelectionListener(inputStepLs);
+	    
+	    wPreview = new Button( shell, SWT.PUSH );
+	    wPreview.setText( BaseMessages.getString( PKG, "OntologyMapping.PreviewData.Button" ) );
+	    fdPreview = new FormData();
+	    fdPreview.left = new FormAttachment( wStep2, 0 );
+	    fdPreview.top = new FormAttachment( wStep1, margin );
+	    wPreview.setLayoutData( fdPreview );
+	    
+	    lsPreview = new Listener() {
+	      public void handleEvent( Event e ) {
+	        dataPreview();
+	      }
+	    };
+	    wPreview.addListener( SWT.Selection, lsPreview );
 	    
 	    wlBaseURI = new Label( shell, SWT.RIGHT  | SWT.MEDIUM);
 	    wlBaseURI.setText( BaseMessages.getString( PKG, "OntologyMapping.BaseURI.Label" ) );
@@ -313,7 +356,7 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	    fdBaseURI = new FormData();
 	    fdBaseURI.left = new FormAttachment( middle, 0 );
 	    fdBaseURI.top = new FormAttachment( wStep2, margin );
-	    fdBaseURI.right = new FormAttachment( 100, 0 );
+	    fdBaseURI.right = new FormAttachment( 80, 0 );
 	    wBaseURI.setLayoutData( fdBaseURI );
 	    wBaseURI.addSelectionListener(inputStepLs);
 	    
@@ -332,7 +375,7 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 		fdOutputDir=new FormData();
 		fdOutputDir.left = new FormAttachment(middle, 0);
 		fdOutputDir.top  = new FormAttachment(wBaseURI, margin);
-		fdOutputDir.right= new FormAttachment(98, 0);
+		fdOutputDir.right= new FormAttachment(80, 0);
 		wOutputDir.setLayoutData(fdOutputDir);
 		
 		wbOutputDir=new Button(shell, SWT.PUSH| SWT.CENTER);
@@ -340,7 +383,7 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 		wbOutputDir.setText( BaseMessages.getString( PKG, "OntologyMapping.OutputDir.Button" ) );
 		fdbOutputDir=new FormData();
 		//fdbOutputDir.left= new FormAttachment(100, margin);
-		fdbOutputDir.right= new FormAttachment(100, 0);
+		fdbOutputDir.left= new FormAttachment(wOutputDir, 0);
 		fdbOutputDir.top  = new FormAttachment(wBaseURI, margin);
 		wbOutputDir.setLayoutData(fdbOutputDir);
 
@@ -452,6 +495,7 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 				int[] filters = colNr == 6 ? new int[]{8,10}:(colNr == 8 ? new int[]{6,10}:new int[]{6,8});
 				
 				String stepName = wStep2.getText();
+				stepName = getRootStep( transMeta.findStep(stepName) ).getName();
 				String [] values = new String[]{"No fields found"};
 				try {
 					List<String> filter= new ArrayList<String>();
@@ -476,12 +520,14 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 				List<String> result = new ArrayList<String>();
 				String [] rsField = new String[]{"No values found"};
 				String fieldName = tableItem.getText(colNr-1).toUpperCase().replaceAll(" ", "_");
+				String stepName = wStep2.getText();
+				stepName = getRootStep( transMeta.findStep(stepName) ).getName();
 				if(dataCache.containsKey(fieldName)) {
 					rsField = dataCache.get(fieldName);
 				} else {
 					String sqlQuery = "SELECT DISTINCT " + fieldName 
 							+ " FROM " + meta.getDataDbTable() + " WHERE TRANSID ='" + transMeta.getName().toUpperCase() 
-							+ "' AND STEPID='" + meta.getDataStepName().toUpperCase() + "'";					
+							+ "' AND STEPID='" + stepName.toUpperCase() + "'";
 					try {
 						DatabaseLoader.getConnection();
 						ResultSet rs = DatabaseLoader.executeQuery(sqlQuery);
@@ -855,7 +901,7 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 		String ontologyStepName = wStep1.getText();
 		meta.setOntologyDbTable(this.stepDBTableLookup(transMeta.findStep(ontologyStepName), false, null));
 		meta.setOntologyStepName(ontologyStepName);		
-		String dataStepName = wStep2.getText();
+		String dataStepName = wStep2.getText();		
 		meta.setDataDbTable(this.stepDBTableLookup(transMeta.findStep(dataStepName), true, "setDataStepName"));
 		//meta.setDataStepName(dataStepName);
 		String baseURI = wBaseURI.getText();
@@ -864,13 +910,9 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 			throw new KettleException( BaseMessages.getString(PKG, "OntologyMapping.exception.baseURI") );
 		meta.setMapBaseURI(baseURI);
 		meta.setOutputDir(wOutputDir.getText());
+		meta.setOutFileName(stepname + "-R2RML.ttl");
 	}
 	
-	/**
-	 *  
-	 * @param stepMeta
-	 * @return
-	 */
 	/**
 	 * Browse DB Table name on Previous Steps
 	 * @param stepMeta Data step Meta
@@ -1181,5 +1223,106 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 		dialog.setMessage(msg);
 	    		    
 	    dialog.open();
+	}
+	
+	/**
+	 * Sets the list of steps available on the transformation
+	 * @param filter step to be filtered
+	 */
+	private void setStepNames(String filter) {
+	    previousSteps = transMeta.getStepNames();
+	    String[] nextSteps = transMeta.getNextStepNames( stepMeta );
+
+	    List<String> entries = new ArrayList<String>();
+	    for ( int i = 0; i < previousSteps.length; i++ ) {
+	      if ( !previousSteps[i].equals( stepname ) && !filter.equals(previousSteps[i]) ) {
+	        if ( nextSteps != null && nextSteps.length > 0 ) {
+	          for ( int j = 0; j < nextSteps.length; j++ ) {
+	            if ( !nextSteps[j].equals( previousSteps[i] ) ) {
+	              entries.add( previousSteps[i] );
+	            }
+	          }
+	        } else {
+	        	entries.add( previousSteps[i] );
+	        }
+	      }
+	    }
+	    previousSteps = entries.toArray( new String[entries.size()] );
+	}
+	
+	/**
+	 * Find the ontology PDI step if available
+	 * @param stepMeta base step to start looking backwards.
+	 */
+	private void findOntologyStep(StepMeta stepMeta) {
+		for(StepMeta step: stepMeta.getParentTransMeta().findPreviousSteps(stepMeta)) {
+			if(step.getStepMetaInterface().getClass().getCanonicalName()
+					.equals( "com.ucuenca.pentaho.plugin.step.owl.GetPropertiesOWLMeta" )) {
+				wStep1.setText(step.getName());
+				return;
+			}
+			if(step.getParentTransMeta().findPreviousSteps(step).size() > 0) {
+				this.findOntologyStep(step);
+			}
+		}
+	}
+	
+	/**
+	 * Data step preview process
+	 */
+	private void dataPreview() {
+		String stepName = wStep2.getText();
+		StepMeta rootStep = this.getRootStep(transMeta.findStep( stepName ));
+		/*StepMetaInterface metaDataInterface = transMeta.findStep( stepName ) != null ?
+				transMeta.findStep( stepName ).getStepMetaInterface():null;*/
+		stepName = rootStep.getName();
+		StepMetaInterface metaDataInterface = rootStep.getStepMetaInterface();
+		if(metaDataInterface != null) {
+		    try {
+		      TransMeta previewMeta = TransPreviewFactory.generatePreviewTransformation(this.transMeta, metaDataInterface, stepName);
+	
+		      EnterNumberDialog numberDialog = new EnterNumberDialog(this.shell, this.props.getDefaultPreviewSize(), "Preview", "Number of row to Preview");
+		      int previewSize = numberDialog.open();
+		      if (previewSize > 0) {
+		        TransPreviewProgressDialog progressDialog = new TransPreviewProgressDialog(this.shell, previewMeta, new String[] { stepName }, new int[] { previewSize });
+		        progressDialog.open();
+	
+		        Trans trans = progressDialog.getTrans();
+		        String loggingText = progressDialog.getLoggingText();
+	
+		        if ((!progressDialog.isCancelled()) && 
+		          (trans.getResult() != null) && (trans.getResult().getNrErrors() > 0L)) {
+		          EnterTextDialog etd = new EnterTextDialog(this.shell, "Error", "An Error was caused by", loggingText, true);
+	
+		          etd.setReadOnly();
+		          etd.open();
+		        }
+	
+		        PreviewRowsDialog prd = new PreviewRowsDialog(this.shell, this.transMeta, 0, stepName, progressDialog.getPreviewRowsMeta(stepName), progressDialog.getPreviewRows(stepName), loggingText);
+		        prd.open();
+		      }
+		    } catch (Exception e) {
+		      new ErrorDialog(this.shell, "Error Dialog", "Message: ", e);
+		    }
+		}
+	  }
+	
+	/**
+	 * Get the root step from a base step
+	 * @param stepMeta base step
+	 * @return root step
+	 */
+	private StepMeta getRootStep(StepMeta stepMeta) {
+		StepMeta rootStep = null;
+		for(StepMeta step: stepMeta.getParentTransMeta().findPreviousSteps(stepMeta)) { 
+			if(step.getParentTransMeta().findPreviousSteps(step).size() > 0) {
+				rootStep = this.getRootStep(step);
+				if(rootStep != null) break;
+			} else {
+				rootStep = step;
+				break;
+			}
+		}
+		return rootStep;
 	}
 }
