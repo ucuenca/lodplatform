@@ -295,6 +295,10 @@ public class GetPropertiesOWLMeta extends BaseStepMeta implements StepMetaInterf
 			throw new KettleException("Unable to load step from repository", e);
 		}
 	}
+	
+	public void getFields(RowMetaInterface r, String origin, RowMetaInterface[] info, StepMeta nextStep, VariableSpace space) throws KettleStepException {
+		this.getFields(r, origin, info, nextStep, space, null, null);
+	}
 
 	/**
 	 * This method is called to determine the changes the step is making to the row-stream.
