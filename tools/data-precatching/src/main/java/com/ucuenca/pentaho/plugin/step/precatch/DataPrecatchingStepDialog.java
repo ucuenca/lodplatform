@@ -271,7 +271,7 @@ public class DataPrecatchingStepDialog extends BaseStepDialog implements StepDia
 	 */
 	private void populateDialog() {
 		wStepname.selectAll();
-		String[] dbResult = new String[2];
+		String[] dbResult = new String[2]; 
 		try {
 			dbResult =  this.getDBTableNameFromPreviousSteps(stepMeta);
 		}catch(KettleException e) {
@@ -279,8 +279,7 @@ public class DataPrecatchingStepDialog extends BaseStepDialog implements StepDia
 		}
 		wTableNameField.setText( Const.nullToEmpty(dbResult[0]) );
 		wTableNameField.setEnabled( dbResult[0] == null );
-		this.dataStepName = dbResult[1];
-		//wHelloFieldName.setText(meta.getOutputField());	
+		this.dataStepName = dbResult[1];	
 	}
 
 	/**
@@ -302,22 +301,19 @@ public class DataPrecatchingStepDialog extends BaseStepDialog implements StepDia
 	private void ok() {
 		// The "stepname" variable will be the return value for the open() method. 
 		// Setting to step name from the dialog control
+		stepname = wStepname.getText();
 		if(changed) {
-			stepname = wStepname.getText();
 			meta.setDbTable( wTableNameField.getText() );
 		}
 		meta.setChanged(!dataStepName.equals(meta.getDataStepName()));
-		meta.setDataStepName(this.dataStepName);
-		// Setting the  settings to the meta object
-		//meta.setOutputField(wHelloFieldName.getText());
-		// close the SWT dialog window
+		//meta.setDataStepName(this.dataStepName);
+		meta.setDataStepName(stepname);
 		dispose();
 	}
 	
 	/**
 	 * Lookup for the DB table name across the hop grid 
 	 * @param stepMeta base step meta
-	 * @param stepNameSetterMethod Name of the method in charge to set the data source step Name
 	 * @return table name
 	 * @throws KettleException
 	 */
