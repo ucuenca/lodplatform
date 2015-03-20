@@ -36,6 +36,7 @@ import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.core.exception.KettleStepException;
 import org.pentaho.di.core.exception.KettleValueException;
 import org.pentaho.di.core.exception.KettleXMLException;
+import org.pentaho.di.core.row.RowMeta;
 import org.pentaho.di.core.row.RowMetaInterface;
 import org.pentaho.di.core.row.ValueMeta;
 import org.pentaho.di.core.row.ValueMetaInterface;
@@ -94,8 +95,17 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 	  private String mapBaseURI;
 	  private String outputDir;
 	  private List<String> sqlStack = new ArrayList<String>();
+	  private String outFileName;
 
 	  
+	public String getOutFileName() {
+		return outFileName;
+	}
+
+	public void setOutFileName(String outFileName) {
+		this.outFileName = outFileName;
+	}
+
 	public String getOutputDir() {
 		return outputDir;
 	}
@@ -217,6 +227,7 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 	 */
 	private void readData( Node stepnode ) throws KettleXMLException {
 	    try {
+	    	
 	      List<StreamInterface> infoStreams = getStepIOMeta().getInfoStreams();
 	      infoStreams.get( 0 ).setSubject( XMLHandler.getTagValue( stepnode, "ontologiesStep" ) );
 	      infoStreams.get( 1 ).setSubject( XMLHandler.getTagValue( stepnode, "dataStep" ) );
@@ -230,6 +241,7 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 			sqlStack = sqlStack.substring(1, sqlStack.length()-1);
 			this.setSqlStack( Arrays.asList( sqlStack.split(",\\s") ) );
 			this.setOutputDir( XMLHandler.getTagValue( stepnode, "outputDir" ) );
+			this.setOutFileName( XMLHandler.getTagValue( stepnode, "outFileName" ) );
 	      
 	    } catch ( Exception e ) {
 	      throw new KettleXMLException( "Unable to load step info from XML", e );
@@ -254,6 +266,7 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 		retval.append( XMLHandler.addTagValue( "dataDBTable", this.getDataDbTable() ));
 		retval.append( XMLHandler.addTagValue( "mapBaseURI", this.getMapBaseURI() ));
 		retval.append( XMLHandler.addTagValue( "outputDir", this.getOutputDir() ));
+		retval.append( XMLHandler.addTagValue( "outFileName", this.getOutFileName() ));
 		retval.append( XMLHandler.addTagValue( "sqlStack", this.getSqlStack().toString()));
 
 	    return retval.toString();
@@ -290,6 +303,7 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 	      rep.saveStepAttribute( id_transformation, id_step, "dataDBTable", this.getDataDbTable() );
 	      rep.saveStepAttribute( id_transformation, id_step, "mapBaseURI", this.getMapBaseURI() );
 	      rep.saveStepAttribute( id_transformation, id_step, "outputDir", this.getOutputDir() );
+	      rep.saveStepAttribute( id_transformation, id_step, "outFileName", this.getOutFileName() );
 	      rep.saveStepAttribute( id_transformation, id_step, "sqlStack", this.getSqlStack().toString() );
 	      
 	    } catch ( Exception e ) {
@@ -314,6 +328,7 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 			this.setDataDbTable( rep.getStepAttributeString( id_step, "dataDBTable" ) );
 			this.setMapBaseURI( rep.getStepAttributeString( id_step, "mapBaseURI" ) );
 			this.setOutputDir( rep.getStepAttributeString( id_step, "outputDir" ) );
+			this.setOutFileName( rep.getStepAttributeString( id_step, "outFileName" ) );
 			String sqlStack = rep.getStepAttributeString( id_step, "sqlStack" );
 			sqlStack = sqlStack.substring(1, sqlStack.length()-1);
 			this.setSqlStack( Arrays.asList( sqlStack.split(",\\s") ) );
@@ -343,7 +358,8 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 	  public void resetStepIoMeta() {
 	    // Don't reset!
 	  }
-
+	  
+	
 	/**
 	 * This method is called to determine the changes the step is making to the row-stream.
 	 * To that end a RowMetaInterface object is passed in, containing the row-stream structure as it is when entering
@@ -358,7 +374,7 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 	 */
 	public void getFields( RowMetaInterface r, String origin, RowMetaInterface[] info, StepMeta nextStep,
 		    VariableSpace space, Repository repository, IMetaStore metaStore ) throws KettleStepException {
-	        
+
 	        ValueMetaInterface id = new ValueMeta(BaseMessages.getString(PKG, "OntologyMapping.Table.Field.Subject"), ValueMetaInterface.TYPE_STRING);
 			id.setOrigin(origin);
 			id.setLength(1000);
@@ -375,6 +391,13 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 			data.setLength(10000);
 			r.addValueMeta(data);
 		
+	}
+	
+	public void getFields(RowMetaInterface r, String origin, RowMetaInterface[] info, StepMeta nextStep, VariableSpace space) throws KettleStepException {
+		r.clear();
+		RowMeta rowMeta = new RowMeta();
+		this.getFields(rowMeta, origin, info, nextStep, space, null, null);
+		r.addRowMeta(rowMeta);
 	}
 
 	/**

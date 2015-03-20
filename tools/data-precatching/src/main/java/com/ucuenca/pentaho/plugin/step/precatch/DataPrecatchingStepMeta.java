@@ -87,6 +87,16 @@ public class DataPrecatchingStepMeta extends BaseStepMeta implements StepMetaInt
 	
 	private String dataStepName;
 	
+	private String stepName;
+	
+	public String getStepName() {
+		return stepName;
+	}
+
+	public void setStepName(String stepName) {
+		this.stepName = stepName;
+	}
+
 	public String getDataStepName() {
 		return dataStepName;
 	}
@@ -123,6 +133,7 @@ public class DataPrecatchingStepMeta extends BaseStepMeta implements StepMetaInt
 		  try {
 				this.setDbTable( XMLHandler.getTagValue( stepnode, "DBTABLE" ));
 				this.setDataStepName( XMLHandler.getTagValue( stepnode, "dataStepName" ));
+				this.setStepName( XMLHandler.getTagValue( stepnode, "stepName" ));
 		    } catch ( Exception e ) {
 		      throw new KettleXMLException( "Unable to load step info from XML", e );
 		    }
@@ -141,6 +152,7 @@ public class DataPrecatchingStepMeta extends BaseStepMeta implements StepMetaInt
 		StringBuffer retval = new StringBuffer( 300 );
 		retval.append( XMLHandler.addTagValue( "DBTABLE", this.getDbTable() ));
 		retval.append( XMLHandler.addTagValue( "dataStepName", this.getDataStepName() ));
+		retval.append( XMLHandler.addTagValue( "stepName", this.getStepName() ));
 	    return retval.toString();
 	}
 	
@@ -165,6 +177,7 @@ public class DataPrecatchingStepMeta extends BaseStepMeta implements StepMetaInt
 		  try {
 				this.setDbTable( rep.getStepAttributeString( id_step, "DBTABLE" ));
 				this.setDataStepName( rep.getStepAttributeString( id_step, "dataStepName" ));
+				this.setStepName( rep.getStepAttributeString( id_step, "stepName" ));
 				
 		    } catch ( Exception e ) {
 		      throw new KettleException( "Unexpected error reading step information from the repository", e );
@@ -175,6 +188,7 @@ public class DataPrecatchingStepMeta extends BaseStepMeta implements StepMetaInt
 		  try {
 		      rep.saveStepAttribute( id_transformation, id_step, "DBTABLE", this.getDbTable() );
 		      rep.saveStepAttribute( id_transformation, id_step, "dataStepName", this.getDataStepName() );
+		      rep.saveStepAttribute( id_transformation, id_step, "stepName", this.getStepName() );
 		      
 			} catch ( Exception e ) {
 			  throw new KettleException( "Unable to save step information to the repository for id_step=" + id_step, e );

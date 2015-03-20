@@ -137,6 +137,7 @@ public class DataPrecatchingStep extends BaseStep implements StepInterface {
 			data.outputRowMeta = getInputRowMeta();
 			meta.getFields(data.outputRowMeta, getStepname(), null, null, null, null, null);
 			data.dataLoader = new StepDataLoader(meta.getDbTable());
+			data.dataLoader.setBaseStep(this);
 		}
 	    // no more input to be expected...
 	    if ( data.row == null ) {

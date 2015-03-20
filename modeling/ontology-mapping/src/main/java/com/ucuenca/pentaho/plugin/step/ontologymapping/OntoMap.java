@@ -22,12 +22,10 @@
 
 package com.ucuenca.pentaho.plugin.step.ontologymapping;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import org.pentaho.di.core.exception.KettleException;
-import org.pentaho.di.core.row.RowMeta;
 import org.pentaho.di.trans.Trans;
 import org.pentaho.di.trans.TransMeta;
 import org.pentaho.di.trans.step.BaseStep;
@@ -65,8 +63,7 @@ public class OntoMap extends BaseStep implements StepInterface {
 	private OntoMapMeta meta;
 	private OntoMapData data;
 	
-	private Iterator rowIter;
-
+	private Iterator<String[]> rowIter;
 	/**
 	 * The constructor should simply pass on its arguments to the parent class.
 	 * 
@@ -102,13 +99,14 @@ public class OntoMap extends BaseStep implements StepInterface {
 	 * @return true if initialization completed successfully, false if there was an error preventing the step from working. 
 	 *  
 	 */
+	/*
 	public boolean init(StepMetaInterface smi, StepDataInterface sdi) {
 		// Casting to step-specific implementation classes is safe
 		meta = (OntoMapMeta) smi;
 	    data = (OntoMapData) sdi;
 	    
 	    return super.init( smi, sdi );
-	}
+	}*/
 
 	/**
 	 * Once the transformation starts executing, the processRow() method is called repeatedly
@@ -135,15 +133,17 @@ public class OntoMap extends BaseStep implements StepInterface {
 		Boolean hasMoreData = Boolean.TRUE;
 		if (first) {
 			first = false;
-			data.outputRowMeta = new RowMeta();
-			meta.getFields(data.outputRowMeta, getStepname(), null, null, this, null, null);
-			
+			super.init( smi, sdi );
+			getRow();
+			data.outputRowMeta = getInputRowMeta().clone();
+			meta.getFields(data.outputRowMeta, getStepname(), null, null, this);
+
 			R2RMLGenerator r2rmlParser = new R2RMLGenerator(smi, sdi);
 			r2rmlParser.process();
 			List<String[]> rowSet = r2rmlParser.getModelSentences();
-			this.rowIter = rowSet.iterator();
-			
+			this.rowIter = rowSet.iterator();	
 		}
+		
 		if(rowIter.hasNext()) {
 			putRow(data.outputRowMeta, ((Object[])rowIter.next()) );
 			
