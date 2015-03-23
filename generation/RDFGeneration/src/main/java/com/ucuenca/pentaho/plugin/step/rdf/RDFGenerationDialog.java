@@ -423,7 +423,6 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 		fdbaseUri.right = new FormAttachment(80, 0);
 		fdbaseUri.top = new FormAttachment(txtpassword, margin);
 		txtbaseUri.setLayoutData(fdbaseUri);
-		txtbaseUri.setEditable(false);
 
 		lboutputFileRDF = new Label(shell, SWT.RIGHT);
 		lboutputFileRDF.setText(BaseMessages.getString(PKG,
@@ -530,17 +529,48 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 
 		lsreuseConecction = new Listener() {
 			public void handleEvent(Event e) {
-				cbmsqlvendor.select(0);
-				txtdatabaseUrl.setText(DatabaseLoader.SQL_URI_CONNECTION);
-				txtdatabaseUrl.setEditable(false);
-				txtdatabaseSchema.setText(DatabaseLoader.SQL_SCHEMA);
-				txtdatabaseSchema.setEditable(false);
-				txtuserName.setText(DatabaseLoader.SQL_USERNAME);
-				txtuserName.setEditable(false);
-				txtpassword.setText(DatabaseLoader.SQL_PASSWORD);
-				txtpassword.setEditable(false);
-				txtbaseUri.setText(lookupGetterMethod());
+				if (!transMeta.findPreviousSteps(stepMeta).isEmpty()) {
+
+					String directorio = lookupGetterMethod("getOutputDir");
+					String filename = lookupGetterMethod("getOutFileName");
+					String baUri = lookupGetterMethod("getMapBaseURI");
+
+					cbmsqlvendor.select(0);
+					if (!directorio.equals("") && !filename.equals("")
+							&& !baUri.equals("")) {
+						txtR2rmlfile.setText(directorio
+								+ System.getProperty("file.separator")
+								+ filename);
+						txtbaseUri.setText(baUri);
+						txtbaseUri.setEditable(false);
+
+						txtdatabaseUrl.setText(DatabaseLoader.SQL_URI_CONNECTION);
+						txtdatabaseUrl.setEditable(false);
+						txtdatabaseSchema.setText(DatabaseLoader.SQL_SCHEMA);
+						txtdatabaseSchema.setEditable(false);
+						txtuserName.setText(DatabaseLoader.SQL_USERNAME);
+						txtuserName.setEditable(false);
+						txtpassword.setText(DatabaseLoader.SQL_PASSWORD);
+						txtpassword.setEditable(false);
+					}
+					else{						
+						MessageBox dialog = new MessageBox(shell, SWT.ICON_ERROR);
+						dialog.setText("ERROR");
+						dialog.setMessage(BaseMessages.getString(PKG,
+								"RDFGeneration.ERROR.PreviewStepOntology"));
+						dialog.open();
+					}
+					
+
+				} else {
+					MessageBox dialog = new MessageBox(shell, SWT.ICON_ERROR);
+					dialog.setText("ERROR");
+					dialog.setMessage(BaseMessages.getString(PKG,
+							"RDFGeneration.ERROR.PreviewStep"));
+					dialog.open();
+				}
 			}
+
 		};
 
 		btnTest.addListener(SWT.Selection, lsTest);
@@ -646,7 +676,7 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 			txtbaseUri.setText(meta.getBaseUri());
 		}
 		if (meta.getDirectorioOutputRDF() == null) {
-			txtoutputFileRDF.setText(lookupGetterMethod());
+			txtoutputFileRDF.setText("");
 		} else {
 			txtoutputFileRDF.setText(meta.getDirectorioOutputRDF());
 		}
@@ -833,31 +863,32 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 
 	}
 
-	private String lookupGetterMethod() {
+	private String lookupGetterMethod(String nameMethod) {
 		String value = "";
-		for (StepMeta stepMeta : this.transMeta.findPreviousSteps(this.stepMeta)) {
+		for (StepMeta stepMeta : this.transMeta
+				.findPreviousSteps(this.stepMeta)) {
 
 			StepMetaInterface stepMetaIn = stepMeta.getStepMetaInterface();
 
 			try {
 				for (Method method : stepMetaIn.getClass().getDeclaredMethods()) {
-					if (method.getName().equals("getMapBaseURI")) {
+					if (method.getName().equals(nameMethod)) {
 						value = (String) method.invoke(stepMetaIn);
 						break;
 					}
 				}
 			} catch (IllegalAccessException ne) {
 				logBasic(ne.getMessage());
-				value="";
+				value = "";
 			} catch (IllegalArgumentException se) {
 				logBasic(se.getMessage());
-				value="";
+				value = "";
 			} catch (InvocationTargetException ae) {
 				logBasic(ae.getMessage());
-				value="";
+				value = "";
 			} finally {
 				if (value != null)
-					break;			
+					break;
 			}
 		}
 		return value;
