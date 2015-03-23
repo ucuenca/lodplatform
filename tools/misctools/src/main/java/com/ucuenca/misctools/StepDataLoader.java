@@ -141,6 +141,7 @@ public class StepDataLoader {
 			while(--totalFields >= 1) this.sqlInsertion += "?,";
 			this.sqlInsertion += "?)";
 			DatabaseLoader.executeUpdate(this.sqlInsertion, values);
+			this.logDebug(this.sqlInsertion, values);
 		}catch(Exception e) {
 			logBasic("ERROR EXECUTING SQL INSERT: "+ e.getMessage());
 		}
@@ -172,6 +173,18 @@ public class StepDataLoader {
     		throw new KettleException(message);
     	}
     	
+    }
+	
+	/**
+	 * Logging options for StepData classes
+	 * @param message
+	 * @param throwException
+	 * @throws KettleException
+	 */
+	public void logDebug(String message, Object... arguments) throws KettleException{
+    	if(!databaseLoad && step !=null && step.isDebug()) {
+    		step.logDebug(message, arguments);
+    	}
     }
 	
 };

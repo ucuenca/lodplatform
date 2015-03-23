@@ -32,6 +32,7 @@ import org.pentaho.di.core.CheckResultInterface;
 import org.pentaho.di.core.Counter;
 import org.pentaho.di.core.database.DatabaseMeta;
 import org.pentaho.di.core.exception.KettleException;
+import org.pentaho.di.core.exception.KettleStepException;
 import org.pentaho.di.core.exception.KettleValueException;
 import org.pentaho.di.core.exception.KettleXMLException;
 import org.pentaho.di.core.row.RowMetaInterface;
@@ -50,6 +51,7 @@ import org.pentaho.di.trans.step.StepDialogInterface;
 import org.pentaho.di.trans.step.StepInterface;
 import org.pentaho.di.trans.step.StepMeta;
 import org.pentaho.di.trans.step.StepMetaInterface;
+import org.pentaho.metastore.api.IMetaStore;
 import org.w3c.dom.Node;
 
 /**
@@ -293,6 +295,10 @@ public class GetPropertiesOWLMeta extends BaseStepMeta implements StepMetaInterf
 			throw new KettleException("Unable to load step from repository", e);
 		}
 	}
+	
+	public void getFields(RowMetaInterface r, String origin, RowMetaInterface[] info, StepMeta nextStep, VariableSpace space) throws KettleStepException {
+		this.getFields(r, origin, info, nextStep, space, null, null);
+	}
 
 	/**
 	 * This method is called to determine the changes the step is making to the row-stream.
@@ -306,7 +312,8 @@ public class GetPropertiesOWLMeta extends BaseStepMeta implements StepMetaInterf
 	 * @param nextStep	the description of a step this step is passing rows to
 	 * @param space		the variable space for resolving variables
 	 */
-	public void getFields(RowMetaInterface row, String origin, RowMetaInterface[] info, StepMeta nextStep, VariableSpace space) {
+	public void getFields( RowMetaInterface row, String origin, RowMetaInterface[] info, StepMeta nextStep,
+		    VariableSpace space, Repository repository, IMetaStore metaStore ) throws KettleStepException {
 
 		/*
 		 * This implementation appends the  to the row-stream

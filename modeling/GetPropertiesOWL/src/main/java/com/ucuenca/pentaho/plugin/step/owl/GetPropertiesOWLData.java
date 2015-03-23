@@ -104,7 +104,6 @@ public class GetPropertiesOWLData extends BaseStepData implements StepDataInterf
 		private final StepDataLoader dataLoader = new StepDataLoader(DBTABLE);
 		// End Database Data Loading attributes
 		
-		protected LogChannelInterface log;
 		public boolean first;
 		int ii = 0;
 		
@@ -115,9 +114,6 @@ public class GetPropertiesOWLData extends BaseStepData implements StepDataInterf
     public GetPropertiesOWLData()
 	{
 		super();
-	}
-    public void logError(String message) {
-		log.logError(message);
 	}
     
 	public boolean getData(StepMetaInterface smi, StepDataInterface sdi,
@@ -149,8 +145,7 @@ public class GetPropertiesOWLData extends BaseStepData implements StepDataInterf
 			try {
 				DatabaseLoader.getConnection();
 			} catch (Exception e) {
-				
-				logError("Error in Database Loader "+e.getMessage());
+				throw new KettleException("Error in Database Loader "+e.getMessage());
 			}
 		}	
 		

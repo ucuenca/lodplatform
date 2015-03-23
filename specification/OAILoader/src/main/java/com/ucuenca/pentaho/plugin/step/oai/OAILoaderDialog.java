@@ -52,6 +52,7 @@ import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.i18n.BaseMessages;
 import org.pentaho.di.trans.TransMeta;
 import org.pentaho.di.ui.core.dialog.EnterSelectionDialog;
+import org.pentaho.di.ui.core.dialog.ErrorDialog;
 import org.pentaho.di.ui.trans.step.BaseStepDialog;
 import org.pentaho.di.trans.step.BaseStepMeta;
 import org.pentaho.di.trans.step.StepDialogInterface;
@@ -338,7 +339,27 @@ public class OAILoaderDialog extends BaseStepDialog implements
 				data.getDataLoader().setStepName(meta.getStepName());
 				data.getDataLoader().setDatabaseLoad(Boolean.TRUE);
 				data.initOAIHarvester(meta, data);
-				new Thread(new DBLoader(data)).start();
+				
+				MessageBox dialog1 = new MessageBox(shell, SWT.ICON_WORKING | SWT.OK);
+				dialog1.setText("Dialog");						
+				dialog1.setMessage( BaseMessages.getString( PKG, "Precatching.StartDialog.Text") );   		    
+			    dialog1.open();
+				DBLoader dbloader = new DBLoader(data);
+				Thread thread = new Thread(dbloader);
+				thread.start();
+				try {
+					thread.join();
+					if( dbloader.status != null ) {
+						MessageBox dialog = new MessageBox(shell, SWT.ICON_INFORMATION | SWT.OK);
+						dialog.setText("Dialog");						
+						dialog.setMessage( BaseMessages.getString( PKG, "Precatching.FinishDialog.Text") );   		    
+					    dialog.open();
+					} else if(dbloader.exception != null){
+						new ErrorDialog(shell, "Dialog", "Message: ", dbloader.exception);
+					}
+				}catch(InterruptedException ie) {
+					ie.printStackTrace();
+				}
 			}
 		});
 
@@ -419,6 +440,10 @@ public class OAILoaderDialog extends BaseStepDialog implements
 
 		private OAILoaderData data;
 		
+		String status;
+		
+		Exception exception;
+		
 		private DBLoader(OAILoaderData data) {
 			this.data = data;
 		}
@@ -430,13 +455,10 @@ public class OAILoaderDialog extends BaseStepDialog implements
 				}
 				data.getDataLoader().logBasic(BaseMessages.getString(PKG,
 						"OAILoader.Dialog.TotalRequests.Label") + x);
+				status = "OK";
 			}catch(KettleException ex) {
 				ex.printStackTrace();
-				MessageBox dialog = 
-						  new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
-						dialog.setText("ERROR");						
-				dialog.setMessage(ex.getMessage());   		    
-			    dialog.open();
+				exception = ex;
 			}
 		}
 	}

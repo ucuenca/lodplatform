@@ -225,7 +225,7 @@ public class R2RMLGenerator {
 	 */
 	private ResultSet getClassificationRows() throws Exception {
 		return DatabaseLoader.executeQuery(sqlClassificationRows, 
-				new Object[]{meta.getParentStepMeta().getParentTransMeta().getName(), meta.getParentStepMeta().getName()});
+				new Object[]{meta.getParentStepMeta().getParentTransMeta().getName().toUpperCase(), meta.getParentStepMeta().getName().toUpperCase()});
 	}
 	
 	/**
@@ -254,8 +254,8 @@ public class R2RMLGenerator {
 	 */
 	private ResultSet getAnnotationRows(String classId) throws Exception {
 		return DatabaseLoader.executeQuery(sqlAnnotationRows, 
-				new Object[]{meta.getParentStepMeta().getParentTransMeta().getName(), 
-				meta.getParentStepMeta().getName(), classId});
+				new Object[]{meta.getParentStepMeta().getParentTransMeta().getName().toUpperCase(), 
+				meta.getParentStepMeta().getName().toUpperCase(), classId});
 	}
 	
 	/**
@@ -285,8 +285,8 @@ public class R2RMLGenerator {
 	 */
 	private ResultSet getRelationRows() throws Exception {
 		return DatabaseLoader.executeQuery(sqlRelationRows, 
-				new Object[]{meta.getParentStepMeta().getParentTransMeta().getName(), 
-				meta.getParentStepMeta().getName()});
+				new Object[]{meta.getParentStepMeta().getParentTransMeta().getName().toUpperCase(), 
+				meta.getParentStepMeta().getName().toUpperCase()});
 	}
 	
 	/**
@@ -358,8 +358,8 @@ public class R2RMLGenerator {
 	 * @throws Exception
 	 */
 	private void finishProcess() throws Exception{
-		FileOutputStream out = new FileOutputStream(
-				meta.getOutputDir() + "/" + meta.getParentStepMeta().getName().trim() + "-R2RML.ttl");
+		String url = meta.getOutputDir() + System.getProperty("file.separator") + meta.getOutFileName();
+		FileOutputStream out = new FileOutputStream(url);
 		r2rmlModel.write(out, "TURTLE");
 		DatabaseLoader.closeConnection();
 	}

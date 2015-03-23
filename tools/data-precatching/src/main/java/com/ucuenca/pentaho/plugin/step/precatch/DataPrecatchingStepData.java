@@ -55,10 +55,12 @@ public class DataPrecatchingStepData extends BaseStepData implements StepDataInt
 	
 	// must be included for DataBase Data Loading
 	public StepDataLoader dataLoader;
+	public String DBTABLE;
 	
-    public DataPrecatchingStepData()
-	{
+    public DataPrecatchingStepData(String dbTable) {
 		super();
+		DBTABLE = dbTable;
+		
 	}
 }
 	
