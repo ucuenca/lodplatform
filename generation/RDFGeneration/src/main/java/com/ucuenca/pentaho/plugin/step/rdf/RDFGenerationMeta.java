@@ -51,23 +51,7 @@ import org.pentaho.di.trans.step.StepMeta;
 import org.pentaho.di.trans.step.StepMetaInterface;
 import org.w3c.dom.Node;
 
-/**
- * This class is part of the demo step plug-in implementation. It demonstrates
- * the basics of developing a plug-in step for PDI.
- * 
- * The demo step adds a new string field to the row stream and sets its value to
- * "Hello World!". The user may select the name of the new field.
- * 
- * This class is the implementation of StepMetaInterface. Classes implementing
- * this interface need to:
- * 
- * - keep track of the step settings - serialize step settings both to xml and a
- * repository - provide new instances of objects implementing
- * StepDialogInterface, StepInterface and StepDataInterface - report on how the
- * step modifies the meta-data of the row-stream (row structure and field types)
- * - perform a sanity-check on the settings provided by the user
- * 
- */
+
 public class RDFGenerationMeta extends BaseStepMeta implements
 		StepMetaInterface {
 

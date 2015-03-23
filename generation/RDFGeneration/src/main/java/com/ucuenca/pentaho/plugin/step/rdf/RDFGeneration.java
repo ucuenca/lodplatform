@@ -109,68 +109,25 @@ public class RDFGeneration extends BaseStep implements StepInterface {
 	 *         an error preventing the step from working.
 	 * 
 	 */
-	public boolean init(StepMetaInterface smi, StepDataInterface sdi) {
-		// Casting to step-specific implementation classes is safe
-		RDFGenerationMeta meta = (RDFGenerationMeta) smi;
-		RDFGenerationData data = (RDFGenerationData) sdi;
+	// public boolean init(StepMetaInterface smi, StepDataInterface sdi) {
+	// // Casting to step-specific implementation classes is safe
+	// RDFGenerationMeta meta = (RDFGenerationMeta) smi;
+	// RDFGenerationData data = (RDFGenerationData) sdi;
+	//
+	// return super.init(meta, data);
+	// }
 
-		return super.init(meta, data);
-	}
-
-	/**
-	 * Once the transformation starts executing, the processRow() method is
-	 * called repeatedly by PDI for as long as it returns true. To indicate that
-	 * a step has finished processing rows this method must call setOutputDone()
-	 * and return false;
-	 * 
-	 * Steps which process incoming rows typically call getRow() to read a
-	 * single row from the input stream, change or add row content, call
-	 * putRow() to pass the changed row on and return true. If getRow() returns
-	 * null, no more rows are expected to come in, and the processRow()
-	 * implementation calls setOutputDone() and returns false to indicate that
-	 * it is done too.
-	 * 
-	 * Steps which generate rows typically construct a new row Object[] using a
-	 * call to RowDataUtil.allocateRowData(numberOfFields), add row content, and
-	 * call putRow() to pass the new row on. Above process may happen in a loop
-	 * to generate multiple rows, at the end of which processRow() would call
-	 * setOutputDone() and return false;
-	 * 
-	 * @param smi
-	 *            the step meta interface containing the step settings
-	 * @param sdi
-	 *            the step data interface that should be used to store
-	 * 
-	 * @return true to indicate that the function should be called again, false
-	 *         if the step is done
-	 */
+	
 	public boolean processRow(StepMetaInterface smi, StepDataInterface sdi)
 			throws KettleException {
 
-		// safely cast the step settings (meta) and runtime info (data) to
-		// specific implementations
 		RDFGenerationMeta meta = (RDFGenerationMeta) smi;
 		RDFGenerationData data = (RDFGenerationData) sdi;
 
-		// Object[] r = getRow();
-		//
-		// // if no more rows are expected, indicate step is finished and
-		// processRow() should not be called again
-		// if (r == null){
-		// setOutputDone();
-		// return false;
-		// }
-
-		// the "first" flag is inherited from the base step implementation
-		// it is used to guard some processing tasks, like figuring out field
-		// indexes
-		// in the row structure that only need to be done once
 		if (first) {
 			first = false;
-			// clone the input row structure and place it in our data object
+			super.init(meta, data);
 			data.outputRowMeta = new RowMeta();
-			// use meta.getFields() to change it, so it reflects the output row
-			// structure
 			meta.getFields(data.outputRowMeta, getStepname(), null, null, this);
 		}
 
@@ -241,26 +198,7 @@ public class RDFGeneration extends BaseStep implements StepInterface {
 		return false;
 	}
 
-	/**
-	 * This method is called by PDI once the step is done processing.
-	 * 
-	 * The dispose() method is the counterpart to init() and should release any
-	 * resources acquired for step execution like file handles or database
-	 * connections.
-	 * 
-	 * The meta and data implementations passed in can safely be cast to the
-	 * step's respective implementations.
-	 * 
-	 * It is mandatory that super.dispose() is called to ensure correct
-	 * behavior.
-	 * 
-	 * @param smi
-	 *            step meta interface implementation, containing the step
-	 *            settings
-	 * @param sdi
-	 *            step data interface implementation, used to store runtime
-	 *            information
-	 */
+	
 	public void dispose(StepMetaInterface smi, StepDataInterface sdi) {
 
 		// Casting to step-specific implementation classes is safe
