@@ -544,7 +544,8 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 						txtbaseUri.setText(baUri);
 						txtbaseUri.setEditable(false);
 
-						txtdatabaseUrl.setText(DatabaseLoader.SQL_URI_CONNECTION);
+						txtdatabaseUrl
+								.setText(DatabaseLoader.SQL_URI_CONNECTION);
 						txtdatabaseUrl.setEditable(false);
 						txtdatabaseSchema.setText(DatabaseLoader.SQL_SCHEMA);
 						txtdatabaseSchema.setEditable(false);
@@ -552,15 +553,14 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 						txtuserName.setEditable(false);
 						txtpassword.setText(DatabaseLoader.SQL_PASSWORD);
 						txtpassword.setEditable(false);
-					}
-					else{						
-						MessageBox dialog = new MessageBox(shell, SWT.ICON_ERROR);
+					} else {
+						MessageBox dialog = new MessageBox(shell,
+								SWT.ICON_ERROR);
 						dialog.setText("ERROR");
 						dialog.setMessage(BaseMessages.getString(PKG,
 								"RDFGeneration.ERROR.PreviewStepOntology"));
 						dialog.open();
 					}
-					
 
 				} else {
 					MessageBox dialog = new MessageBox(shell, SWT.ICON_ERROR);
@@ -746,7 +746,18 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 		meta.setPassword(txtpassword.getText());
 		meta.setBaseUri(txtbaseUri.getText());
 		meta.setDirectorioOutputRDF(txtoutputFileRDF.getText());
+
 		meta.setFormat(cbmoutputFormat.getText());
+
+		if (cbmoutputFormat.getText().equals("RDFXML")) {
+			meta.setFileoutput(stepname+".rdf");
+		} else if (cbmoutputFormat.getText().equals("TURTLE")
+				|| cbmoutputFormat.getText().equals("NTRIPLES")) {
+			meta.setFileoutput(stepname+".ttl");
+		} else if (cbmoutputFormat.getText().equals("N3")) {
+			meta.setFileoutput(stepname+".n3");
+		}
+
 		meta.setChanged(true);
 	}
 
@@ -858,7 +869,9 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 						"RDFGeneration.SUCCESS.Connection"));
 				dialog.open();
 				logBasic("Succesful Connection");
+				conn.close();
 			}
+
 		}
 
 	}

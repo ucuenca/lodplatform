@@ -51,7 +51,6 @@ import org.pentaho.di.trans.step.StepMeta;
 import org.pentaho.di.trans.step.StepMetaInterface;
 import org.w3c.dom.Node;
 
-
 public class RDFGenerationMeta extends BaseStepMeta implements
 		StepMetaInterface {
 
@@ -74,6 +73,7 @@ public class RDFGenerationMeta extends BaseStepMeta implements
 	private String baseUri;
 	private String directorioOutputRDF;
 	private String format;
+	private String fileoutput;
 
 	private String stepName;
 
@@ -138,6 +138,7 @@ public class RDFGenerationMeta extends BaseStepMeta implements
 		baseUri = "";
 		directorioOutputRDF = "";
 		format = "";
+		fileoutput = "";
 	}
 
 	/**
@@ -187,6 +188,8 @@ public class RDFGenerationMeta extends BaseStepMeta implements
 		retval.append("    ").append(
 				XMLHandler.addTagValue("OutputRDF", directorioOutputRDF));
 		retval.append("    ").append(XMLHandler.addTagValue("formats", format));
+		retval.append("    ").append(
+				XMLHandler.addTagValue("fileout", fileoutput));
 
 		return retval.toString();
 	}
@@ -222,6 +225,7 @@ public class RDFGenerationMeta extends BaseStepMeta implements
 		password = XMLHandler.getTagValue(stepnode, "pass");
 		directorioOutputRDF = XMLHandler.getTagValue(stepnode, "OutputRDF");
 		format = XMLHandler.getTagValue(stepnode, "formats");
+		fileoutput = XMLHandler.getTagValue(stepnode, "fileout");
 	}
 
 	/**
@@ -372,31 +376,28 @@ public class RDFGenerationMeta extends BaseStepMeta implements
 
 		// validacion de campos
 
-		if (inputFieldr2rml==null || inputFieldr2rml.equals("R2rml File")  ) {
+		if (inputFieldr2rml == null || inputFieldr2rml.equals("R2rml File")) {
 			cr = new CheckResult(CheckResult.TYPE_RESULT_ERROR,
 					BaseMessages.getString(PKG,
-							"RDFGeneration.CheckResult.FileR2rml"),
-					stepMeta);
+							"RDFGeneration.CheckResult.FileR2rml"), stepMeta);
 			remarks.add(cr);
 		}
 
-		if ( sqlvendor==null ||  sqlvendor.equals("") ) {
+		if (sqlvendor == null || sqlvendor.equals("")) {
 			cr = new CheckResult(CheckResult.TYPE_RESULT_ERROR,
 					BaseMessages.getString(PKG,
-							"RDFGeneration.CheckResult.SQLVendor"),
-					stepMeta);
+							"RDFGeneration.CheckResult.SQLVendor"), stepMeta);
 			remarks.add(cr);
 		}
 
-		if ( databaseURL==null || databaseURL.equals("") ) {
+		if (databaseURL == null || databaseURL.equals("")) {
 			cr = new CheckResult(CheckResult.TYPE_RESULT_ERROR,
 					BaseMessages.getString(PKG,
-							"RDFGeneration.CheckResult.DataBaseUri"),
-					stepMeta);
+							"RDFGeneration.CheckResult.DataBaseUri"), stepMeta);
 			remarks.add(cr);
 		}
 
-		if (databaseSchema==null || databaseSchema.equals("")  ) {
+		if (databaseSchema == null || databaseSchema.equals("")) {
 			cr = new CheckResult(CheckResult.TYPE_RESULT_ERROR,
 					BaseMessages.getString(PKG,
 							"RDFGeneration.CheckResult.dataBaseSchema"),
@@ -404,23 +405,21 @@ public class RDFGenerationMeta extends BaseStepMeta implements
 			remarks.add(cr);
 		}
 
-		if (userName==null || userName.equals("")  ) {
+		if (userName == null || userName.equals("")) {
 			cr = new CheckResult(CheckResult.TYPE_RESULT_ERROR,
 					BaseMessages.getString(PKG,
-							"RDFGeneration.CheckResult.userName"),
-					stepMeta);
+							"RDFGeneration.CheckResult.userName"), stepMeta);
 			remarks.add(cr);
 		}
 
-		if (password==null || password.equals("")) {
+		if (password == null || password.equals("")) {
 			cr = new CheckResult(CheckResult.TYPE_RESULT_ERROR,
 					BaseMessages.getString(PKG,
-							"RDFGeneration.CheckResult.Password"),
-					stepMeta);
+							"RDFGeneration.CheckResult.Password"), stepMeta);
 			remarks.add(cr);
 		}
 
-		if (directorioOutputRDF==null || directorioOutputRDF.equals("") ) {
+		if (directorioOutputRDF == null || directorioOutputRDF.equals("")) {
 			cr = new CheckResult(CheckResult.TYPE_RESULT_ERROR,
 					BaseMessages.getString(PKG,
 							"RDFGeneration.CheckResult.outputRDFfiel"),
@@ -428,14 +427,13 @@ public class RDFGenerationMeta extends BaseStepMeta implements
 			remarks.add(cr);
 		}
 
-		if (format==null || format.equals("")) {
+		if (format == null || format.equals("")) {
 			cr = new CheckResult(CheckResult.TYPE_RESULT_ERROR,
 					BaseMessages.getString(PKG,
-							"RDFGeneration.CheckResult.Formats"),
-					stepMeta);
+							"RDFGeneration.CheckResult.Formats"), stepMeta);
 			remarks.add(cr);
 		}
-		
+
 	}
 
 	public String getInputFieldr2rml() {
@@ -516,6 +514,14 @@ public class RDFGenerationMeta extends BaseStepMeta implements
 
 	public void setStepName(String stepName) {
 		this.stepName = stepName;
+	}
+
+	public String getFileoutput() {
+		return fileoutput;
+	}
+
+	public void setFileoutput(String fileoutput) {
+		this.fileoutput = fileoutput;
 	}
 
 }

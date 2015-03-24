@@ -176,7 +176,7 @@ public class RDFGeneration extends BaseStep implements StepInterface {
 
 				g.dumpRDF(
 						meta.getDirectorioOutputRDF() + "/"
-								+ meta.getStepName() + ".ttl", data.rdfFormat);
+								+ meta.getFileoutput(), data.rdfFormat);
 
 			} catch (Exception e) {
 				e.printStackTrace();
