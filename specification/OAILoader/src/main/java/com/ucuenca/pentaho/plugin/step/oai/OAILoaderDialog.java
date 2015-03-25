@@ -337,13 +337,12 @@ public class OAILoaderDialog extends BaseStepDialog implements
 				OAILoaderData data = (OAILoaderData)meta.getStepData();
 				setDialogMetadata();
 				data.getDataLoader().setStepName(meta.getStepName());
-				data.getDataLoader().setDatabaseLoad(Boolean.TRUE);
-				data.initOAIHarvester(meta, data);
 				
 				MessageBox dialog1 = new MessageBox(shell, SWT.ICON_WORKING | SWT.OK);
 				dialog1.setText("Dialog");						
 				dialog1.setMessage( BaseMessages.getString( PKG, "Precatching.StartDialog.Text") );   		    
 			    dialog1.open();
+			    data.initOAIHarvester(meta, data, true);
 				DBLoader dbloader = new DBLoader(data);
 				Thread thread = new Thread(dbloader);
 				thread.start();
@@ -450,7 +449,7 @@ public class OAILoaderDialog extends BaseStepDialog implements
 		public void run() {
 			try {
 				int x = 0;
-				while(data.getData(meta, data, true)) {
+				while(data.getData(meta, data)) {
 					x++;
 				}
 				data.getDataLoader().logBasic(BaseMessages.getString(PKG,

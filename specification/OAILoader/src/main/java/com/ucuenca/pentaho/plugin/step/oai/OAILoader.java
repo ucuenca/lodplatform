@@ -50,7 +50,7 @@ public class OAILoader extends BaseStep implements StepInterface {
 		OAILoaderMeta meta = (OAILoaderMeta) smi;
 		OAILoaderData data = (OAILoaderData) sdi;
 		data.getDataLoader().setBaseStep(this);
-		data.initOAIHarvester(meta, data);
+		data.initOAIHarvester(meta, data, false);
 
 		return super.init(meta, data);
 	}
@@ -69,7 +69,7 @@ public class OAILoader extends BaseStep implements StepInterface {
 			meta.getFields(data.outputRowMeta, getStepname(), null, null, this);
 		}
 
-		Boolean hasMoreData = data.getData(smi, sdi, false);
+		Boolean hasMoreData = data.getData(smi, sdi);
 		if(!hasMoreData) setOutputDone();
 		if (checkFeedback(getLinesRead())) {
 			logBasic("Linenr " + getLinesRead()); // Some basic logging

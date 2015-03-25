@@ -76,14 +76,18 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
 	public Schema schema;
 	int total;
 
-	private ArrayList<String> datos;
-	private ArrayList<String> nameFields;
+	private ArrayList<String> datos = new ArrayList<String>();
+	private ArrayList<String> nameFields = new ArrayList<String>();
+	private NodeList records = null;
+	private NodeList header = null;
+	private int recordIndex, dataIndex;
 	private String numRegistro;
 	Hashtable<String, String> Sets = new Hashtable<String, String>();
 
 	// must be included for DataBase Data Loading
 	public static final String DBTABLE = "OAIPMHDATA";
 	private final StepDataLoader dataLoader = new StepDataLoader(DBTABLE);
+	private Boolean databaseLoad;
 
 	// End Database Data Loading attributes
 
@@ -108,8 +112,11 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
 	 *            Step Metadata class
 	 * @param data
 	 *            Step Data class
+	 * @param databaseLoad
+	 *            Boolean.TRUE if the step needs to precatch data to a bundled
+	 *            database
 	 */
-	public void initOAIHarvester(OAILoaderMeta meta, OAILoaderData data) {
+	public void initOAIHarvester(OAILoaderMeta meta, OAILoaderData data, Boolean databaseLoad) {
 		data.schema = new Schema();
 		data.schema.setNamespace(meta.getNamespace());
 		data.schema.setPrefix(meta.getPrefix());
@@ -133,6 +140,11 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
 						meta.getPrefix(), data.schema);
 				data.listSet = new ListSets(meta.getInputURI());
 			}
+			this.loadListSets(meta, data);
+			this.databaseLoad = databaseLoad;
+			if (databaseLoad)
+				DatabaseLoader.getConnection();
+			
 		} catch (Exception e) {
 			try {
 				dataLoader.logBasic(e.getMessage());
@@ -141,6 +153,72 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
 			}
 		}
 
+	}
+
+	private void loadListSets(OAILoaderMeta meta, OAILoaderData data)throws KettleException {
+		try {
+			//Process for load the set 
+			NodeList recordsSets = null;
+			int total = 0;
+			while (listSet != null) {
+
+				recordsSets = data.listSet
+						.getNodeList("oai20:OAI-PMH/oai20:ListSets/oai20:set");
+				int batch = recordsSets.getLength();
+				total += batch;
+				dataLoader.logBasic("Harvested ListSet Records: batch "
+						+ recordsSets.getLength() + ", total " + total);
+                String key=null;
+                String name=null;
+				
+				for (int temp1 = 0; temp1 < recordsSets.getLength(); temp1++) {
+					Node nSet = recordsSets.item(temp1);
+					
+					if (nSet.getNodeType() == Node.ELEMENT_NODE) {
+						Element eElement1 = (Element) nSet;
+						NodeList recordSet= eElement1.getChildNodes();
+						for (int temp2 = 0; temp2 < recordSet.getLength(); temp2++) {
+        					Node nSet2 = recordSet.item(temp2);
+        					if (nSet2.getNodeType() == Node.ELEMENT_NODE) {
+        						Element eElement2 = (Element) nSet2;
+        						if(nSet2.getNodeName().equals("setSpec")){
+        						  key = nSet2.getTextContent();
+        						}else if (nSet2.getNodeName().equals("setName")) {
+        							name = nSet2.getTextContent();                    							
+        						}                    						
+        					}            					
+						}//end second for
+						Sets.put(key, name);    					
+					}                    
+				}					
+				
+				 resumptionToken = listSet.getResumptionToken();
+                 if (resumptionToken == null || resumptionToken.length() == 0) {
+                	 dataLoader.logBasic("No more resumption token found, end was reached.");
+                     //listRecords = null;
+                     listSet = null;
+                 } else {
+                	 dataLoader.logBasic("Resuming harvesting from " + resumptionToken);
+                     try {
+                     	//listRecords = new ListRecords(url_str, resumptionToken);
+                     	listSet = new ListSets(meta.getInputURI(),
+        						data.resumptionToken);
+                     } catch (IOException e) {
+                    	 dataLoader.logBasic("IOException while trying to resume from " + resumptionToken + ", trying again.");
+                     	//listRecords = new ListRecords(url_str, resumptionToken);
+                     	listSet = new ListSets(meta.getInputURI(),
+        						data.resumptionToken);
+                     } catch (SAXException e) {
+                    	 dataLoader.logBasic("SAXException while trying to resume from " + resumptionToken + ", trying again.");
+                     	//listRecords = new ListRecords(url_str, resumptionToken);
+                    	 listSet = new ListSets(meta.getInputURI(),
+         						data.resumptionToken);
+                     }
+                 }
+			}
+		}catch(Exception e) {
+			dataLoader.logBasic("Error: " + e.toString());
+		}		
 	}
 
 	// must be included for DataBase Data Loading
@@ -153,127 +231,45 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
 	 *            StepMetaInterface
 	 * @param sdi
 	 *            StepDataInterface
-	 * @param databaseLoad
-	 *            Boolean.TRUE if the step needs to precatch data to a bundled
-	 *            database
 	 * @return Boolean.TRUE if there is more data to extract, otherwise
 	 *         Boolean.FALSE
 	 * @throws KettleException
 	 */
-	public Boolean getData(StepMetaInterface smi, StepDataInterface sdi,
-			Boolean databaseLoad) throws KettleException {
+	public Boolean getData(StepMetaInterface smi, StepDataInterface sdi) throws KettleException {
 		OAILoaderMeta meta = (OAILoaderMeta) smi;
 		OAILoaderData data = (OAILoaderData) sdi;
+		Boolean hasMoreData = Boolean.TRUE;
 		// must be included for DataBase Data Loading
 		data.outputRowMeta = data.outputRowMeta == null ? dataLoader
 				.getMetaFieldsDef(smi) : data.outputRowMeta;
-		Object[] outputRow = new Object[data.outputRowMeta.size() + 3];
 
 		try {
-			NodeList header = null;
-		
-			NodeList records = null;
-			
-           //Process for load the set 
-			NodeList recordsSets = null;
-			if (Sets.isEmpty()) {
-				while (listSet != null) {
-
-					recordsSets = data.listSet
-							.getNodeList("oai20:OAI-PMH/oai20:ListSets/oai20:set");
-					int batch = recordsSets.getLength();
-					total += batch;
-					dataLoader.logBasic("Harvested Records: batch "
-							+ recordsSets.getLength() + ", total " + total);
-                    String key=null;
-                    String name=null;
-    				
-    				for (int temp1 = 0; temp1 < recordsSets.getLength(); temp1++) {
-    					Node nSet = recordsSets.item(temp1);
-    					
-    					if (nSet.getNodeType() == Node.ELEMENT_NODE) {
-    						Element eElement1 = (Element) nSet;
-    						NodeList recordSet= eElement1.getChildNodes();
-    						for (int temp2 = 0; temp2 < recordSet.getLength(); temp2++) {
-            					Node nSet2 = recordSet.item(temp2);
-            					if (nSet2.getNodeType() == Node.ELEMENT_NODE) {
-            						Element eElement2 = (Element) nSet2;
-            						if(nSet2.getNodeName().equals("setSpec")){
-            						  key = nSet2.getTextContent();
-            						}else if (nSet2.getNodeName().equals("setName")) {
-            							name = nSet2.getTextContent();                    							
-            						}                    						
-            					}            					
-    						}//end second for
-    						Sets.put(key, name);    					
-    					}                    
-    				}					
-					
-					 resumptionToken = listSet.getResumptionToken();
-                     if (resumptionToken == null || resumptionToken.length() == 0) {
-                    	 dataLoader.logBasic("No more resumption token found, end was reached.");
-                         //listRecords = null;
-                         listSet = null;
-                     } else {
-                    	 dataLoader.logBasic("Resuming harvesting from " + resumptionToken);
-                         try {
-                         	//listRecords = new ListRecords(url_str, resumptionToken);
-                         	listSet = new ListSets(meta.getInputURI(),
-            						data.resumptionToken);
-                         } catch (IOException e) {
-                        	 dataLoader.logBasic("IOException while trying to resume from " + resumptionToken + ", trying again.");
-                         	//listRecords = new ListRecords(url_str, resumptionToken);
-                         	listSet = new ListSets(meta.getInputURI(),
-            						data.resumptionToken);
-                         } catch (SAXException e) {
-                        	 dataLoader.logBasic("SAXException while trying to resume from " + resumptionToken + ", trying again.");
-                         	//listRecords = new ListRecords(url_str, resumptionToken);
-                        	 listSet = new ListSets(meta.getInputURI(),
-             						data.resumptionToken);
-                         }
-                     }
-					
-				}
-			}//end of load of set
-			
-			
-			try {
-				records = data.listRecords.getNodeList(meta.getXpath());
-				if (header == null) {
-					header = data.listRecords
-							.getNodeList("/oai20:OAI-PMH/oai20:ListRecords/oai20:record/oai20:header");
-				}
-			} catch (TransformerException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			if(dataIndex == 0 && recordIndex == 0) {
+				this.records = data.listRecords.getNodeList(meta.getXpath());
+				this.recordIndex = 0;
+				this.header = this.header == null ? 
+						data.listRecords
+							.getNodeList("/oai20:OAI-PMH/oai20:ListRecords/oai20:record/oai20:header")
+							:this.header;
+				int batch = this.records.getLength();
+				data.total += batch;
+				dataLoader.logBasic("Harvested Records: batch "
+						+ records.getLength() + ", total " + data.total);
 			}
 
-			int batch = records.getLength();
-			data.total += batch;
-
-			dataLoader.logBasic("Harvested Records: batch "
-					+ records.getLength() + ", total " + data.total);
-
-			// must be included for DataBase Data Loading
-			if (databaseLoad)
-				DatabaseLoader.getConnection();
-
-			for (int temp1 = 0; temp1 < records.getLength(); temp1++) {
-				Node nNode1 = records.item(temp1);
-				Node nNodeHeader = header.item(temp1);
-
-				datos = new ArrayList<String>();
-				nameFields = new ArrayList<String>();
-
+			if(datos.size() == 0) { 
+				Node nNode1 = records.item(recordIndex);
+				Node nNodeHeader = header.item(recordIndex);
+	
 				if (nNode1.getNodeType() == Node.ELEMENT_NODE) {
 					Element eElement1 = (Element) nNode1;
 					Element eElementHeader = (Element) nNodeHeader;
-
+	
 					getHeader(eElementHeader);
-
+	
 					StringTokenizer strobj = new StringTokenizer(
 							meta.getXpath(), "/");
-
+	
 					// methods to get data
 					if (data.schema.prefix.equals("xoai")) {
 						getDataXOAI(eElement1, strobj.countTokens(), 0, 0);
@@ -288,74 +284,82 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
 					} else if (data.schema.prefix.equals("didl")) {
 						getDataUKETDDC(eElement1);
 					}
-
-					// must be included for DataBase Data Loading
-					for (int i = 0; i < datos.size(); i++) {
-						dataLoader.sequence++;
-						int dataIndex = databaseLoad ? 3 : 0;
-						outputRow[dataIndex] = numRegistro;
-						outputRow[dataIndex + 1] = nameFields.get(i);
-						outputRow[dataIndex + 2] = datos.get(i);
-						if (databaseLoad) {
-							outputRow[0] = meta.getTransMeta().getName()
-									.toUpperCase();
-							outputRow[1] = meta.getStepName().toUpperCase();
-							outputRow[2] = Integer.valueOf(dataLoader.sequence);
-							dataLoader.insertTableRow(smi, outputRow);
-						} else {
-							dataLoader.getBaseStep().putRow(data.outputRowMeta,
-									outputRow);
-						}
-					}
-
-				}
-
-			}// end two for
-			if (databaseLoad)
-				DatabaseLoader.closeConnection();
-
-			data.resumptionToken = data.listRecords.getResumptionToken();
-
-			if (data.resumptionToken == null
-					|| data.resumptionToken.length() == 0) {
-
-				data.listRecords = null;
-				dataLoader
-						.logBasic("No more resumption token found, end was reached.");
-				return false;
-
-			} else {
-				dataLoader.logBasic("Resuming harvesting from "
-						+ data.resumptionToken);
-				try {
-					data.listRecords = new ListRecords(meta.getInputURI(),
-							data.resumptionToken);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					dataLoader
-							.logBasic("IOException while trying to resume from "
-									+ data.resumptionToken + ", trying again.");
-
-					data.listRecords = new ListRecords(meta.getInputURI(),
-							data.resumptionToken);
-
-				} catch (SAXException e) {
-					dataLoader
-							.logBasic("SAXException while trying to resume from "
-									+ data.resumptionToken + ", trying again.");
-
-					data.listRecords = new ListRecords(meta.getInputURI(),
-							data.resumptionToken);
-
+	
 				}
 			}
+			dataLoader.sequence++;
+			Object[] outputRow = new Object[data.outputRowMeta.size() + 3];
+			int columnIndex = databaseLoad ? 3 : 0;
+			outputRow[columnIndex] = numRegistro;
+			outputRow[columnIndex + 1] = nameFields.get(dataIndex);
+			outputRow[columnIndex + 2] = datos.get(dataIndex);
+			if (databaseLoad) {
+				outputRow[0] = meta.getTransMeta().getName()
+						.toUpperCase();
+				outputRow[1] = meta.getStepName().toUpperCase();
+				outputRow[2] = Integer.valueOf(dataLoader.sequence);
+				dataLoader.insertTableRow(smi, outputRow);
+			} else {
+				dataLoader.getBaseStep().putRow(data.outputRowMeta,
+						outputRow);
+			}
 
-			// }// end while
+			if((this.dataIndex == this.datos.size()-1)) {
+				this.dataIndex = 0;
+				this.datos.clear();
+				this.nameFields.clear();
+				numRegistro = null;
+			} else {
+				dataIndex++;
+			}
+			this.recordIndex = this.dataIndex == 0 ? this.recordIndex+1:this.recordIndex;
+			if(this.recordIndex == this.records.getLength()) {
+				this.recordIndex = 0;
+				data.resumptionToken = data.listRecords.getResumptionToken();
+				if (data.resumptionToken == null
+					|| data.resumptionToken.length() == 0) {
+
+					data.listRecords = null;
+					dataLoader
+							.logBasic("No more resumption token found, end was reached.");
+					if (databaseLoad)
+						DatabaseLoader.closeConnection();
+					hasMoreData = Boolean.FALSE;
+
+				} else {
+					
+						dataLoader.logBasic("Resuming harvesting from "
+								+ data.resumptionToken);
+						try {
+							data.listRecords = new ListRecords(meta.getInputURI(),
+									data.resumptionToken);
+							this.header = null;
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							dataLoader
+									.logBasic("IOException while trying to resume from "
+											+ data.resumptionToken + ", trying again.");
+		
+							data.listRecords = new ListRecords(meta.getInputURI(),
+									data.resumptionToken);
+							this.header = null;
+		
+						} catch (SAXException e) {
+							dataLoader
+									.logBasic("SAXException while trying to resume from "
+											+ data.resumptionToken + ", trying again.");
+		
+							data.listRecords = new ListRecords(meta.getInputURI(),
+									data.resumptionToken);
+		
+						}
+				}
+			}
 
 		} catch (Exception e) {
 			dataLoader.logBasic("Error: " + e.toString());
 		}
-		return true;
+		return hasMoreData;
 
 	}
 
