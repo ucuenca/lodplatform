@@ -31,9 +31,9 @@ import net.antidot.sql.model.core.SQLConnector;
 
 import org.openrdf.rio.RDFFormat;
 import org.pentaho.di.core.exception.KettleException;
+import org.pentaho.di.core.row.RowDataUtil;
 import org.pentaho.di.core.row.RowMeta;
 import org.pentaho.di.i18n.BaseMessages;
-
 import org.pentaho.di.trans.Trans;
 import org.pentaho.di.trans.TransMeta;
 import org.pentaho.di.trans.step.BaseStep;
@@ -123,24 +123,29 @@ public class RDFGeneration extends BaseStep implements StepInterface {
 
 		RDFGenerationMeta meta = (RDFGenerationMeta) smi;
 		RDFGenerationData data = (RDFGenerationData) sdi;
-
+		getRow();
 		if (first) {
 			first = false;
 			super.init(meta, data);
-			data.outputRowMeta = new RowMeta();
+			data.outputRowMeta = getInputRowMeta() != null ? getInputRowMeta().clone(): new RowMeta();
 			meta.getFields(data.outputRowMeta, getStepname(), null, null, this);
 		}
-
+		
+		Object [] outputRow = RowDataUtil.allocateRowData(data.outputRowMeta.size());
+		outputRow[0] = meta.getInputFieldr2rml(); 
 		if (meta.getInputFieldr2rml() == null || meta.getSqlvendor() == null
 				|| meta.getDatabaseURL() == null
 				|| meta.getDatabaseSchema() == null
 				|| meta.getUserName() == null || meta.getPassword() == null
 				|| meta.getDirectorioOutputRDF() == null
 				|| meta.getFormat() == null) {
-			logBasic(BaseMessages.getString(PKG,
+			logError(BaseMessages.getString(PKG,
 					"RDFGeneration.ERROR.MissingField"));
+			outputRow[1] = "ERROR =>" + BaseMessages.getString(PKG,
+					"RDFGeneration.ERROR.MissingField");
 
 		} else {
+			String status = "OK";
 			if (meta.getBaseUri() == null) {
 				meta.setBaseUri("");
 			}
@@ -173,13 +178,15 @@ public class RDFGeneration extends BaseStep implements StepInterface {
 				g = R2RMLProcessor.convertDatabase(data.conn,
 						meta.getInputFieldr2rml(), meta.getBaseUri(),
 						data.sqlDriver);
-
+				outputRow[0] = meta.getDirectorioOutputRDF() + "/"
+						+ meta.getFileoutput();
 				g.dumpRDF(
 						meta.getDirectorioOutputRDF() + "/"
 								+ meta.getFileoutput(), data.rdfFormat);
 
 			} catch (Exception e) {
-				e.printStackTrace();
+				status = "ERROR => " + e.getMessage();
+				logError(status, e);
 			} finally {
 				try {
 					// Close db connection
@@ -187,8 +194,10 @@ public class RDFGeneration extends BaseStep implements StepInterface {
 				} catch (SQLException e) {
 					logBasic("expection" + e.getMessage());
 				}
+				outputRow[1] = status;
 			}
 		}
+		putRow(data.outputRowMeta, outputRow);
 
 		if (checkFeedback(getLinesRead())) {
 			logBasic(meta.getDirectorioOutputRDF()); // Some basic logging
