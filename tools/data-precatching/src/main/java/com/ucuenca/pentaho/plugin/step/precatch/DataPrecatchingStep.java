@@ -92,19 +92,19 @@ public class DataPrecatchingStep extends BaseStep implements StepInterface {
 	 * @return true if initialization completed successfully, false if there was an error preventing the step from working. 
 	 *  
 	 */
-	public boolean init(StepMetaInterface smi, StepDataInterface sdi) {
+	/*public boolean init(StepMetaInterface smi, StepDataInterface sdi) {
 		// Casting to step-specific implementation classes is safe
 		DataPrecatchingStepMeta meta = (DataPrecatchingStepMeta) smi;
 		DataPrecatchingStepData data = (DataPrecatchingStepData) sdi;
 		
-		Boolean ok = super.init(meta, data);
-		try {
+		return super.init(meta, data);*/
+		/*try {
 			if(ok) DatabaseLoader.getConnection();
 		}catch(Exception e) {
 			logError("Error: " + e.getMessage());
 		}
-		return ok;
-	}	
+		return ok;*/
+	//}	
 
 	/**
 	 * Once the transformation starts executing, the processRow() method is called repeatedly
@@ -127,12 +127,17 @@ public class DataPrecatchingStep extends BaseStep implements StepInterface {
 	 * 
 	 * @return true to indicate that the function should be called again, false if the step is done
 	 */
-	public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws KettleException {
+	public synchronized boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws KettleException {
 		
 		DataPrecatchingStepMeta meta = (DataPrecatchingStepMeta) smi;
 		DataPrecatchingStepData data = (DataPrecatchingStepData) sdi;
 		data.row = getRow(); // get row, set busy!
 		if (first) {
+			try {
+				DatabaseLoader.getConnection();
+			}catch(Exception e) {
+				throw new KettleException("Error: " + e.getMessage());
+			}
 			first = false;
 			data.outputRowMeta = getInputRowMeta();
 			meta.getFields(data.outputRowMeta, getStepname(), null, null, null, null, null);
