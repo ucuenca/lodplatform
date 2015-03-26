@@ -15,5 +15,6 @@
   <name>LOD Specification PDI Plugins</name>
   <modules>
 	<module>marc21Loader</module>
+	<module>OAILoader</module>
   </modules>
 </project>

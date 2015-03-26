@@ -12,5 +12,7 @@
   <packaging>pom</packaging>
   <name>LOD Modeling PDI Plugins</name>
   <modules>
+	<module>GetPropertiesOWL</module>
+	<module>ontology-mapping</module>
   </modules>
 </project>
