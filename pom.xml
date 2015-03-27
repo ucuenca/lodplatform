@@ -16,6 +16,7 @@
     <openrdf.sesame.version>2.6.10</openrdf.sesame.version>
   </properties>
   <modules>
+    <module>no-released-libs</module>
     <module>tools</module>
     <module>specification</module>
     <module>modeling</module>
