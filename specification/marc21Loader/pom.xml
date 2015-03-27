@@ -42,6 +42,27 @@
   <build>
     <plugins>
       <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>2.4</version>
+          <executions>
+            <execution>
+              <id>santteegt-freelib-marc4j</id>
+              <phase>clean</phase>
+              <goals>
+                <goal>install-file</goal>
+              </goals>
+              <configuration>
+                <file>noreleased-libs/freelib-marc4j-2.6.4-SNAPSHOT.jar</file>
+                <groupId>info.freelibrary</groupId>
+                <artifactId>freelib-marc4j</artifactId>
+                <version>2.6.4-SNAPSHOT</version>
+                <packaging>jar</packaging>
+              </configuration>
+            </execution>
+          </executions>
+      </plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
         <version>1.7</version>
