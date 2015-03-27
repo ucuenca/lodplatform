@@ -8,7 +8,6 @@
     <version>0.0.1-SNAPSHOT</version>
   </parent>
 
-
   <groupId>com.ucuenca</groupId>
   <artifactId>specification</artifactId>
   <packaging>pom</packaging>

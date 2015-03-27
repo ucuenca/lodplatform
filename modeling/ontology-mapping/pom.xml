@@ -2,9 +2,14 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <parent>
+    <groupId>com.ucuenca</groupId>
+    <artifactId>modeling</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+
   <groupId>com.ucuenca.modeling</groupId>
   <artifactId>ontology-mapping</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>Ontology Mapping</name>
@@ -50,6 +55,7 @@
             <configuration>
               <target>
                 <property name="runtime-classpath" refid="maven.runtime.classpath"/>
+                <property name="kettle-local-dir" value="${pdiDirectory}" />
                 <ant antfile="build.xml" target="install" output="${basedir}/target/ant.log" inheritRefs="true"/>
               </target>
             </configuration>
@@ -89,7 +95,7 @@
                 <artifactItem>
 					  <groupId>com.ucuenca</groupId>
 					  <artifactId>misctools</artifactId>
-					  <version>0.0.1-SNAPSHOT</version>
+					  <version>${project.version}</version>
 					  <type>jar</type>
 					  <overWrite>false</overWrite>
 					  <outputDirectory>${project.build.directory}/lib</outputDirectory>
@@ -97,7 +103,7 @@
                 <artifactItem>
 					  <groupId>org.apache.jena</groupId>
 					  <artifactId>jena-core</artifactId>
-					  <version>2.12.0</version>
+					  <version>${apache.jena.version}</version>
 					  <type>jar</type>
 					  <overWrite>false</overWrite>
 					  <outputDirectory>${project.build.directory}/lib</outputDirectory>
@@ -153,25 +159,25 @@
     <dependency>
   		<groupId>pentaho-kettle</groupId>
   		<artifactId>kettle-core</artifactId>
-  		<version>5.1.preview.506</version>
+  		<version>${pentaho.kettle.version}</version>
 	</dependency>
 	
 	<dependency>
   		<groupId>pentaho-kettle</groupId>
   		<artifactId>kettle-dbdialog</artifactId>
-  		<version>5.1.preview.506</version>
+  		<version>${pentaho.kettle.version}</version>
 	</dependency>
 	
 	<dependency>
   		<groupId>pentaho-kettle</groupId>
   		<artifactId>kettle-engine</artifactId>
-  		<version>5.1.preview.506</version>
+  		<version>${pentaho.kettle.version}</version>
 	</dependency>
 	
 	<dependency>
   		<groupId>pentaho-kettle</groupId>
   		<artifactId>kettle-ui-swt</artifactId>
-  		<version>5.1.preview.506</version>
+  		<version>${pentaho.kettle.version}</version>
 	</dependency>
 	<!-- 
 	<dependency>
@@ -184,7 +190,7 @@
 	<dependency>
 	  <groupId>org.apache.jena</groupId>
 	  <artifactId>jena-core</artifactId>
-	  <version>2.12.0</version>
+	  <version>${apache.jena.version}</version>
 	</dependency>
 	
 	<dependency>
@@ -196,7 +202,7 @@
 	<dependency>
 	  <groupId>com.ucuenca</groupId>
 	  <artifactId>misctools</artifactId>
-	  <version>0.0.1-SNAPSHOT</version>
+	  <version>${project.version}</version>
     </dependency>
 	
   </dependencies>

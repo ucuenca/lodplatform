@@ -8,7 +8,7 @@
 	<property file="build/build.properties" />
 
 	<!-- set global properties for this build -->
-	<property name="kettle-local-dir" location="/home/depcc/MEGA/Investigación/Pentaho/data-integration" />
+	<!-- <property name="kettle-local-dir" location="" /> -->
 	<!--
 	<property name="src" location="src" />
 	<property name="classes" location="classes" />

@@ -6,6 +6,15 @@
   <version>0.0.1-SNAPSHOT</version>
   <name>LOD Platform UCUENCA</name>
   <packaging>pom</packaging>
+  <properties>
+    <pdiDirectory>${project.build.directory}</pdiDirectory>
+    <ucuenca.lod.version>${project.version}</ucuenca.lod.version>
+    <pentaho.kettle.version>5.1.preview.506</pentaho.kettle.version>
+    <apache.jena.version>2.12.0</apache.jena.version>
+    <h2.database.version>1.4.184</h2.database.version>
+    <antidot.db2triples.version>1.0.3-SNAPSHOT</antidot.db2triples.version>
+    <openrdf.sesame.version>2.6.10</openrdf.sesame.version>
+  </properties>
   <modules>
     <module>tools</module>
     <module>specification</module>
