@@ -24,43 +24,7 @@
 
    fuseki:services (
      <#service1>
-     <#service2>
+ 
    ) .
 ## ---------------------------------------------------------------
-## Read-only access to a small books database.
-
-<#service1> rdf:type fuseki:Service ;
-    fuseki:name                     "mymodelname" ;
-    fuseki:serviceQuery             "queryName" ;
-    fuseki:serviceReadGraphStore    "dataGraph" ;
-    fuseki:dataset                   <#myds> ;
-    .
-    
-<#myds>    rdf:type ja:RDFDataset ;
-    rdfs:label "myds" ;
-    ja:defaultGraph 
-      [ rdfs:label "books.ttl" ;
-        a ja:MemoryModel ;
-        ja:content [ja:externalContent <file:Data/myrdf.rdf> ] ;
-      ] ;
-    .
-
-## ---------------------------------------------------------------
-## Updatable in-memory dataset.
-
-<#service2> rdf:type fuseki:Service ;
-    # URI of the dataset -- http://host:port/ds
-    fuseki:name                        "ds" ; 
-    fuseki:serviceQuery                "sparql" ;
-    fuseki:serviceQuery                "query" ;
-    fuseki:serviceUpdate               "update" ;
-    fuseki:serviceUpload               "upload" ;
-    fuseki:serviceReadWriteGraphStore  "data" ;     
-    fuseki:serviceReadGraphStore       "get" ;
-    fuseki:dataset                     <#emptyDataset> ;
-    .
-
-## In-memory, initially empty.
-<#emptyDataset> rdf:type ja:RDFDataset .
-
-
+## 

@@ -36,7 +36,6 @@ import java.io.PrintStream;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 
-
 import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.core.row.RowDataUtil;
 import org.pentaho.di.core.row.RowMetaInterface;
@@ -48,10 +47,11 @@ import org.pentaho.di.trans.step.StepInterface;
 import org.pentaho.di.trans.step.StepMeta;
 import org.pentaho.di.trans.step.StepMetaInterface;
 
-
 //-----------------------
 import org.apache.jena.atlas.lib.FileOps;
-import org.apache.jena.fuseki.*;
+import org.apache.jena.fuseki.Fuseki;
+import org.apache.jena.fuseki.server.FusekiVocab;
+
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
@@ -66,345 +66,418 @@ import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.query.ReadWrite;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.sparql.core.DatasetGraph;
 import com.hp.hpl.jena.tdb.TDBFactory;
 import com.hp.hpl.jena.tdb.base.file.Location;
+import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.query.Dataset;
+
 
 //----------------------------
 /**
- * This class is part of the demo step plug-in implementation.
- * It demonstrates the basics of developing a plug-in step for PDI. 
+ * This class is part of the demo step plug-in implementation. It demonstrates
+ * the basics of developing a plug-in step for PDI.
  * 
- * The demo step adds a new string field to the row stream and sets its
- * value to "Hello World!". The user may select the name of the new field.
- *   
- * This class is the implementation of StepInterface.
- * Classes implementing this interface need to:
+ * The demo step adds a new string field to the row stream and sets its value to
+ * "Hello World!". The user may select the name of the new field.
  * 
- * - initialize the step
- * - execute the row processing logic
- * - dispose of the step 
+ * This class is the implementation of StepInterface. Classes implementing this
+ * interface need to:
+ * 
+ * - initialize the step - execute the row processing logic - dispose of the
+ * step
  * 
  * Please do not create any local fields in a StepInterface class. Store any
- * information related to the processing logic in the supplied step data interface
- * instead.  
+ * information related to the processing logic in the supplied step data
+ * interface instead.
  * 
  */
 
 public class FusekiLoader extends BaseStep implements StepInterface {
 
+	private Model fModel= ModelFactory.createDefaultModel();
+	
 	/**
 	 * The constructor should simply pass on its arguments to the parent class.
 	 * 
-	 * @param s 				step description
-	 * @param stepDataInterface	step data class
-	 * @param c					step copy
-	 * @param t					transformation description
-	 * @param dis				transformation executing
+	 * @param s
+	 *            step description
+	 * @param stepDataInterface
+	 *            step data class
+	 * @param c
+	 *            step copy
+	 * @param t
+	 *            transformation description
+	 * @param dis
+	 *            transformation executing
 	 */
-	public FusekiLoader(StepMeta s, StepDataInterface stepDataInterface, int c, TransMeta t, Trans dis) {
+	public FusekiLoader(StepMeta s, StepDataInterface stepDataInterface, int c,
+			TransMeta t, Trans dis) {
 		super(s, stepDataInterface, c, t, dis);
 	}
-	
+
 	/**
-	 * This method is called by PDI during transformation startup. 
+	 * This method is called by PDI during transformation startup.
 	 * 
-	 * It should initialize required for step execution. 
+	 * It should initialize required for step execution.
 	 * 
-	 * The meta and data implementations passed in can safely be cast
-	 * to the step's respective implementations. 
+	 * The meta and data implementations passed in can safely be cast to the
+	 * step's respective implementations.
 	 * 
 	 * It is mandatory that super.init() is called to ensure correct behavior.
 	 * 
-	 * Typical tasks executed here are establishing the connection to a database,
-	 * as wall as obtaining resources, like file handles.
+	 * Typical tasks executed here are establishing the connection to a
+	 * database, as wall as obtaining resources, like file handles.
 	 * 
-	 * @param smi 	step meta interface implementation, containing the step settings
-	 * @param sdi	step data interface implementation, used to store runtime information
+	 * @param smi
+	 *            step meta interface implementation, containing the step
+	 *            settings
+	 * @param sdi
+	 *            step data interface implementation, used to store runtime
+	 *            information
 	 * 
-	 * @return true if initialization completed successfully, false if there was an error preventing the step from working. 
-	 *  
+	 * @return true if initialization completed successfully, false if there was
+	 *         an error preventing the step from working.
+	 * 
 	 */
-	public boolean init(StepMetaInterface smi, StepDataInterface sdi) {
+	/*public boolean init(StepMetaInterface smi, StepDataInterface sdi) {
 		// Casting to step-specific implementation classes is safe
 		FusekiLoaderMeta meta = (FusekiLoaderMeta) smi;
 		FusekiLoaderData data = (FusekiLoaderData) sdi;
 
 		return super.init(meta, data);
-	}	
-
+	}
+*/
 	/**
-	 * Once the transformation starts executing, the processRow() method is called repeatedly
-	 * by PDI for as long as it returns true. To indicate that a step has finished processing rows
-	 * this method must call setOutputDone() and return false;
+	 * Once the transformation starts executing, the processRow() method is
+	 * called repeatedly by PDI for as long as it returns true. To indicate that
+	 * a step has finished processing rows this method must call setOutputDone()
+	 * and return false;
 	 * 
-	 * Steps which process incoming rows typically call getRow() to read a single row from the
-	 * input stream, change or add row content, call putRow() to pass the changed row on 
-	 * and return true. If getRow() returns null, no more rows are expected to come in, 
-	 * and the processRow() implementation calls setOutputDone() and returns false to
-	 * indicate that it is done too.
+	 * Steps which process incoming rows typically call getRow() to read a
+	 * single row from the input stream, change or add row content, call
+	 * putRow() to pass the changed row on and return true. If getRow() returns
+	 * null, no more rows are expected to come in, and the processRow()
+	 * implementation calls setOutputDone() and returns false to indicate that
+	 * it is done too.
 	 * 
-	 * Steps which generate rows typically construct a new row Object[] using a call to
-	 * RowDataUtil.allocateRowData(numberOfFields), add row content, and call putRow() to
-	 * pass the new row on. Above process may happen in a loop to generate multiple rows,
-	 * at the end of which processRow() would call setOutputDone() and return false;
+	 * Steps which generate rows typically construct a new row Object[] using a
+	 * call to RowDataUtil.allocateRowData(numberOfFields), add row content, and
+	 * call putRow() to pass the new row on. Above process may happen in a loop
+	 * to generate multiple rows, at the end of which processRow() would call
+	 * setOutputDone() and return false;
 	 * 
-	 * @param smi the step meta interface containing the step settings
-	 * @param sdi the step data interface that should be used to store
+	 * @param smi
+	 *            the step meta interface containing the step settings
+	 * @param sdi
+	 *            the step data interface that should be used to store
 	 * 
-	 * @return true to indicate that the function should be called again, false if the step is done
+	 * @return true to indicate that the function should be called again, false
+	 *         if the step is done
 	 */
-	public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws KettleException {
+	public boolean processRow(StepMetaInterface smi, StepDataInterface sdi)
+			throws KettleException {
 
-		// safely cast the step settings (meta) and runtime info (data) to specific implementations 
+		// safely cast the step settings (meta) and runtime info (data) to
+		// specific implementations
 		FusekiLoaderMeta meta = (FusekiLoaderMeta) smi;
 		FusekiLoaderData data = (FusekiLoaderData) sdi;
-
-
-		// the "first" flag is inherited from the base step implementation
-		// it is used to guard some processing tasks, like figuring out field indexes
-		// in the row structure that only need to be done once
-		if (first) {
-			first = false;
-			try{
-			data.model.read(meta.getOutputField().trim());
-			
-			
-		
-		} catch (Exception eox) {
-		logBasic(" ERROR " + eox +" Unload model " +meta.getOutputField() );
-		}
-			
-
-		
-			
-			
-			try{
+		if (meta.getValidate().equals("true")) {
+			// the "first" flag is inherited from the base step implementation
+			// it is used to guard some processing tasks, like figuring out
+			// field
+			// indexes
+			// in the row structure that only need to be done once
+			if (first) {
 				
-			FileWriter out = new FileWriter("plugins/steps/FusekiLoader/fuseki/Data/"+meta.getInputName() );
-			data.model.write(out, "TTL");
-			logBasic("mapping from "+meta.getOutputField()+" is Ok in "+"plugins/steps/FusekiLoader/fuseki/Data/"+meta.getInputName() );
-			}
-        	catch (FileNotFoundException e) { System.out.println(e); } catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				logBasic(" ERROR " + e );
-			}
+				first = false;
+				super.init(meta, data);
+				try {
+					data.model.read(meta.getOutputField().trim());
 
-			//create mapping.ttl-------------------------------------
-			createmapping(meta);
+				} catch (Exception eox) {
+					logBasic(" ERROR " + eox + " Unload model "
+							+ meta.getOutputField());
+				}
 
-			logBasic(" config.ttl is ok " );
+				try {
 
-			/**
-			try{
-		        String verify, putData;
-		        File file = new File("plugins/steps/FusekiLoader/fuseki/config.ttl");
-		        file.createNewFile();
-		        FileWriter fw = new FileWriter(file);
-		        BufferedWriter bw = new BufferedWriter(fw);
-		        bw.write("Some text here for a reason");
-		        bw.flush();
+					FileWriter out = new FileWriter(
+							"plugins/steps/FusekiLoader/fuseki/Data/"
+									+ meta.getInputName());
+					data.model.write(out, "TTL");
+					logBasic("mapping from " + meta.getOutputField()
+							+ " is Ok in "
+							+ "plugins/steps/FusekiLoader/fuseki/Data/"
+							+ meta.getInputName());
+				} catch (FileNotFoundException e) {
+					System.out.println(e);
+				} catch (IOException e) {
+				
+					e.printStackTrace();
+					logBasic(" ERROR " + e);
+				}
 
-		        FileReader fr = new FileReader(file);
-		        BufferedReader br = new BufferedReader(fr);
+				// create mapping.ttl-------------------------------------
+				createmapping(meta);
 
-		        while( (verify=br.readLine()) != null )
-		        { 
-		            if(verify != null)
-		            {
-		                putData = verify.replaceAll("here", "there");
-		                bw.write(putData);
-		            }
-		        }
-		        br.close();
-		        bw.close();
+				logBasic(" config.ttl is ok ");
 
-		    }catch(IOException e){
-		    e.printStackTrace();
-		    }
-			*/
-			/**--------------------------------------------------
-			
-			 File oldFile1 = new File("plugins/steps/FusekiLoader/fuseki/fuseki-server2.jars");
-			
-			    if (oldFile1.renameTo(new File("plugins/steps/FusekiLoader/fuseki/fuseki-server.jar"))) {
-	             //   System.out.println("The file was build succesfully in "+meta.getDirectory()+"/"+ oldFile.getName());
-	                logBasic("copy fuseki-server.jar in resources , ready");
-	            } else {
-	            	logBasic("ERROR  no fuseki-server.jar in resources.");
-	                // System.out.println("The File was not created.");
-	             }
-			*/
-			//compile(meta.getDirectory());
-			
-			try {
 				/**
-				File source=new File("plugins/steps/FusekiLoader/fuseki.war");
-				File destination=new File(meta.getDirectory()+"/fuseki.war");
-				*/
-				
-				//create destination
-				File dir = new File(meta.getDirectory()+"/fuseki");
-				dir.mkdir();
-				//
-				File source=new File("plugins/steps/FusekiLoader/fuseki");
-				File destination=new File(meta.getDirectory()+"/fuseki");
-				
-				recursiveCopy(source, destination);
-				//copyFile(source,destination);
-			       logBasic("The file was build succesfully in "+meta.getDirectory()+"/"+ "fuseki");
-			          
-			} catch (Exception e1) {
-				// TODO Auto-generated catch block
-				logBasic(" ERROR " + e1 +"The File was not created. in "+meta.getDirectory()+"/"+ "fuseki");
+				 * try{ String verify, putData; File file = new
+				 * File("plugins/steps/FusekiLoader/fuseki/config.ttl");
+				 * file.createNewFile(); FileWriter fw = new FileWriter(file);
+				 * BufferedWriter bw = new BufferedWriter(fw);
+				 * bw.write("Some text here for a reason"); bw.flush();
+				 * 
+				 * FileReader fr = new FileReader(file); BufferedReader br = new
+				 * BufferedReader(fr);
+				 * 
+				 * while( (verify=br.readLine()) != null ) { if(verify != null)
+				 * { putData = verify.replaceAll("here", "there");
+				 * bw.write(putData); } } br.close(); bw.close();
+				 * 
+				 * }catch(IOException e){ e.printStackTrace(); }
+				 */
+				/**
+				 * --------------------------------------------------
+				 * 
+				 * File oldFile1 = new File(
+				 * "plugins/steps/FusekiLoader/fuseki/fuseki-server2.jars");
+				 * 
+				 * if (oldFile1.renameTo(new
+				 * File("plugins/steps/FusekiLoader/fuseki/fuseki-server.jar")))
+				 * { // System.out.println("The file was build succesfully in "+
+				 * meta. getDirectory()+"/"+ oldFile.getName());
+				 * logBasic("copy fuseki-server.jar in resources , ready"); }
+				 * else { logBasic("ERROR  no fuseki-server.jar in resources.");
+				 * // System.out.println("The File was not created."); }
+				 */
+				// compile(meta.getDirectory());
+
+				try {
+					/**
+					 * File source=new
+					 * File("plugins/steps/FusekiLoader/fuseki.war"); File
+					 * destination=new File(meta.getDirectory()+"/fuseki.war");
+					 */
+
+					// create destination
+					File dir = new File(meta.getDirectory() + "/fuseki");
+					dir.mkdir();
+					//
+					File source = new File("plugins/steps/FusekiLoader/fuseki");
+					File destination = new File(meta.getDirectory() + "/fuseki");
+
+					recursiveCopy(source, destination);
+					// copyFile(source,destination);
+					logBasic("The file was build succesfully in "
+							+ meta.getDirectory() + "/" + "fuseki");
+
+				} catch (Exception e1) {
+					
+					logBasic(" ERROR " + e1 + "The File was not created. in "
+							+ meta.getDirectory() + "/" + "fuseki");
+				}
+				/**
+				 * File oldFile = new
+				 * File("plugins/steps/FusekiLoader/fuseki.war");
+				 * 
+				 * 
+				 * if (oldFile.renameTo(new
+				 * File(meta.getDirectory()+"/"+oldFile.getName()))) { //
+				 * System.out.
+				 * println("The file was build succesfully in "+meta.
+				 * getDirectory ()+"/"+ oldFile.getName());
+				 * logBasic("The file was build succesfully in "
+				 * +meta.getDirectory()+"/"+ oldFile.getName()); } else {
+				 * logBasic("ERROR  The File was not created. in "
+				 * +meta.getDirectory()+"/"+ oldFile.getName()); //
+				 * System.out.println("The File was not created."); }
+				 */
 			}
-			/**
-			 File oldFile = new File("plugins/steps/FusekiLoader/fuseki.war");
-			  
-			 
-			            if (oldFile.renameTo(new File(meta.getDirectory()+"/"+oldFile.getName()))) {
-			             //   System.out.println("The file was build succesfully in "+meta.getDirectory()+"/"+ oldFile.getName());
-			                logBasic("The file was build succesfully in "+meta.getDirectory()+"/"+ oldFile.getName());
-			            } else {
-			            	logBasic("ERROR  The File was not created. in "+meta.getDirectory()+"/"+ oldFile.getName());
-			                // System.out.println("The File was not created.");
-			             }
-			*/
+
+			// safely add the string "Hello World!" at the end of the output row
+			// the row array will be resized if necessary
+			// Object[] outputRow = RowDataUtil.addValueData(r,
+			// data.outputRowMeta.size() - 1, "Hello World!");
+
+			// put the row to the output row stream
+			// putRow(data.outputRowMeta, outputRow);
+
+			// log progress if it is time to to so
+			if (checkFeedback(getLinesRead())) {
+				logBasic("Linenr " + getLinesRead()); // Some basic logging
+			}
+		} else {
+
+			logBasic(" ERROR Tranformation dont started because parameters es empty");
 		}
-
-		// safely add the string "Hello World!" at the end of the output row
-		// the row array will be resized if necessary 
-		//Object[] outputRow = RowDataUtil.addValueData(r, data.outputRowMeta.size() - 1, "Hello World!");
-
-		// put the row to the output row stream
-		//putRow(data.outputRowMeta, outputRow); 
-
-		// log progress if it is time to to so
-		if (checkFeedback(getLinesRead())) {
-			logBasic("Linenr " + getLinesRead()); // Some basic logging
-		}
-
 		// indicate that processRow() should be called again
 		return false;
 	}
 
 	private void createmapping(FusekiLoaderMeta meta) {
-		try
-	    {
-	    File file = new File("plugins/steps/FusekiLoader/fuseki/configO.ttl");
-	    BufferedReader reader = new BufferedReader(new FileReader(file));
-	    String line = "", oldtext = "";
-	    while((line = reader.readLine()) != null)
-	        {
-	        oldtext += line + "\r\n";
-	    }
-	    reader.close();
-	    // replace a word in a file
-	    String newtext = oldtext.replaceAll("mymodelname",meta.getServiceName());oldtext=newtext;
-	    newtext = oldtext.replaceAll("queryName",meta.getFuQuery());oldtext=newtext;
-	     newtext = oldtext.replaceAll("dataGraph",meta.getFuGraph());oldtext=newtext;
-	     newtext = oldtext.replaceAll("myds",meta.getFuDataset());oldtext=newtext;
-	     newtext = oldtext.replaceAll("books.ttl",meta.getInputName());oldtext=newtext;
-	     newtext = oldtext.replaceAll("myrdf.rdf",meta.getInputName());
-	
-	   
-	    //To replace a line in a file
-	    //String newtext = oldtext.replaceAll("This is test string 20000", "blah blah blah");
-	   
-	    FileWriter writer = new FileWriter("plugins/steps/FusekiLoader/fuseki/config.ttl");
-	    writer.write(newtext);writer.close();
-	}
-	catch (IOException ioe)
-	    {
-		logBasic(" ERROR " + ioe +"The File config.ttl was not created. ");
-	    ioe.printStackTrace();
-		
-		
-	}
-	
+		Resource resource3 = fModel.createResource("file:Data/"+meta.getInputName());
+		Resource resource2 = fModel.createResource("#"+meta.getFuDataset());
+		resource2.addProperty(RDF.type, ja.RDFDataset)
+		.addProperty(RDFS.label, meta.getFuDataset())
+		.addProperty(ja.defaultGraph,
+				fModel.createResource()
+				.addProperty(RDFS.label,meta.getInputName())
+				.addProperty(RDF.type, ja.MemoryModel)
+				.addProperty(ja.content, 
+						fModel.createResource().addProperty(ja.externalContent,resource3))
+				);
 
 		
+		Resource resource1 = fModel.createResource("#service1");
+		
+		resource1.addProperty(RDF.type,fuseki.Service )
+		.addProperty(FusekiVocab.pServiceName, meta.getServiceName())
+		.addProperty(FusekiVocab.pServiceQueryEP, meta.getFuQuery())
+		.addProperty(FusekiVocab.pServiceReadgraphStoreEP, meta.getFuGraph())
+		.addProperty(fuseki.dataset,resource2);
+		
+		
+		
+	
+		
+		
+		FileWriter out;
+		try {
+			out = new FileWriter("plugins/steps/FusekiLoader/fuseki/"
+							+ "config.ttl");
+			fModel.write(out, "TTL");
+			
+		} catch (IOException e) {
+			
+			logBasic(e.toString());
+			
+		}
+		
+	
+		
+		
+		try {
+			File file = new File(
+					"plugins/steps/FusekiLoader/fuseki/configO.ttl");
+			BufferedReader reader = new BufferedReader(new FileReader(file));
+			String line = "", oldtext = "";
+			while ((line = reader.readLine()) != null) {
+				oldtext += line + "\r\n";
+			}
+			reader.close();
+			
+			 file = new File(
+					"plugins/steps/FusekiLoader/fuseki/config.ttl");
+			BufferedReader reader2 = new BufferedReader(new FileReader(file));
+			String line2 = "", oldtext2 = "";
+			while ((line2 = reader2.readLine()) != null) {
+				oldtext2 += line2 + "\r\n";
+			}
+			reader2.close();
+			 
+			String newtext = oldtext + ""+oldtext2;
+			
+			FileWriter writer = new FileWriter(
+					"plugins/steps/FusekiLoader/fuseki/config.ttl");
+			writer.write(newtext);
+			writer.close();
+			
+			//dar permiso
+			File fileFinal = new File(
+					"plugins/steps/FusekiLoader/fuseki/config.ttl");
+			fileFinal.setExecutable(true);
+		} catch (IOException ioe) {
+			logBasic(" ERROR " + ioe + "The File config.ttl was not created. ");
+			ioe.printStackTrace();
+
+		}
+
 	}
 
 	/**
-	 * This method is called by PDI once the step is done processing. 
+	 * This method is called by PDI once the step is done processing.
 	 * 
-	 * The dispose() method is the counterpart to init() and should release any resources
-	 * acquired for step execution like file handles or database connections.
+	 * The dispose() method is the counterpart to init() and should release any
+	 * resources acquired for step execution like file handles or database
+	 * connections.
 	 * 
-	 * The meta and data implementations passed in can safely be cast
-	 * to the step's respective implementations. 
+	 * The meta and data implementations passed in can safely be cast to the
+	 * step's respective implementations.
 	 * 
-	 * It is mandatory that super.dispose() is called to ensure correct behavior.
+	 * It is mandatory that super.dispose() is called to ensure correct
+	 * behavior.
 	 * 
-	 * @param smi 	step meta interface implementation, containing the step settings
-	 * @param sdi	step data interface implementation, used to store runtime information
+	 * @param smi
+	 *            step meta interface implementation, containing the step
+	 *            settings
+	 * @param sdi
+	 *            step data interface implementation, used to store runtime
+	 *            information
 	 */
 	public void dispose(StepMetaInterface smi, StepDataInterface sdi) {
 
 		// Casting to step-specific implementation classes is safe
 		FusekiLoaderMeta meta = (FusekiLoaderMeta) smi;
 		FusekiLoaderData data = (FusekiLoaderData) sdi;
-		
+
 		super.dispose(meta, data);
 	}
 
-	
-	
-	
 	private void recursiveCopy(File fSource, File fDest) {
-	     try {
-	          if (fSource.isDirectory()) {
-	          // A simple validation, if the destination is not exist then create it
-	               if (!fDest.exists()) {
-	                    fDest.mkdirs();
-	               }
-	 
-	               // Create list of files and directories on the current source
-	               // Note: with the recursion 'fSource' changed accordingly
-	               String[] fList = fSource.list();
-	 
-	               for (int index = 0; index < fList.length; index++) {
-	                    File dest = new File(fDest, fList[index]);
-	                    File source = new File(fSource, fList[index]);
-	 
-	                    // Recursion call take place here
-	                    recursiveCopy(source, dest);
-	               }
-	          }
-	          else {
-	               // Found a file. Copy it into the destination, which is already created in 'if' condition above
-	 
-	               // Open a file for read and write (copy)
-	               FileInputStream fInStream = new FileInputStream(fSource);
-	               FileOutputStream fOutStream = new FileOutputStream(fDest);
-	 
-	               // Read 2K at a time from the file
-	               byte[] buffer = new byte[2048];
-	               int iBytesReads;
-	 
-	               // In each successful read, write back to the source
-	               while ((iBytesReads = fInStream.read(buffer)) >= 0) {
-	                    fOutStream.write(buffer, 0, iBytesReads);
-	               }
-	 
-	               // Safe exit
-	               if (fInStream != null) {
-	                    fInStream.close();
-	               }
-	 
-	               if (fOutStream != null) {
-	                    fOutStream.close();
-	               }
-	          }
-	     }
-	     catch (Exception ex) {
-	          // Please handle all the relevant exceptions here
-	     }
-	}
-	
+		try {
+			if (fSource.isDirectory()) {
+				// A simple validation, if the destination is not exist then
+				// create it
+				if (!fDest.exists()) {
+					fDest.mkdirs();
+				}
 
+				// Create list of files and directories on the current source
+				// Note: with the recursion 'fSource' changed accordingly
+				String[] fList = fSource.list();
+
+				for (int index = 0; index < fList.length; index++) {
+					File dest = new File(fDest, fList[index]);
+					File source = new File(fSource, fList[index]);
+
+					// Recursion call take place here
+					recursiveCopy(source, dest);
+				}
+			} else {
+				// Found a file. Copy it into the destination, which is already
+				// created in 'if' condition above
+
+				// Open a file for read and write (copy)
+				FileInputStream fInStream = new FileInputStream(fSource);
+				FileOutputStream fOutStream = new FileOutputStream(fDest);
+
+				// Read 2K at a time from the file
+				byte[] buffer = new byte[2048];
+				int iBytesReads;
+
+				// In each successful read, write back to the source
+				while ((iBytesReads = fInStream.read(buffer)) >= 0) {
+					fOutStream.write(buffer, 0, iBytesReads);
+				}
+
+				// Safe exit
+				if (fInStream != null) {
+					fInStream.close();
+				}
+
+				if (fOutStream != null) {
+					fOutStream.close();
+				}
+			}
+		} catch (Exception ex) {
+			// Please handle all the relevant exceptions here
+		}
+	}
 
 }

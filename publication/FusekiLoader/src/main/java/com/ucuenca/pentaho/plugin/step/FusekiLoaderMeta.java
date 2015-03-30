@@ -88,6 +88,15 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 	private String fuQuery;
 	private String fuGraph;
 	private String fuDataset;
+	private String Validate;
+	public String getValidate() {
+		return Validate;
+	}
+
+	public void setValidate(String validate) {
+		Validate = validate;
+	}
+
 	public String getPortName() {
 		return PortName;
 	}
@@ -197,7 +206,7 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 		this.serviceName = "myservice";
 		this.inputName = "";
 		this.setPortName("3030");
-		
+		Validate = "false";
 	}
 	
 	/**
@@ -251,7 +260,7 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 		retval.append( "    " ).append( XMLHandler.addTagValue("fuGraph",fuGraph));
 		retval.append( "    " ).append( XMLHandler.addTagValue("fuQuery",fuQuery));
 		retval.append( "    " ).append( XMLHandler.addTagValue("PortName",PortName));
-		
+		retval.append( "    " ).append( XMLHandler.addTagValue("Validate",Validate));
 	
 		return retval.toString();
 	}
@@ -277,6 +286,7 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 			setFuGraph(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "fuGraph")));
 			setFuQuery(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "fuQuery")));
 			setPortName(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "PortName")));
+			setValidate(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "Validate")));
 			
 
 		} catch (Exception e) {
@@ -302,6 +312,7 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 			rep.saveStepAttribute(id_transformation, id_step, "fuGraph", fuGraph); //$NON-NLS-1$
 			rep.saveStepAttribute(id_transformation, id_step, "fuQuery", fuQuery); //$NON-NLS-1$
 			rep.saveStepAttribute(id_transformation, id_step, "PortName", PortName);
+			rep.saveStepAttribute(id_transformation, id_step, "Validate", Validate);
 			
 		}
 		catch(Exception e){
@@ -331,6 +342,8 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 			fuGraph  = rep.getStepAttributeString(id_step, "fuGraph");
 			fuQuery  = rep.getStepAttributeString(id_step, "fuQuery");
 			PortName = rep.getStepAttributeString(id_step, "PortName");
+			Validate = rep.getStepAttributeString(id_step, "Validate");
+	 
 		}
 		catch(Exception e){
 			throw new KettleException("Unable to load step from repository", e);
@@ -406,6 +419,58 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 			cr = new CheckResult(CheckResult.TYPE_RESULT_ERROR, BaseMessages.getString(PKG, "FusekiLoader.CheckResult.ReceivingRows.ERROR"), stepMeta);
 			remarks.add(cr);
 		}	
+	
+	
+		if (outputField==null   ) {
+			cr = new CheckResult(CheckResult.TYPE_RESULT_ERROR,
+					BaseMessages.getString(PKG,
+							"FusekiLoader.input.empty"),
+					stepMeta);
+			remarks.add(cr);
+		}
+		if ( serviceName==null   ) {
+			cr = new CheckResult(CheckResult.TYPE_RESULT_ERROR,
+					BaseMessages.getString(PKG,
+							"FusekiLoader.serviceName.empty"),
+					stepMeta);
+			remarks.add(cr);
+		}
+		if ( directory==null   ) {
+			cr = new CheckResult(CheckResult.TYPE_RESULT_ERROR,
+					BaseMessages.getString(PKG,
+							"FusekiLoader.ouput.empty"),
+					stepMeta);
+			remarks.add(cr);
+		}
+		if (PortName==null   ) {
+			cr = new CheckResult(CheckResult.TYPE_RESULT_ERROR,
+					BaseMessages.getString(PKG,
+							"FusekiLoader.port.empty"),
+					stepMeta);
+			remarks.add(cr);
+		}
+		if (fuQuery==null   ) {
+			cr = new CheckResult(CheckResult.TYPE_RESULT_ERROR,
+					BaseMessages.getString(PKG,
+							"RDFGeneration.CheckResult.FileR2rml"),
+					stepMeta);
+			remarks.add(cr);
+		}
+		if (fuGraph==null   ) {
+			cr = new CheckResult(CheckResult.TYPE_RESULT_ERROR,
+					BaseMessages.getString(PKG,
+							"RDFGeneration.CheckResult.FileR2rml"),
+					stepMeta);
+			remarks.add(cr);
+		}
+		if (fuDataset==null   ) {
+			cr = new CheckResult(CheckResult.TYPE_RESULT_ERROR,
+					BaseMessages.getString(PKG,
+							"RDFGeneration.CheckResult.FileR2rml"),
+					stepMeta);
+			remarks.add(cr);
+		}
+		
     	
 	}
 
