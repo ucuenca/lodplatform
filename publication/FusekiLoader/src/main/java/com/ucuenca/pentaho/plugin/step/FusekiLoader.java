@@ -344,6 +344,7 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 		
 		
 		
+
 	
 		
 		
@@ -388,10 +389,26 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 			writer.write(newtext);
 			writer.close();
 			
-			//dar permiso
+			//DAR PERMISOS LUEGO DE LA CREACION DEL DIRECTORIO FUSEKI 
 			File fileFinal = new File(
-					"plugins/steps/FusekiLoader/fuseki/config.ttl");
+					"plugins/steps/FusekiLoader/fuseki");
+			
+		
+			fileFinal.setWritable(true);
+			fileFinal.setReadable(true);
 			fileFinal.setExecutable(true);
+			File fileF1 = new File(
+					"plugins/steps/FusekiLoader/fuseki/config.ttl");
+			
+			fileF1.setReadable(true);
+			fileF1.setWritable(true);
+			fileF1.setExecutable(true);
+			File fileF2 = new File(
+					"plugins/steps/FusekiLoader/fuseki/fuseki-server");
+			
+			fileF2.setReadable(true);
+			fileF2.setWritable(true);
+			fileF2.setExecutable(true);
 		} catch (IOException ioe) {
 			logBasic(" ERROR " + ioe + "The File config.ttl was not created. ");
 			ioe.printStackTrace();

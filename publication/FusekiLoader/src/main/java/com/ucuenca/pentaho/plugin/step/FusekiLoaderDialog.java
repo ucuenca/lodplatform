@@ -114,7 +114,6 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 
-
 import java.awt.Desktop;
 import java.net.URI;
 
@@ -162,11 +161,14 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 	private Button wOpenBrowser;
 	private Button wPreCatch;
 	private Button wAddFila;
+	private Button wStopService;
+	private Button wCheckService;
 
 	private Listener lsReadUri;
 	private Listener lsLoadFile;
 	private Listener lsChooseDirectory;
 	private Listener lsCheckService;
+	private Listener lsStopService;
 	private Listener lsOpenBrowser;
 	private Listener lsPrecatch;
 	private Listener lsAddRow;
@@ -178,11 +180,13 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 	private int numt = 2;
 	private static final Logger log = Logger.getLogger(FusekiLoader.class
 			.getName());
-	
-	 private TableView wAnnTable;
-	  private Composite wClassifyComp, wAnnotateComp, wRelationComp;
-	  
-	  private CTabFolder wTabFolder;
+
+	private TableView wAnnTable;
+	private Composite wClassifyComp, wAnnotateComp, wRelationComp;
+
+	private CTabFolder wTabFolder;
+
+	Thread executorThread;
 
 	/**
 	 * The constructor should simply invoke super() and save the incoming meta
@@ -320,8 +324,8 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 		// precatch data
 
 		wPreCatch = new Button(shell, SWT.PUSH);
-		wPreCatch.setText(BaseMessages.getString(PKG,
-				"System.Tooltip.Precatch"));
+		wPreCatch.setText(BaseMessages
+				.getString(PKG, "System.Tooltip.Precatch"));
 
 		wPreCatch.setToolTipText(BaseMessages.getString(PKG,
 				"System.Tooltip.Precatch"));
@@ -395,19 +399,18 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 		// fdtextservPort.right = new FormAttachment(100, 0);
 		wTextServPort.setLayoutData(fdtextservPort);
 		// table to parameters
-		
-		
-		
-		
+
 		table = new Table(shell, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
-	     // transMeta, wClassifyComp, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI, colinf, 0, lsMod, props );
-		    //  wClassTable =
-	    //  new TableView(
-	  //	        transMeta, wClassifyComp, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI, colinf, 0, lsMod, props );
-	  	    
+		// transMeta, wClassifyComp, SWT.BORDER | SWT.FULL_SELECTION |
+		// SWT.MULTI, colinf, 0, lsMod, props );
+		// wClassTable =
+		// new TableView(
+		// transMeta, wClassifyComp, SWT.BORDER | SWT.FULL_SELECTION |
+		// SWT.MULTI, colinf, 0, lsMod, props );
+
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);
-		
+
 		String[] titles = { BaseMessages.getString(PKG, "Fuseki.table.col1"),
 				BaseMessages.getString(PKG, "Fuseki.table.col2"),
 
@@ -451,13 +454,13 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 						Text text = (Text) editor.getEditor();
 						editor.getItem()
 								.setText(EDITABLECOLUMN, text.getText());
-						
+
 					}
 				});
 				newEditor.selectAll();
 				newEditor.setFocus();
 				editor.setEditor(newEditor, item, EDITABLECOLUMN);
-				
+
 				final TableEditor editor2 = new TableEditor(table);
 				// The control that will be the editor must be a child of the
 				// Table
@@ -466,15 +469,13 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 				newEditor1.addModifyListener(new ModifyListener() {
 					public void modifyText(ModifyEvent me) {
 						Text text = (Text) editor2.getEditor();
-						editor2.getItem()
-								.setText(0, text.getText());
+						editor2.getItem().setText(0, text.getText());
 					}
 				});
 				newEditor1.selectAll();
 				newEditor1.setFocus();
 				editor2.setEditor(newEditor1, item, 0);
-				
-				
+
 			}
 		});
 		// ----------------------------------------------------------
@@ -490,10 +491,9 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 		// boton ok y cancel al ultimo
 
 		table.setLayoutData(fdmitabla);
-		
-		//---------------------------
-	
-		    
+
+		// ---------------------------
+
 		// -------------setiar datos
 		TableItem item = new TableItem(table, SWT.NONE, 0);
 		item.setText(0, "fuseki:dataset");
@@ -506,44 +506,44 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 
 		item.setText(0, "fuseki:serviceQuery");
 		item.setText(1, "query");
-		
+
 		item = new TableItem(table, SWT.NONE, 3);
 
 		item.setText(0, " ");
 		item.setText(1, " ");
 		table.setEnabled(true);
-		table.addListener(SWT.MouseDown, new Listener(){
-		      public void handleEvent(Event event) {
-		          Rectangle clientArea = table.getClientArea();
-		          Point pt = new Point(event.x, event.y);
-		          int index = table.getTopIndex();
-		          
-		          while (index < table.getItemCount()) {
-		            boolean visible = false;
-		            TableItem item = table.getItem(index);
-		            for (int i = 0; i < table.getItemCount(); i++) {
-		              Rectangle rect = item.getBounds(i);
-		              if (rect.contains(pt)) {
-		             //   System.out.println("Item " + index + "-" + i);
-		             //   System.out.println("ver  " + index + "-" + table.getItemCount());
-		                if(index+1==table.getItemCount()){
-		                	agregarfila(table.getItemCount());
-		                }
-		              }
-		              if (!visible && rect.intersects(clientArea)) {
-		                visible = true;
-		              }
-		            }
-		            if (!visible)
-		              return;
-		            index++;
-		          }
-		        }
-		      });
+		table.addListener(SWT.MouseDown, new Listener() {
+			public void handleEvent(Event event) {
+				Rectangle clientArea = table.getClientArea();
+				Point pt = new Point(event.x, event.y);
+				int index = table.getTopIndex();
 
-		//--------------------crear fila nueva
+				while (index < table.getItemCount()) {
+					boolean visible = false;
+					TableItem item = table.getItem(index);
+					for (int i = 0; i < table.getItemCount(); i++) {
+						Rectangle rect = item.getBounds(i);
+						if (rect.contains(pt)) {
+							// System.out.println("Item " + index + "-" + i);
+							// System.out.println("ver  " + index + "-" +
+							// table.getItemCount());
+							if (index + 1 == table.getItemCount()) {
+								agregarfila(table.getItemCount());
+							}
+						}
+						if (!visible && rect.intersects(clientArea)) {
+							visible = true;
+						}
+					}
+					if (!visible)
+						return;
+					index++;
+				}
+			}
+		});
 
-		
+		// --------------------crear fila nueva
+
 		// ----------------------------------------
 		// label to choose output
 
@@ -587,7 +587,7 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 		wChooseOutput.setLayoutData(fdValNameO);
 
 		// checkbox star service
-		Button wCheckService = new Button(shell, SWT.CHECK);
+		wCheckService = new Button(shell, SWT.PUSH);
 		props.setLook(wCheckService);
 
 		wCheckService.setText(BaseMessages.getString(PKG,
@@ -601,6 +601,19 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 		// fdBotonCheck.right = new FormAttachment(wOpenBrowser, margin);
 		wCheckService.setLayoutData(fdBotonCheck);
 
+		wStopService = new Button(shell, SWT.PUSH);
+		props.setLook(wStopService);
+
+		wStopService.setText(BaseMessages.getString(PKG,
+				"FusekiLoader.Stopservice"));
+
+		FormData fdBotonstop = new FormData();
+		fdBotonstop = new FormData();
+		fdBotonstop.left = new FormAttachment(wCheckService, margin);
+		fdBotonstop.top = new FormAttachment(wlValNameO, margin + 5);
+		wStopService.setEnabled(false);
+		wStopService.setLayoutData(fdBotonstop);
+
 		wOpenBrowser = new Button(shell, SWT.PUSH);
 		props.setLook(wOpenBrowser);
 
@@ -610,7 +623,7 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 				"FukekiLoader.BotonBrowser.tooltip"));
 		FormData fdBotonBrowser = new FormData();
 		fdBotonBrowser = new FormData();
-		fdBotonBrowser.left = new FormAttachment(wCheckService, margin);
+		fdBotonBrowser.left = new FormAttachment(wStopService, margin);
 		fdBotonBrowser.top = new FormAttachment(wlValNameO, margin + 5);
 		wOpenBrowser.setLayoutData(fdBotonBrowser);
 		wOpenBrowser.setEnabled(false);
@@ -673,6 +686,12 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 				StartService();
 			}
 		};
+
+		lsStopService = new Listener() {
+			public void handleEvent(Event e) {
+				stop();
+			}
+		};
 		lsUpdateInstrucctions = new ModifyListener() {
 			public void handleEvent(Event e) {
 				UpdateInstrucctions();
@@ -695,18 +714,17 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 			}
 		};
 		/*
-		lsAddRow  = new Listener() {
-			public void handleEvent(Event e) {
-				 agregarfila();
-			}
-		};*/
+		 * lsAddRow = new Listener() { public void handleEvent(Event e) {
+		 * agregarfila(); } };
+		 */
 		wCancel.addListener(SWT.Selection, lsCancel);
 		wOK.addListener(SWT.Selection, lsOK);
 		wLoadFile.addListener(SWT.Selection, lsLoadFile);
 		wOpenBrowser.addListener(SWT.Selection, lsOpenBrowser);
 		wCheckService.addListener(SWT.Selection, lsCheckService);
 		this.wChooseDirectory.addListener(SWT.Selection, lsChooseDirectory);
-		//this.wAddFila.addListener(SWT.Selection, lsAddRow);
+		this.wPreCatch.addListener(SWT.Selection, lsPrecatch);
+		this.wStopService.addListener(SWT.Selection, lsStopService);
 
 		wTextServPort.addListener(SWT.Verify, new Listener() {
 			public void handleEvent(Event e) {
@@ -958,13 +976,15 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 		}
 
 	}
-	private void agregarfila(int r){
-		
+
+	private void agregarfila(int r) {
+
 		TableItem item = new TableItem(table, SWT.NONE, r);
-		item.setText(0,"");
+		item.setText(0, "");
 		item.setText(1, "");
-		
+
 	}
+
 	private void ChooseDirectory() {
 
 		try {
@@ -992,42 +1012,13 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 					"FusekiLoader.Check.Error"));
 			dialog.open();
 		} else {
-			String command="";
-			File dir;
-			
-			
-	
-			
-			//-----------dar permisos
-			if (isWindows()) {
-			command = "chmod 777 -R fuseki" ;
-			}else{
-				command = "chmod 777 -R fuseki" ;
-			}
-			
-			dir = new File(meta.getDirectory());// path
-			ExecutorTask task = new ExecutorTask();
-			task.setCommand(command);
-			task.setDir(dir);
-			Thread executorThread = new Thread(task);
-			executorThread.start();
-			logBasic("the permises is ok");
-			
-			//-------------------------
+
 			execute();
 			// String output = executeCommand(command,dir);
-			System.out.println(command);
+
 			logBasic("ther service is ok, open in browser");
 			wOpenBrowser.setEnabled(true);
 
-			/**
-			 * System.out.println(command); logBasic(output); command =
-			 * "./fuseki-server --port=" + wTextServPort.getText() +
-			 * " --config=config.ttl";
-			 * 
-			 * output = executeCommand(command); logBasic(output);
-			 * System.out.println(command);
-			 */
 		}
 	}
 
@@ -1059,16 +1050,18 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 
 		if (Desktop.isDesktopSupported()) {
 			try {
-				Desktop.getDesktop().browse(new URI("http://localhost:3030/"));
+				Desktop.getDesktop()
+						.browse(new URI("http://localhost:"
+								+ meta.getPortName() + "/"));
 			} catch (IOException e) {
-		
+
 				e.printStackTrace();
 			} catch (URISyntaxException e) {
-				
+
 				e.printStackTrace();
 			}
 		} else {
-			openUrlInBrowser("http://localhost:3030/");
+			openUrlInBrowser("http://localhost:" + meta.getPortName() + "/");
 
 		}
 
@@ -1100,13 +1093,31 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 		ExecutorTask task = new ExecutorTask();
 		task.setCommand(command);
 		task.setDir(dir);
-		Thread executorThread = new Thread(task);
-		executorThread.start();
+		// Thread executorThread = new Thread(task);
+		executorThread = new Thread(task);
+		try {
+			executorThread.start();
+		} catch (Exception e) {
 
-		/*
-		 * try { Thread.sleep(1000); executorThread.interrupt(); } catch
-		 * (InterruptedException e) { e.printStackTrace(); }
-		 */
+			MessageBox dialog = new MessageBox(shell, SWT.ICON_ERROR);
+			dialog.setText("ERROR");
+			dialog.setMessage(e.getMessage());
+			dialog.open();
+
+		}
+		this.wStopService.setEnabled(true);
+		this.wCheckService.setEnabled(false);
+		this.wOpenBrowser.setEnabled(true);
+
+	}
+
+	public void stop() {
+
+		executorThread.stop();
+		this.wStopService.setEnabled(false);
+		this.wCheckService.setEnabled(true);
+		this.wOpenBrowser.setEnabled(false);
+
 	}
 
 	public static boolean isWindows() {
@@ -1158,7 +1169,7 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 				MessageBox dialog = new MessageBox(shell, SWT.ICON_ERROR);
 				dialog.setText("ERROR");
 				dialog.setMessage(BaseMessages.getString(PKG,
-						"RDFGeneration.ERROR.PreviewStepOntology"));
+						"FusekiLoader.ERROR.PreviewStepOntology"));
 				dialog.open();
 			}
 
@@ -1166,7 +1177,7 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 			MessageBox dialog = new MessageBox(shell, SWT.ICON_ERROR);
 			dialog.setText("ERROR");
 			dialog.setMessage(BaseMessages.getString(PKG,
-					"RDFGeneration.ERROR.PreviewStep"));
+					"FusekiLoader.ERROR.PreviewStep"));
 			dialog.open();
 		}
 	}
@@ -1191,19 +1202,14 @@ class ExecutorTask implements Runnable {
 			while ((line = reader.readLine()) != null) {
 				output.append(line + "\n");
 			}
-		
-		} catch (InterruptedException e) {
-			logBasic(" ERROR "
-					+ e
-					+ "The service was not created. Please execute spoon like administrator");
-			return;
-		} catch (IOException e) {
+
+		} catch (Exception e) {
 			e.printStackTrace();
 			logBasic(" ERROR "
-					+ e
+					+ e.getMessage()
 					+ "The service was not created. Please execute spoon like administrator");
 
-		} 
+		}
 	}
 
 	public void setCommand(String s1) {
