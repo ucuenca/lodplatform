@@ -226,37 +226,7 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 
 				logBasic(" config.ttl is ok ");
 
-				/**
-				 * try{ String verify, putData; File file = new
-				 * File("plugins/steps/FusekiLoader/fuseki/config.ttl");
-				 * file.createNewFile(); FileWriter fw = new FileWriter(file);
-				 * BufferedWriter bw = new BufferedWriter(fw);
-				 * bw.write("Some text here for a reason"); bw.flush();
-				 * 
-				 * FileReader fr = new FileReader(file); BufferedReader br = new
-				 * BufferedReader(fr);
-				 * 
-				 * while( (verify=br.readLine()) != null ) { if(verify != null)
-				 * { putData = verify.replaceAll("here", "there");
-				 * bw.write(putData); } } br.close(); bw.close();
-				 * 
-				 * }catch(IOException e){ e.printStackTrace(); }
-				 */
-				/**
-				 * --------------------------------------------------
-				 * 
-				 * File oldFile1 = new File(
-				 * "plugins/steps/FusekiLoader/fuseki/fuseki-server2.jars");
-				 * 
-				 * if (oldFile1.renameTo(new
-				 * File("plugins/steps/FusekiLoader/fuseki/fuseki-server.jar")))
-				 * { // System.out.println("The file was build succesfully in "+
-				 * meta. getDirectory()+"/"+ oldFile.getName());
-				 * logBasic("copy fuseki-server.jar in resources , ready"); }
-				 * else { logBasic("ERROR  no fuseki-server.jar in resources.");
-				 * // System.out.println("The File was not created."); }
-				 */
-				// compile(meta.getDirectory());
+		
 
 				try {
 					/**
@@ -274,8 +244,13 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 
 					recursiveCopy(source, destination);
 					// copyFile(source,destination);
+					
+					
+					
 					logBasic("The file was build succesfully in "
 							+ meta.getDirectory() + "/" + "fuseki");
+					
+					
 
 				} catch (Exception e1) {
 					
@@ -389,26 +364,7 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 			writer.write(newtext);
 			writer.close();
 			
-			//DAR PERMISOS LUEGO DE LA CREACION DEL DIRECTORIO FUSEKI 
-			File fileFinal = new File(
-					"plugins/steps/FusekiLoader/fuseki");
-			
-		
-			fileFinal.setWritable(true);
-			fileFinal.setReadable(true);
-			fileFinal.setExecutable(true);
-			File fileF1 = new File(
-					"plugins/steps/FusekiLoader/fuseki/config.ttl");
-			
-			fileF1.setReadable(true);
-			fileF1.setWritable(true);
-			fileF1.setExecutable(true);
-			File fileF2 = new File(
-					"plugins/steps/FusekiLoader/fuseki/fuseki-server");
-			
-			fileF2.setReadable(true);
-			fileF2.setWritable(true);
-			fileF2.setExecutable(true);
+
 		} catch (IOException ioe) {
 			logBasic(" ERROR " + ioe + "The File config.ttl was not created. ");
 			ioe.printStackTrace();
@@ -462,14 +418,15 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 				for (int index = 0; index < fList.length; index++) {
 					File dest = new File(fDest, fList[index]);
 					File source = new File(fSource, fList[index]);
-
+					
 					// Recursion call take place here
 					recursiveCopy(source, dest);
 				}
 			} else {
 				// Found a file. Copy it into the destination, which is already
 				// created in 'if' condition above
-
+				fSource.setExecutable(true);   //code to set permises
+				
 				// Open a file for read and write (copy)
 				FileInputStream fInStream = new FileInputStream(fSource);
 				FileOutputStream fOutStream = new FileOutputStream(fDest);
@@ -481,6 +438,7 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 				// In each successful read, write back to the source
 				while ((iBytesReads = fInStream.read(buffer)) >= 0) {
 					fOutStream.write(buffer, 0, iBytesReads);
+			
 				}
 
 				// Safe exit
@@ -491,6 +449,8 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 				if (fOutStream != null) {
 					fOutStream.close();
 				}
+				
+				fDest.setExecutable(true);     //code to set permises
 			}
 		} catch (Exception ex) {
 			// Please handle all the relevant exceptions here
