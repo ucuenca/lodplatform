@@ -185,6 +185,8 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 	private Composite wClassifyComp, wAnnotateComp, wRelationComp;
 
 	private CTabFolder wTabFolder;
+	
+	private TransMeta transMeta;	
 
 	Thread executorThread;
 
@@ -206,6 +208,7 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 			String sname) {
 		super(parent, (BaseStepMeta) in, transMeta, sname);
 		meta = (FusekiLoaderMeta) in;
+		this.transMeta=transMeta;
 	}
 
 	/**
