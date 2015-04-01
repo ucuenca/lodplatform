@@ -8,10 +8,10 @@
 	classname:		The step class implementing StepMetaInterface
  -->
 <plugin
-   id="RDFGeneration"
+   id="R2RMLtoRDF"
    iconfile="icon.png"
-   description="RDF Generation"
-   tooltip="RDFGeneration"
+   description="R2RMLtoRDF"
+   tooltip="R2RML to RDF Generation step"
    category="LODPlatform"
    classname="com.ucuenca.pentaho.plugin.step.rdf.RDFGenerationMeta">
 		
