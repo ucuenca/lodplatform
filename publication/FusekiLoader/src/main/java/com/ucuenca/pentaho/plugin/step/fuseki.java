@@ -2,11 +2,12 @@ package com.ucuenca.pentaho.plugin.step;
 import com.hp.hpl.jena.graph.*;
 import com.hp.hpl.jena.rdf.model.*;
 
-/**
- * R2RML Schema definition
- * @author depcc
- *
+
+/** .
+ * @author Fabian Peñaloza Marin
+ * @version 1
  */
+
 public class fuseki{
 
    protected static final String uri ="http://jena.apache.org/fuseki#";

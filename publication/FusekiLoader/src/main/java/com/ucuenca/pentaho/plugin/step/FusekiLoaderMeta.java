@@ -52,6 +52,10 @@ import org.pentaho.di.trans.step.StepMeta;
 import org.pentaho.di.trans.step.StepMetaInterface;
 import org.w3c.dom.Node;
 
+/** .
+ * @author Fabian Peñaloza Marin
+ * @version 1
+ */
 /**
  * This class is part of the FusekiLoader step plug-in implementation.
  * It FusekiLoadernstrates the basics of developing a plug-in step for PDI. 
@@ -204,9 +208,9 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 	public void setDefault() {
 		outputField = " ";
 		directory = " ";
-		this.serviceName = "myservice";
-		this.inputName = "";
-		this.setPortName("3030");
+		serviceName = "";
+		inputName = " ";
+		PortName= " ";
 		Validate = "false";
 	}
 	
@@ -255,7 +259,7 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 		StringBuffer retval = new StringBuffer( 400 );
 		retval.append( "    " ).append( XMLHandler.addTagValue("outputfield", outputField));
 		retval.append( "    " ).append( XMLHandler.addTagValue("directory", directory));
-		retval.append( "    " ).append( XMLHandler.addTagValue("serviceName", serviceName));
+		retval.append( "    " ).append( XMLHandler.addTagValue("servicename", serviceName));
 		retval.append( "    " ).append( XMLHandler.addTagValue("inputName", inputName));
 		retval.append( "    " ).append( XMLHandler.addTagValue("fuDataset",fuDataset));
 		retval.append( "    " ).append( XMLHandler.addTagValue("fuGraph",fuGraph));
@@ -281,7 +285,7 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 		try {
 			setOutputField(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "outputfield")));
 			setDirectory(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "directory")));
-			setServiceName(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "serviceName")));
+			setServiceName(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "servicename")));
 			setInputName(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "inputName")));
 			setFuDataset(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "fuDataset")));
 			setFuGraph(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "fuGraph")));
@@ -308,7 +312,7 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 		try{
 			rep.saveStepAttribute(id_transformation, id_step, "outputfield", outputField); //$NON-NLS-1$
 			rep.saveStepAttribute(id_transformation, id_step, "directory", directory); //$NON-NLS-1$
-			rep.saveStepAttribute(id_transformation, id_step, "serviceName", serviceName); //$NON-NLS-1$
+			rep.saveStepAttribute(id_transformation, id_step, "servicename", serviceName); //$NON-NLS-1$
 			rep.saveStepAttribute(id_transformation, id_step, "fuDataset", fuDataset); //$NON-NLS-1$
 			rep.saveStepAttribute(id_transformation, id_step, "fuGraph", fuGraph); //$NON-NLS-1$
 			rep.saveStepAttribute(id_transformation, id_step, "fuQuery", fuQuery); //$NON-NLS-1$
@@ -335,7 +339,7 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 			outputField  = rep.getStepAttributeString(id_step, "outputfield"); //$NON-NLS-1$
 			directory= rep.getStepAttributeString(id_step, "directory");
 			inputName= rep.getStepAttributeString(id_step, "inputName");
-			serviceName= rep.getStepAttributeString(id_step, "serviceName");
+			serviceName= rep.getStepAttributeString(id_step, "servicename");
 			
 			fuDataset  = rep.getStepAttributeString(id_step, "fuDataset");
 			
