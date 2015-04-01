@@ -33,6 +33,7 @@ import org.pentaho.di.core.database.DatabaseMeta;
 import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.core.exception.KettleValueException;
 import org.pentaho.di.core.exception.KettleXMLException;
+import org.pentaho.di.core.row.RowMeta;
 import org.pentaho.di.core.row.RowMetaInterface;
 import org.pentaho.di.core.row.ValueMeta;
 import org.pentaho.di.core.row.ValueMetaInterface;
@@ -364,27 +365,22 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 	 */
 	public void getFields(RowMetaInterface r, String origin, RowMetaInterface[] info, StepMeta nextStep, VariableSpace space) {
 
-		/*
-		 * This implementation appends the outputField to the row-stream
-		 */
-
-		// a value meta object contains the meta data for a field
-		ValueMetaInterface v = new ValueMeta();
-
-		// set the name of the new field 
-		v.setName(outputField);
+		r.clear();
+		RowMeta rowMeta = new RowMeta();
 		
-		// type is going to be string
-		v.setType(ValueMeta.TYPE_STRING);
+		ValueMetaInterface file = new ValueMeta("File", ValueMetaInterface.TYPE_STRING);
+		file.setOrigin(origin);
+		file.setLength(100);
+		rowMeta.addValueMeta(file);
 		
-		// setting trim type to "both"
-		v.setTrimType(ValueMeta.TRIM_TYPE_BOTH);
-
-		// the name of the step that adds this field
-		v.setOrigin(origin);
 		
-		// modify the row structure and add the field this step generates  
-		r.addValueMeta(v);
+		ValueMetaInterface status = new ValueMeta("Status", ValueMetaInterface.TYPE_STRING);
+		status.setOrigin(origin);
+		status.setLength(100);
+		rowMeta.addValueMeta(status);
+		
+		r.addRowMeta(rowMeta);
+		
 		
 	}
 
