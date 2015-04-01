@@ -1167,6 +1167,7 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 			if (!directorio.equals("") && !filename.equals("")) {
 				this.wHelloFieldName.setText(directorio
 						+ System.getProperty("file.separator") + filename);
+				meta.setInputName(filename);
 
 			} else {
 				MessageBox dialog = new MessageBox(shell, SWT.ICON_ERROR);
