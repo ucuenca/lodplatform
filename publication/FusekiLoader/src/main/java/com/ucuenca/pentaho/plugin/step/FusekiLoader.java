@@ -20,6 +20,7 @@
  *
  ******************************************************************************/
 
+
 package com.ucuenca.pentaho.plugin.step;
 
 import java.io.BufferedReader;
@@ -77,6 +78,11 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.query.Dataset;
 
 //----------------------------
+
+/** .
+ * @author Fabian Peñaloza Marin
+ * @version 1
+ */
 /**
  * This class is part of the demo step plug-in implementation. It demonstrates
  * the basics of developing a plug-in step for PDI.

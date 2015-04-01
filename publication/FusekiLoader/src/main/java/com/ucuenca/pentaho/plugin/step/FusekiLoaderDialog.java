@@ -43,10 +43,12 @@ import java.util.regex.Pattern;
 
 import org.apache.jena.atlas.json.JSON;
 import org.apache.jena.atlas.json.JsonObject;
+import org.eclipse.jetty.util.thread.ExecutorThreadPool;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.TableEditor;
+import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -116,7 +118,10 @@ import com.hp.hpl.jena.ontology.OntModelSpec;
 
 import java.awt.Desktop;
 import java.net.URI;
-
+/** .
+ * @author Fabian Peñaloza Marin
+ * @version 1
+ */
 /**
  * This class is part of the demo step plug-in implementation. It demonstrates
  * the basics of developing a plug-in step for PDI.
@@ -189,6 +194,8 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 	private TransMeta transMeta;	
 
 	Thread executorThread;
+
+	MiHilo1 elHilo = new MiHilo1();
 
 	/**
 	 * The constructor should simply invoke super() and save the incoming meta
@@ -370,15 +377,22 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 
 		// text para service name
 		wTextServName = new Text(shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
-		wTextServName.setText("myservice");
+		
 		props.setLook(wTextServName);
+		wTextServName.setText("myservice");
 		// wStepname.addModifyListener(lsMod);
 		FormData fdtextservName = new FormData();
 		fdtextservName.left = new FormAttachment(middle, 0);
 		fdtextservName.top = new FormAttachment(wlabelFuseki, margin + 5);
 		fdtextservName.right = new FormAttachment(100, 0);
 		wTextServName.setLayoutData(fdtextservName);
-
+		
+		wTextServName.addVerifyListener(new VerifyListener() {
+			 
+		        public void verifyText(VerifyEvent event) {
+		            event.text = event.text.replaceAll("[^A-Za-z0-9]", "");
+		        }
+		});
 		// label to service Port
 		Label wlabelServicePort = new Label(shell, SWT.RIGHT);
 		wlabelServicePort.setText(BaseMessages.getString(PKG,
@@ -393,8 +407,9 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 		// text para service Port
 
 		wTextServPort = new Text(shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
-		wTextServPort.setText("3030");
+		
 		props.setLook(wTextServPort);
+		wTextServPort.setText("3030");
 		// wStepname.addModifyListener(lsMod);
 		FormData fdtextservPort = new FormData();
 		fdtextservPort.left = new FormAttachment(middle, 0);
@@ -743,21 +758,7 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 			}
 		});
 
-		VerifyListener verify = new VerifyListener() {
-			public void verifyText(VerifyEvent event) {
-				event.doit = false;
 
-				if (Character.isDigit(event.character)
-						|| Character.isAlphabetic(event.character)
-						|| event.keyCode == SWT.ARROW_LEFT
-						|| event.keyCode == SWT.ARROW_RIGHT
-						|| event.keyCode == SWT.BS || event.keyCode == SWT.DEL) {
-
-					event.doit = true;
-				}
-			}
-		};
-		wTextServName.addVerifyListener(verify);
 
 		wTextServName.addModifyListener(lsUpdateInstrucctions);
 		wTextServPort.addModifyListener(lsUpdateInstrucctions);
@@ -852,8 +853,8 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 		wStepname.selectAll();
 		wHelloFieldName.setText(meta.getOutputField());
 		wChooseOutput.setText(meta.getDirectory());
-		wTextServName.setText(meta.getServiceName());
-
+		if(!meta.getServiceName().trim().isEmpty()){ wTextServName.setText(meta.getServiceName());}
+		
 		wTextServPort.setText(meta.getPortName());
 		table.removeAll();
 
@@ -1092,14 +1093,27 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 		}
 
 		File dir = new File(meta.getDirectory() + "/fuseki");// path
+		
+		//----------------------------
+		elHilo.setCommand(command);
+		elHilo.setDir(dir);
+		elHilo.start();
+		
+		
+		//------------------------
+		/**
 
-		ExecutorTask task = new ExecutorTask();
+		//ExecutorTask task = new ExecutorTask();
 		task.setCommand(command);
 		task.setDir(dir);
 		// Thread executorThread = new Thread(task);
 		executorThread = new Thread(task);
 		try {
 			executorThread.start();
+			
+		
+			
+			
 		} catch (Exception e) {
 
 			MessageBox dialog = new MessageBox(shell, SWT.ICON_ERROR);
@@ -1107,7 +1121,7 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 			dialog.setMessage(e.getMessage());
 			dialog.open();
 
-		}
+		}*/
 		this.wStopService.setEnabled(true);
 		this.wCheckService.setEnabled(false);
 		this.wOpenBrowser.setEnabled(true);
@@ -1115,8 +1129,10 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 	}
 
 	public void stop() {
-
-		executorThread.stop();
+		
+		elHilo.detenElHilo();
+		//task.detenElHilo();
+		
 		this.wStopService.setEnabled(false);
 		this.wCheckService.setEnabled(true);
 		this.wOpenBrowser.setEnabled(false);
@@ -1187,26 +1203,40 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 	}
 }// fin class
 
-class ExecutorTask implements Runnable {
-	protected LogChannelInterface log;
-	public String command;
-	public File dir;
 
-	public void run() {
+
+
+
+ class MiHilo1 extends Thread
+{
+   // boolean que pondremos a false cuando queramos parar el hilo
+	 protected LogChannelInterface log;
+   private boolean continuar = true;
+   public String command;
+	public File dir;
+	 public boolean line = true;
+	 
+	  public void detenElHilo()
+	   {
+	      line=false;
+	   }
+
+   // Metodo del hilo
+   public void run()
+   {
 		StringBuffer output = new StringBuffer();
 		Process p = null;
-
+		int i=0;
 		try {
 			p = Runtime.getRuntime().exec(command, null, dir);
-			p.waitFor();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(
-					p.getInputStream()));
-
-			String line = "";
-			while ((line = reader.readLine()) != null) {
-				output.append(line + "\n");
+			
+			
+			while (line) {
+				 i++;
+				// System.out.println(i);
 			}
-
+			p.destroy();
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			logBasic(" ERROR "
@@ -1214,8 +1244,11 @@ class ExecutorTask implements Runnable {
 					+ "The service was not created. Please execute spoon like administrator");
 
 		}
+   }
+	public void logBasic(String message) {
+		log.logBasic(message);
 	}
-
+	
 	public void setCommand(String s1) {
 		this.command = s1;
 
@@ -1225,9 +1258,4 @@ class ExecutorTask implements Runnable {
 		this.dir = s2;
 
 	}
-
-	public void logBasic(String message) {
-		log.logBasic(message);
-	}
-
-}
+} 
