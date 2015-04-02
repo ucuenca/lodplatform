@@ -1132,7 +1132,7 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 		
 		elHilo.detenElHilo();
 		//task.detenElHilo();
-		
+		elHilo.suspend();
 		this.wStopService.setEnabled(false);
 		this.wCheckService.setEnabled(true);
 		this.wOpenBrowser.setEnabled(false);
@@ -1215,9 +1215,9 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
    public String command;
 	public File dir;
 	 public boolean line = true;
-	 
+	 public Process p = null;
 	  public void detenElHilo()
-	   {
+	   {	p.destroy();
 	      line=false;
 	   }
 
@@ -1225,24 +1225,30 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
    public void run()
    {
 		StringBuffer output = new StringBuffer();
-		Process p = null;
+		
 		int i=0;
+		int j=10000;
 		try {
 			p = Runtime.getRuntime().exec(command, null, dir);
 			
 			
 			while (line) {
 				 i++;
-				// System.out.println(i);
+				 if (i>j){
+				//System.out.print(i);
+				j=0;
+				 }
+				 
 			}
+			System.out.print("stop service");
 			p.destroy();
-			
+				
 		} catch (Exception e) {
 			e.printStackTrace();
 			logBasic(" ERROR "
 					+ e.getMessage()
 					+ "The service was not created. Please execute spoon like administrator");
-
+			System.out.println(e.getMessage());
 		}
    }
 	public void logBasic(String message) {
