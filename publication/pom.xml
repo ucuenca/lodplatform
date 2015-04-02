@@ -12,5 +12,6 @@
   <packaging>pom</packaging>
   <name>LOD Publication PDI Plugins</name>
   <modules>
+    <module>FusekiLoader</module>
   </modules>
 </project>

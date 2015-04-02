@@ -8,7 +8,7 @@
 	<property file="build/build.properties" />
 
 	<!-- set global properties for this build -->
-	<property name="kettle-local-dir" location="/windows/pdi/data-integration" />
+	<!-- <property name="kettle-local-dir" location="/windows/pdi/data-integration" /> -->
 	<!--
 		<property name="kettle-local-dir" location="/home/falpema/data-integration" />
 	<property name="src" location="src" />
