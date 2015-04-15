@@ -226,7 +226,7 @@ public class OAILoaderDialog extends BaseStepDialog implements
 		fbcbmPrefix.left = new FormAttachment(middle, 0);
 		fbcbmPrefix.top = new FormAttachment(txtURI, margin);
 		fbcbmPrefix.height = 23;
-		cbmPrefix.setEnabled(false);
+		cbmPrefix.setEditable(false);
 		cbmPrefix.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent arg0) {
 				prefix = cbmPrefix.getText();
@@ -326,7 +326,7 @@ public class OAILoaderDialog extends BaseStepDialog implements
 		fdtxtPrefijo.right = new FormAttachment(100, 0);
 		fdtxtPrefijo.top = new FormAttachment(getFormats, margin);
 		txtXpath.setLayoutData(fdtxtPrefijo);
-		txtXpath.setEnabled(false);
+		txtXpath.setEditable(false);
 		
 		//must be included for DataBase Data Loading
 		precatchDataButton = new Button(shell, SWT.PUSH);
