@@ -80,7 +80,7 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
 	private ArrayList<String> nameFields = new ArrayList<String>();
 	private NodeList records = null;
 	private NodeList header = null;
-	private int recordIndex, dataIndex;
+	private int recordIndex, dataIndex, headerIndex = 0;
 	private String numRegistro;
 	Hashtable<String, String> Sets = new Hashtable<String, String>();
 
@@ -116,7 +116,8 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
 	 *            Boolean.TRUE if the step needs to precatch data to a bundled
 	 *            database
 	 */
-	public void initOAIHarvester(OAILoaderMeta meta, OAILoaderData data, Boolean databaseLoad) {
+	public void initOAIHarvester(OAILoaderMeta meta, OAILoaderData data,
+			Boolean databaseLoad) {
 		data.schema = new Schema();
 		data.schema.setNamespace(meta.getNamespace());
 		data.schema.setPrefix(meta.getPrefix());
@@ -144,7 +145,7 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
 			this.databaseLoad = databaseLoad;
 			if (databaseLoad)
 				DatabaseLoader.getConnection();
-			
+
 		} catch (Exception e) {
 			try {
 				dataLoader.logBasic(e.getMessage());
@@ -155,9 +156,10 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
 
 	}
 
-	private void loadListSets(OAILoaderMeta meta, OAILoaderData data)throws KettleException {
+	private void loadListSets(OAILoaderMeta meta, OAILoaderData data)
+			throws KettleException {
 		try {
-			//Process for load the set 
+			// Process for load the set
 			NodeList recordsSets = null;
 			int total = 0;
 			while (listSet != null) {
@@ -168,57 +170,67 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
 				total += batch;
 				dataLoader.logBasic("Harvested ListSet Records: batch "
 						+ recordsSets.getLength() + ", total " + total);
-                String key=null;
-                String name=null;
-				
+				String key = null;
+				String name = null;
+
 				for (int temp1 = 0; temp1 < recordsSets.getLength(); temp1++) {
 					Node nSet = recordsSets.item(temp1);
-					
+
 					if (nSet.getNodeType() == Node.ELEMENT_NODE) {
 						Element eElement1 = (Element) nSet;
-						NodeList recordSet= eElement1.getChildNodes();
+						NodeList recordSet = eElement1.getChildNodes();
 						for (int temp2 = 0; temp2 < recordSet.getLength(); temp2++) {
-        					Node nSet2 = recordSet.item(temp2);
-        					if (nSet2.getNodeType() == Node.ELEMENT_NODE) {
-        						Element eElement2 = (Element) nSet2;
-        						if(nSet2.getNodeName().equals("setSpec")){
-        						  key = nSet2.getTextContent();
-        						}else if (nSet2.getNodeName().equals("setName")) {
-        							name = nSet2.getTextContent();                    							
-        						}                    						
-        					}            					
-						}//end second for
-						Sets.put(key, name);    					
-					}                    
-				}					
-				
-				 resumptionToken = listSet.getResumptionToken();
-                 if (resumptionToken == null || resumptionToken.length() == 0) {
-                	 dataLoader.logBasic("No more resumption token found, end was reached.");
-                     //listRecords = null;
-                     listSet = null;
-                 } else {
-                	 dataLoader.logBasic("Resuming harvesting from " + resumptionToken);
-                     try {
-                     	//listRecords = new ListRecords(url_str, resumptionToken);
-                     	listSet = new ListSets(meta.getInputURI(),
-        						data.resumptionToken);
-                     } catch (IOException e) {
-                    	 dataLoader.logBasic("IOException while trying to resume from " + resumptionToken + ", trying again.");
-                     	//listRecords = new ListRecords(url_str, resumptionToken);
-                     	listSet = new ListSets(meta.getInputURI(),
-        						data.resumptionToken);
-                     } catch (SAXException e) {
-                    	 dataLoader.logBasic("SAXException while trying to resume from " + resumptionToken + ", trying again.");
-                     	//listRecords = new ListRecords(url_str, resumptionToken);
-                    	 listSet = new ListSets(meta.getInputURI(),
-         						data.resumptionToken);
-                     }
-                 }
+							Node nSet2 = recordSet.item(temp2);
+							if (nSet2.getNodeType() == Node.ELEMENT_NODE) {
+								Element eElement2 = (Element) nSet2;
+								if (nSet2.getNodeName().equals("setSpec")) {
+									key = nSet2.getTextContent();
+								} else if (nSet2.getNodeName()
+										.equals("setName")) {
+									name = nSet2.getTextContent();
+								}
+							}
+						}// end second for
+						Sets.put(key, name);
+					}
+				}
+
+				resumptionToken = listSet.getResumptionToken();
+				if (resumptionToken == null || resumptionToken.length() == 0) {
+					dataLoader
+							.logBasic("No more resumption token found, end was reached.");
+					// listRecords = null;
+					listSet = null;
+				} else {
+					dataLoader.logBasic("Resuming harvesting from "
+							+ resumptionToken);
+					try {
+						// listRecords = new ListRecords(url_str,
+						// resumptionToken);
+						listSet = new ListSets(meta.getInputURI(),
+								data.resumptionToken);
+					} catch (IOException e) {
+						dataLoader
+								.logBasic("IOException while trying to resume from "
+										+ resumptionToken + ", trying again.");
+						// listRecords = new ListRecords(url_str,
+						// resumptionToken);
+						listSet = new ListSets(meta.getInputURI(),
+								data.resumptionToken);
+					} catch (SAXException e) {
+						dataLoader
+								.logBasic("SAXException while trying to resume from "
+										+ resumptionToken + ", trying again.");
+						// listRecords = new ListRecords(url_str,
+						// resumptionToken);
+						listSet = new ListSets(meta.getInputURI(),
+								data.resumptionToken);
+					}
+				}
 			}
-		}catch(Exception e) {
+		} catch (Exception e) {
 			dataLoader.logBasic("Error: " + e.toString());
-		}		
+		}
 	}
 
 	// must be included for DataBase Data Loading
@@ -235,7 +247,8 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
 	 *         Boolean.FALSE
 	 * @throws KettleException
 	 */
-	public Boolean getData(StepMetaInterface smi, StepDataInterface sdi) throws KettleException {
+	public Boolean getData(StepMetaInterface smi, StepDataInterface sdi)
+			throws KettleException {
 		OAILoaderMeta meta = (OAILoaderMeta) smi;
 		OAILoaderData data = (OAILoaderData) sdi;
 		Boolean hasMoreData = Boolean.TRUE;
@@ -244,32 +257,52 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
 				.getMetaFieldsDef(smi) : data.outputRowMeta;
 
 		try {
-			if(dataIndex == 0 && recordIndex == 0) {
+			if (dataIndex == 0 && recordIndex == 0) {
 				this.records = data.listRecords.getNodeList(meta.getXpath());
 				this.recordIndex = 0;
-				this.header = this.header == null ? 
-						data.listRecords
-							.getNodeList("/oai20:OAI-PMH/oai20:ListRecords/oai20:record/oai20:header")
-							:this.header;
+				this.header = this.header == null ? data.listRecords
+						.getNodeList("/oai20:OAI-PMH/oai20:ListRecords/oai20:record/oai20:header")
+						: this.header;
 				int batch = this.records.getLength();
 				data.total += batch;
 				dataLoader.logBasic("Harvested Records: batch "
 						+ records.getLength() + ", total " + data.total);
 			}
 
-			if(datos.size() == 0) { 
+			if (datos.size() == 0) {
 				Node nNode1 = records.item(recordIndex);
-				Node nNodeHeader = header.item(recordIndex);
-	
+				Node nNodeHeader = null;
+
+				// nuevo codigo
+				if (records.getLength() > header.getLength()) {
+					if (data.schema.prefix.equals("oai_dc")) {
+						String identifier = nNode1.getParentNode()
+								.getParentNode().getPreviousSibling()
+								.getFirstChild().getTextContent();
+						nNodeHeader = header.item(headerIndex);
+						String identifierHeaher = nNodeHeader.getFirstChild()
+								.getTextContent();
+						if (!identifierHeaher.equals(identifier)) {
+							headerIndex++;
+							nNodeHeader = header.item(headerIndex);
+						}
+
+					}
+
+				} else {
+					nNodeHeader = header.item(recordIndex);
+				}
+
 				if (nNode1.getNodeType() == Node.ELEMENT_NODE) {
+
 					Element eElement1 = (Element) nNode1;
 					Element eElementHeader = (Element) nNodeHeader;
-	
+
 					getHeader(eElementHeader);
-	
+
 					StringTokenizer strobj = new StringTokenizer(
 							meta.getXpath(), "/");
-	
+
 					// methods to get data
 					if (data.schema.prefix.equals("xoai")) {
 						getDataXOAI(eElement1, strobj.countTokens(), 0, 0);
@@ -284,7 +317,7 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
 					} else if (data.schema.prefix.equals("didl")) {
 						getDataUKETDDC(eElement1);
 					}
-	
+					// oai:dspace.espoch.edu.ec:123456789
 				}
 			}
 			dataLoader.sequence++;
@@ -294,17 +327,15 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
 			outputRow[columnIndex + 1] = nameFields.get(dataIndex);
 			outputRow[columnIndex + 2] = datos.get(dataIndex);
 			if (databaseLoad) {
-				outputRow[0] = meta.getTransMeta().getName()
-						.toUpperCase();
+				outputRow[0] = meta.getTransMeta().getName().toUpperCase();
 				outputRow[1] = meta.getStepName().toUpperCase();
 				outputRow[2] = Integer.valueOf(dataLoader.sequence);
 				dataLoader.insertTableRow(smi, outputRow);
 			} else {
-				dataLoader.getBaseStep().putRow(data.outputRowMeta,
-						outputRow);
+				dataLoader.getBaseStep().putRow(data.outputRowMeta, outputRow);
 			}
 
-			if((this.dataIndex == this.datos.size()-1)) {
+			if ((this.dataIndex == this.datos.size() - 1)) {
 				this.dataIndex = 0;
 				this.datos.clear();
 				this.nameFields.clear();
@@ -312,12 +343,15 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
 			} else {
 				dataIndex++;
 			}
-			this.recordIndex = this.dataIndex == 0 ? this.recordIndex+1:this.recordIndex;
-			if(this.recordIndex == this.records.getLength()) {
+
+			this.recordIndex = this.dataIndex == 0 ? this.recordIndex + 1
+					: this.recordIndex;
+			if (this.recordIndex == this.records.getLength()) {
 				this.recordIndex = 0;
+				this.headerIndex=0;
 				data.resumptionToken = data.listRecords.getResumptionToken();
 				if (data.resumptionToken == null
-					|| data.resumptionToken.length() == 0) {
+						|| data.resumptionToken.length() == 0) {
 
 					data.listRecords = null;
 					dataLoader
@@ -327,32 +361,34 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
 					hasMoreData = Boolean.FALSE;
 
 				} else {
-					
-						dataLoader.logBasic("Resuming harvesting from "
-								+ data.resumptionToken);
-						try {
-							data.listRecords = new ListRecords(meta.getInputURI(),
-									data.resumptionToken);
-							this.header = null;
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							dataLoader
-									.logBasic("IOException while trying to resume from "
-											+ data.resumptionToken + ", trying again.");
-		
-							data.listRecords = new ListRecords(meta.getInputURI(),
-									data.resumptionToken);
-							this.header = null;
-		
-						} catch (SAXException e) {
-							dataLoader
-									.logBasic("SAXException while trying to resume from "
-											+ data.resumptionToken + ", trying again.");
-		
-							data.listRecords = new ListRecords(meta.getInputURI(),
-									data.resumptionToken);
-		
-						}
+
+					dataLoader.logBasic("Resuming harvesting from "
+							+ data.resumptionToken);
+					try {
+						data.listRecords = new ListRecords(meta.getInputURI(),
+								data.resumptionToken);
+						this.header = null;
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						dataLoader
+								.logBasic("IOException while trying to resume from "
+										+ data.resumptionToken
+										+ ", trying again.");
+
+						data.listRecords = new ListRecords(meta.getInputURI(),
+								data.resumptionToken);
+						this.header = null;
+
+					} catch (SAXException e) {
+						dataLoader
+								.logBasic("SAXException while trying to resume from "
+										+ data.resumptionToken
+										+ ", trying again.");
+
+						data.listRecords = new ListRecords(meta.getInputURI(),
+								data.resumptionToken);
+
+					}
 				}
 			}
 
@@ -492,10 +528,15 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
 
 		if (prueba.getChildNodes().getLength() == 1) {
 			datos.add(prueba.getTextContent());
-			StringTokenizer strobj1 = new StringTokenizer(prueba.getTagName(),
-					":");
-			strobj1.nextToken();
-			tag = strobj1.nextToken();
+			if (!prueba.getTagName().equals("metadata")) {
+				StringTokenizer strobj1 = new StringTokenizer(
+						prueba.getTagName(), ":");
+				strobj1.nextToken();
+				tag = strobj1.nextToken();
+			} else {
+				tag = prueba.getTagName();
+			}
+
 			nameFields.add(tag);
 
 		} else {
@@ -550,12 +591,12 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
 		String tag = null;
 
 		if (prueba.getChildNodes().getLength() == 1) {
-			
-			String value = prueba.getNodeName().equals("setSpec") ? 
-					(prueba.getTextContent() + " => " + Sets.get(prueba.getTextContent()))
-					:prueba.getTextContent();
+
+			String value = prueba.getNodeName().equals("setSpec") ? (prueba
+					.getTextContent() + " => " + Sets.get(prueba
+					.getTextContent())) : prueba.getTextContent();
 			datos.add(value);
-		    tag = prueba.getTagName();
+			tag = prueba.getTagName();
 			nameFields.add(tag);
 			if (prueba.getTagName().equals("identifier")) {
 				numRegistro = prueba.getTextContent();
