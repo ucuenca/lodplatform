@@ -28,12 +28,17 @@ import java.util.Hashtable;
 import java.util.StringTokenizer;
 
 import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
 
 import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.core.row.RowMetaInterface;
 import org.pentaho.di.trans.step.BaseStepData;
 import org.pentaho.di.trans.step.StepDataInterface;
 import org.pentaho.di.trans.step.StepMetaInterface;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -272,24 +277,29 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
 			if (datos.size() == 0) {
 				Node nNode1 = records.item(recordIndex);
 				Node nNodeHeader = null;
+				Node nNode2 = null;
 
 				// nuevo codigo
 				if (records.getLength() > header.getLength()) {
-					if (data.schema.prefix.equals("oai_dc")) {
-						String identifier = nNode1.getParentNode()
-								.getParentNode().getPreviousSibling()
-								.getFirstChild().getTextContent();
-						nNodeHeader = header.item(headerIndex);
-						String identifierHeaher = nNodeHeader.getFirstChild()
-								.getTextContent();
-						if (!identifierHeaher.equals(identifier)) {
-							headerIndex++;
-							nNodeHeader = header.item(headerIndex);
-						}
-
+					if (recordIndex > 0) {
+						nNode2 = records.item(recordIndex - 1);
 					}
+					
+					if (nNode2 != null) {
+						if (!nNode2
+								.getParentNode()
+								.getParentNode()
+								.getPreviousSibling()
+								.isSameNode(
+										nNode1.getParentNode().getParentNode()
+												.getPreviousSibling())) {
+							headerIndex++;							
+						}
+					}
+					nNodeHeader = header.item(headerIndex);
+				}
 
-				} else {
+				else {
 					nNodeHeader = header.item(recordIndex);
 				}
 
@@ -348,7 +358,7 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
 					: this.recordIndex;
 			if (this.recordIndex == this.records.getLength()) {
 				this.recordIndex = 0;
-				this.headerIndex=0;
+				this.headerIndex = 0;
 				data.resumptionToken = data.listRecords.getResumptionToken();
 				if (data.resumptionToken == null
 						|| data.resumptionToken.length() == 0) {

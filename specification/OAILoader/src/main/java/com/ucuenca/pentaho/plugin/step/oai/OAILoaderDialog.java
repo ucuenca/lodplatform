@@ -227,6 +227,7 @@ public class OAILoaderDialog extends BaseStepDialog implements
 		fbcbmPrefix.top = new FormAttachment(txtURI, margin);
 		fbcbmPrefix.height = 23;
 		cbmPrefix.setEditable(false);
+		cbmPrefix.setEnabled(false);
 		cbmPrefix.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent arg0) {
 				prefix = cbmPrefix.getText();
