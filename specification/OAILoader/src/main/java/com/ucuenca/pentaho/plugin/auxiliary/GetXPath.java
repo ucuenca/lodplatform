@@ -173,7 +173,7 @@ public class GetXPath {
 	}
 
 	public void GetXpathuketd_dc(Node prueba) {
-		meta.getListpath().add("/oai20:OAI-PMH/oai20:ListRecords/oai20:record/oai20:metadata");
+		//meta.getListpath().add("/oai20:OAI-PMH/oai20:ListRecords/oai20:record/oai20:metadata");
 		String ruta = "/oai20:OAI-PMH/oai20:ListRecords/oai20:record/oai20:metadata";
 		
 		if (prueba.getNodeType() == Node.ELEMENT_NODE) {
@@ -220,7 +220,7 @@ public class GetXPath {
 
 
 	public void GetXpathQDC(Node prueba) {		
-		meta.getListpath().add("/oai20:OAI-PMH/oai20:ListRecords/oai20:record/oai20:metadata");
+		//meta.getListpath().add("/oai20:OAI-PMH/oai20:ListRecords/oai20:record/oai20:metadata");
 		String ruta = "/oai20:OAI-PMH/oai20:ListRecords/oai20:record/oai20:metadata";
 		
 		
