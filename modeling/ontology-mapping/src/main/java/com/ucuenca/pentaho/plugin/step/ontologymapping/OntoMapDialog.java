@@ -23,6 +23,7 @@
 package com.ucuenca.pentaho.plugin.step.ontologymapping;
 
 import java.sql.ResultSet;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -1097,6 +1098,8 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 			if(rowCount != meta.getSqlStack().size() && meta.getSqlStack().get(0) != null) {
 				for(String sqlInsert:meta.getSqlStack()) {
 					logBasic( BaseMessages.getString( PKG, "OntologyMapping.log.basic.rules.meta.Insert" ) );
+					sqlInsert = sqlInsert.replaceAll("\\{0\\}", "'" + data.getTransName().toUpperCase() + "'");
+					sqlInsert = sqlInsert.replaceAll("\\{1\\}", "'" + data.getStepName().toUpperCase() + "'");
 					DatabaseLoader.executeUpdate(sqlInsert);
 				}
 				this.queryMappingRules(data);

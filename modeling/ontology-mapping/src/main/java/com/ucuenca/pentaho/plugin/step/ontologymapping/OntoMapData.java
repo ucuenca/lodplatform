@@ -129,7 +129,10 @@ public class OntoMapData extends BaseStepData implements StepDataInterface {
 	    			sqlInsertion += "?)";
 	    			sqlInsertStack += "{"+ (values.length-1) +"})";
 	    			DatabaseLoader.executeUpdate(sqlInsertion, values);
-	    			sqlInsertList.add( new MessageFormat(sqlInsertStack).format( this.setValuesFormat(values) ) );
+	    			sqlInsertList.add( new MessageFormat(sqlInsertStack)
+	    				.format( this.setValuesFormat( 
+	    						ArrayUtils.addAll(new Object[]{"{0}","{1}"}, tableValues) 
+						) ) );
 	    		}catch(Exception e) {
 	    			throw new KettleException("ERROR EXECUTING SQL INSERT: "+ e.getMessage());
 	    		}
@@ -144,10 +147,10 @@ public class OntoMapData extends BaseStepData implements StepDataInterface {
 	 * @return new formatted set of values
 	 * @throws Exception
 	 */
-	private Object[] setValuesFormat(Object[] values)throws Exception {
+	protected Object[] setValuesFormat(Object[] values)throws Exception {
 		Object[] result = new Object[values.length];
 		for(int i=0;i<values.length;i++) {
-			if(values[i] instanceof String) {
+			if(values[i] instanceof String && !((String)values[i]).matches("\\{\\d\\}") ) {
 				result[i] = "'" + values[i] + "'";
 			} else {
 				result[i] = values[i];
