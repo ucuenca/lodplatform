@@ -496,15 +496,18 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 				int[] filters = colNr == 6 ? new int[]{8,10}:(colNr == 8 ? new int[]{6,10}:new int[]{6,8});
 				
 				String stepName = wStep2.getText();
-				stepName = getRootStep( transMeta.findStep(stepName) ).getName();
 				String [] values = new String[]{"No fields found"};
-				try {
-					List<String> filter= new ArrayList<String>();
-					if(!StringUtils.isEmpty(tableItem.getText(filters[0]) )) filter.add(tableItem.getText(filters[0]));
-					if(!StringUtils.isEmpty(tableItem.getText(filters[1]) )) filter.add(tableItem.getText(filters[1]));
-					values = getStepFieldsMeta(stepName, filter.toArray());
-				}catch(KettleException e) {
-					logError(e.getMessage(), e);
+				StepMeta stemStep = getRootStep( transMeta.findStep(stepName) );
+				if(stemStep !=  null) {
+					stepName = stemStep.getName();
+					try {
+						List<String> filter= new ArrayList<String>();
+						if(!StringUtils.isEmpty(tableItem.getText(filters[0]) )) filter.add(tableItem.getText(filters[0]));
+						if(!StringUtils.isEmpty(tableItem.getText(filters[1]) )) filter.add(tableItem.getText(filters[1]));
+						values = getStepFieldsMeta(stepName, filter.toArray());
+					}catch(KettleException e) {
+						logError(e.getMessage(), e);
+					}
 				}
 				return values;
 			}
