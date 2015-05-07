@@ -931,6 +931,8 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 				this.getDBTableNameFromPreviousSteps(stepMeta, stepNameSetter):tableName;
 		if(tableName == null) {
 			throw new KettleException("NO 'DBTABLE' FIELD FOUND FROM " + stepMeta.getParentTransMeta().getName() + " STEP");
+		} else{
+			this.setMetaValueByMethodName(stepNameSetter, String.class, stepMeta.getName());
 		}
 		return tableName;
 	}
@@ -948,11 +950,7 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 			tableName = this.lookupGetterMethod(step.getName(), step.getStepMetaInterface().getStepData());
 			if(tableName != null) {
 				if(stepNameSetterMethod != null) {
-					try {
-						meta.getClass().getMethod(stepNameSetterMethod, String.class).invoke(meta, step.getName());
-					}catch(Exception e) {
-						throw new KettleException(e);
-					}
+					this.setMetaValueByMethodName(stepNameSetterMethod, String.class, step.getName());
 				}
 				logBasic("DBTABLE FIELD FOUND ON " + step.getName() + " STEP DATA CLASS. VALUE ==> " + tableName);
 				break;
@@ -963,6 +961,14 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 			}
 		}
 		return tableName;
+	}
+	
+	private void setMetaValueByMethodName(String stepNameSetterMethod, Class pType, Object pValue)throws KettleException{
+		try {
+			meta.getClass().getMethod(stepNameSetterMethod, pType).invoke(meta, pValue);
+		}catch(Exception e) {
+			throw new KettleException(e);
+		}
 	}
 	
 	/**
