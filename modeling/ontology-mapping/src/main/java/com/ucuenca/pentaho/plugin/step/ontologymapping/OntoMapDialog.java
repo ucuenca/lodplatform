@@ -903,8 +903,8 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	 */
 	private void getPrevStepsMeta()throws KettleException {
 		String ontologyStepName = wStep1.getText();
-		meta.setOntologyDbTable(this.stepDBTableLookup(transMeta.findStep(ontologyStepName), false, null));
-		meta.setOntologyStepName(ontologyStepName);		
+		meta.setOntologyDbTable(this.stepDBTableLookup(transMeta.findStep(ontologyStepName), false, "setOntologyStepName"));
+		//meta.setOntologyStepName(ontologyStepName);		
 		String dataStepName = wStep2.getText();		
 		meta.setDataDbTable(this.stepDBTableLookup(transMeta.findStep(dataStepName), true, "setDataStepName"));
 		//meta.setDataStepName(dataStepName);
@@ -931,7 +931,7 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 				this.getDBTableNameFromPreviousSteps(stepMeta, stepNameSetter):tableName;
 		if(tableName == null) {
 			throw new KettleException("NO 'DBTABLE' FIELD FOUND FROM " + stepMeta.getParentTransMeta().getName() + " STEP");
-		} else{
+		} else {
 			this.setMetaValueByMethodName(stepNameSetter, String.class, stepMeta.getName());
 		}
 		return tableName;
