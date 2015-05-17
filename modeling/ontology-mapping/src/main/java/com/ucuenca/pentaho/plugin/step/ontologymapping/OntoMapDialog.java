@@ -23,6 +23,7 @@
 package com.ucuenca.pentaho.plugin.step.ontologymapping;
 
 import java.sql.ResultSet;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -495,15 +496,18 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 				int[] filters = colNr == 6 ? new int[]{8,10}:(colNr == 8 ? new int[]{6,10}:new int[]{6,8});
 				
 				String stepName = wStep2.getText();
-				stepName = getRootStep( transMeta.findStep(stepName) ).getName();
 				String [] values = new String[]{"No fields found"};
-				try {
-					List<String> filter= new ArrayList<String>();
-					if(!StringUtils.isEmpty(tableItem.getText(filters[0]) )) filter.add(tableItem.getText(filters[0]));
-					if(!StringUtils.isEmpty(tableItem.getText(filters[1]) )) filter.add(tableItem.getText(filters[1]));
-					values = getStepFieldsMeta(stepName, filter.toArray());
-				}catch(KettleException e) {
-					logError(e.getMessage(), e);
+				StepMeta stemStep = getRootStep( transMeta.findStep(stepName) );
+				if(stemStep !=  null) {
+					stepName = stemStep.getName();
+					try {
+						List<String> filter= new ArrayList<String>();
+						if(!StringUtils.isEmpty(tableItem.getText(filters[0]) )) filter.add(tableItem.getText(filters[0]));
+						if(!StringUtils.isEmpty(tableItem.getText(filters[1]) )) filter.add(tableItem.getText(filters[1]));
+						values = getStepFieldsMeta(stepName, filter.toArray());
+					}catch(KettleException e) {
+						logError(e.getMessage(), e);
+					}
 				}
 				return values;
 			}
@@ -899,8 +903,8 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	 */
 	private void getPrevStepsMeta()throws KettleException {
 		String ontologyStepName = wStep1.getText();
-		meta.setOntologyDbTable(this.stepDBTableLookup(transMeta.findStep(ontologyStepName), false, null));
-		meta.setOntologyStepName(ontologyStepName);		
+		meta.setOntologyDbTable(this.stepDBTableLookup(transMeta.findStep(ontologyStepName), false, "setOntologyStepName"));
+		//meta.setOntologyStepName(ontologyStepName);		
 		String dataStepName = wStep2.getText();		
 		meta.setDataDbTable(this.stepDBTableLookup(transMeta.findStep(dataStepName), true, "setDataStepName"));
 		//meta.setDataStepName(dataStepName);
@@ -927,6 +931,8 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 				this.getDBTableNameFromPreviousSteps(stepMeta, stepNameSetter):tableName;
 		if(tableName == null) {
 			throw new KettleException("NO 'DBTABLE' FIELD FOUND FROM " + stepMeta.getParentTransMeta().getName() + " STEP");
+		} else {
+			this.setMetaValueByMethodName(stepNameSetter, String.class, stepMeta.getName());
 		}
 		return tableName;
 	}
@@ -944,11 +950,7 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 			tableName = this.lookupGetterMethod(step.getName(), step.getStepMetaInterface().getStepData());
 			if(tableName != null) {
 				if(stepNameSetterMethod != null) {
-					try {
-						meta.getClass().getMethod(stepNameSetterMethod, String.class).invoke(meta, step.getName());
-					}catch(Exception e) {
-						throw new KettleException(e);
-					}
+					this.setMetaValueByMethodName(stepNameSetterMethod, String.class, step.getName());
 				}
 				logBasic("DBTABLE FIELD FOUND ON " + step.getName() + " STEP DATA CLASS. VALUE ==> " + tableName);
 				break;
@@ -959,6 +961,14 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 			}
 		}
 		return tableName;
+	}
+	
+	private void setMetaValueByMethodName(String stepNameSetterMethod, Class pType, Object pValue)throws KettleException{
+		try {
+			meta.getClass().getMethod(stepNameSetterMethod, pType).invoke(meta, pValue);
+		}catch(Exception e) {
+			throw new KettleException(e);
+		}
 	}
 	
 	/**
@@ -1097,6 +1107,8 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 			if(rowCount != meta.getSqlStack().size() && meta.getSqlStack().get(0) != null) {
 				for(String sqlInsert:meta.getSqlStack()) {
 					logBasic( BaseMessages.getString( PKG, "OntologyMapping.log.basic.rules.meta.Insert" ) );
+					sqlInsert = sqlInsert.replaceAll("\\{0\\}", "'" + data.getTransName().toUpperCase() + "'");
+					sqlInsert = sqlInsert.replaceAll("\\{1\\}", "'" + data.getStepName().toUpperCase() + "'");
 					DatabaseLoader.executeUpdate(sqlInsert);
 				}
 				this.queryMappingRules(data);
