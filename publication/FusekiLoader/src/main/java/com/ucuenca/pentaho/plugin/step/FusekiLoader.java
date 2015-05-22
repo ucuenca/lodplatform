@@ -212,12 +212,15 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 					logBasic(" ERROR " + eox + " Unload model "
 							+ meta.getOutputField());
 				}
-
+				//eliminar extension y escribir con el mismo pero diferente extension 
+				String name = meta.getInputName().replaceFirst("[.][^.]+$", ""); 
+				String FileName = name+".ttl";
 				try {
-
+		
+					
 					FileWriter out = new FileWriter(
 							"plugins/steps/FusekiLoader/fuseki/Data/"
-									+ meta.getInputName());
+									+ FileName);
 					data.model.write(out, "TTL");
 					logBasic("mapping from " + meta.getOutputField()
 							+ " is Ok in "
@@ -232,7 +235,7 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 				}
 
 				// create mapping.ttl-------------------------------------
-				createmapping(meta);
+				createmapping(meta,FileName);
 
 				logBasic(" config.ttl is ok ");
 
@@ -296,9 +299,9 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 		return false;
 	}
 
-	private void createmapping(FusekiLoaderMeta meta) {
+	private void createmapping(FusekiLoaderMeta meta, String nombre) {
 		Resource resource3 = fModel.createResource("file:Data/"
-				+ meta.getInputName());
+				+ nombre);
 		Resource resource2 = fModel.createResource("#" + meta.getFuDataset());
 		resource2
 				.addProperty(RDF.type, ja.RDFDataset)
