@@ -1,6 +1,6 @@
 # Licensed under the terms of http://www.apache.org/licenses/LICENSE-2.0
 
-## Basic Fuseki configuation file.
+## Basic Fuseki configuration file.
 ## 
 ## See also config-tdb.ttl for TDB specific examples.
 ## See also config-examples.ttl for commented examples.

@@ -169,6 +169,7 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 	private Button wAddFila;
 	private Button wStopService;
 	private Button wCheckService;
+	private Button WcheckBox;  //habilitar consultas federadas
 
 	private Listener lsReadUri;
 	private Listener lsLoadFile;
@@ -508,7 +509,7 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 		fdmitabla.right = new FormAttachment(100, 1);
 
 		fdmitabla.top = new FormAttachment(wTextServPort, margin);
-
+		
 		// boton ok y cancel al ultimo
 
 		table.setLayoutData(fdmitabla);
@@ -648,6 +649,46 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 		fdBotonBrowser.top = new FormAttachment(wlValNameO, margin + 5);
 		wOpenBrowser.setLayoutData(fdBotonBrowser);
 		wOpenBrowser.setEnabled(false);
+		//----------------------------------------
+		Boolean check = false;
+		 WcheckBox = new Button(shell,SWT.CHECK);
+		WcheckBox.setText("Consultas Federadas");
+		FormData fdCheckBox = new FormData();
+		fdCheckBox = new FormData();
+		fdCheckBox.left = new FormAttachment(wOpenBrowser, margin);
+		fdCheckBox.top = new FormAttachment(wlValNameO, margin + 5);
+		WcheckBox.setLayoutData(fdCheckBox);
+	
+		WcheckBox.addSelectionListener(new SelectionAdapter() {
+
+		     @Override
+		        public void widgetSelected(SelectionEvent event) {
+		            Button btn = (Button) event.getSource();
+		            TableItem miti3 = table.getItem(2);
+		           // final TableEditor editor3 = new TableEditor(table);
+		            if (btn.getSelection()){
+		            	meta.setFederada("sparql");
+		            	meta.setFuQuery("sparql");
+		            	
+		        		miti3.setText(1, "sparql");
+		            	//item.setText(0, "fuseki:serviceQuery");
+		        		//item.setText(1, "sparql");
+		        		//editor3.setItem(item);
+		        		//table.remove(3);
+		            }else{
+		            	miti3.setText(1, "query");
+		            	meta.setFederada("query");
+		            	meta.setFuQuery("query");
+		            	//meta.setFuQuery("query");
+		        		//item.setText(0, "fuseki:serviceQuery");
+		        		//item.setText(1, "queri");
+		        		//editor3.setItem(item);
+		        		//table.remove(3);
+		            }
+
+		        }
+		    });
+		
 		// ------------------------------------ how start service
 		// label how to startService
 		Label wLabelHowService = new Label(shell, SWT.RIGHT);
@@ -942,6 +983,12 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 		meta.setServiceName(wTextServName.getText());
 		meta.setPortName(wTextServPort.getText());
 
+
+		if (validado) {
+			meta.setValidate("true");
+		} else {
+			meta.setValidate("false");
+		}
 		TableItem miti = table.getItem(0);
 		meta.setFuDataset(miti.getText(1));
 
@@ -950,12 +997,7 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 
 		TableItem miti3 = table.getItem(2);
 		meta.setFuQuery(miti3.getText(1));
-		if (validado) {
-			meta.setValidate("true");
-		} else {
-			meta.setValidate("false");
-		}
-
+		
 		meta.setChanged();
 		dispose();
 	}
