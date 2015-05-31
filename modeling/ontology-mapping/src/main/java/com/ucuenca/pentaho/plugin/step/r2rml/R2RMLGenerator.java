@@ -44,6 +44,9 @@ public class R2RMLGenerator {
 	private String sqlRelationRows = "SELECT ID, ENTITY_CLASSID_1, ONTOLOGY, PROPERTY, ENTITY_CLASSID_2"
 			+ " FROM ";
 	
+	private static final String FIELD_AS_FUNCTION_PATTERN = "(.*)\\$\\{(.*)\\}(.*)";
+	private static final String FIELD_EXTRACTION_PATTERN = "\\$\\{(.*)\\}";
+	
 	private String baseURI;
 	private Model r2rmlModel;
 	private Map<String, String> prefixes = new HashMap<String, String>();
@@ -89,8 +92,8 @@ public class R2RMLGenerator {
 				String id = classBean.getId();
 				String entityId = classBean.getUriFieldId();
 				String entityRealId = "";
-				if(entityId.matches("(.*)\\$\\{(.*)\\}(.*)")) { //there is a function involved with a field
-					Pattern pattern = Pattern.compile("\\$\\{(.*)\\}"); // extract field name
+				if(entityId.matches(FIELD_AS_FUNCTION_PATTERN)) { //there is a function involved with a field
+					Pattern pattern = Pattern.compile(FIELD_EXTRACTION_PATTERN); // extract field name
 			        Matcher matcher = pattern.matcher(entityId);
 			        if (matcher.find()) {
 			        	String field = matcher.group(1).toUpperCase().replaceAll(" ", "_");
@@ -103,7 +106,7 @@ public class R2RMLGenerator {
 			            		sqlField, "ID = '" + id + "'");*/
 			        	
 			        	//entityRealId = entityId.replaceAll("\\$\\{(.*)\\}", classBean.getFieldName(field));
-			        	entityRealId = entityId.replaceAll("\\$\\{(.*)\\}", field);        
+			        	entityRealId = entityId.replaceAll(FIELD_EXTRACTION_PATTERN, field);        
 			        }
 				} else {
 					entityRealId = entityId.toUpperCase().replaceAll(" ", "_");
@@ -141,6 +144,7 @@ public class R2RMLGenerator {
 	 * @throws Exception
 	 */
 	private void processAnnotationModeling(String classId)throws Exception {
+		String entityIDfromRelation = getEntityFieldIDfromParent(classId);
 		ResultSet rs = this.getAnnotationRows(classId);
 		while(rs.next()) {
 			AnnotationBean annBean =  new AnnotationBean(rs);
@@ -159,10 +163,13 @@ public class R2RMLGenerator {
 			if(annBean.getLanguage().length() > 0) {
 				objectMapResource.addProperty(RR.language, annBean.getLanguage() );
 			}
+			String sqlDefinition = entityIDfromRelation != null ? 
+					this.getPropertySQLDefinition(classId, entityIDfromRelation, annBean):
+						this.getPropertySQLDefinition(classId, annBean);
 			
 			resource.addProperty(RR.logicalTable, 
 					r2rmlModel.createResource()
-						.addProperty(RR.sqlQuery, this.getPropertySQLDefinition(classId, annBean))
+						.addProperty(RR.sqlQuery, sqlDefinition)
 				)
 				.addProperty(RR.subjectMap,
 						r2rmlModel.createResource()
@@ -177,6 +184,42 @@ public class R2RMLGenerator {
 							.addProperty(RR.objectMap, objectMapResource)
 				);
 		}
+	}
+	
+	/**
+	 * Obtaints the FieldID for Child-Defined Entities
+	 * @param classID classification ID that establish the Child-defined Entity
+	 * @return
+	 * @throws Exception
+	 */
+	private String getEntityFieldIDfromParent(String classID)throws Exception {
+		String fieldID = null;
+		String relationQuery = "SELECT ENTITY_CLASSID_1 FROM RELATIONMAPPING WHERE ";
+		String[] condField = new String[]{"TRANSID", "STEPID", "ENTITY_CLASSID_2"};
+		String[] condValue = new String[]{meta.getParentStepMeta().getParentTransMeta().getName().toUpperCase(), 
+				meta.getParentStepMeta().getName().toUpperCase(), classID};
+		relationQuery = this.generateSQLPredicate(relationQuery, condField, condValue);
+		String parentRelationQuery = "SELECT URI_FIELD_ID FROM CLASSMAPPING WHERE ";
+		condField = new String[]{"TRANSID", "STEPID"};
+		condValue = new String[]{meta.getParentStepMeta().getParentTransMeta().getName().toUpperCase(), 
+				meta.getParentStepMeta().getName().toUpperCase()};
+		parentRelationQuery = this.generateSQLPredicate(parentRelationQuery, condField, condValue);
+		parentRelationQuery += " AND ID IN(" + relationQuery + ")";
+		ResultSet rs = DatabaseLoader.executeQuery(parentRelationQuery);
+		while(rs.next()) {
+			String entityId = rs.getString(1);
+			if(entityId.matches(FIELD_AS_FUNCTION_PATTERN)) { //there is a function involved with a field
+				Pattern pattern = Pattern.compile(FIELD_EXTRACTION_PATTERN); // extract field name
+		        Matcher matcher = pattern.matcher(entityId);
+		        if (matcher.find()) {
+		        	fieldID = matcher.group(1).toUpperCase().replaceAll(" ", "_");        
+		        }
+			} else {
+				fieldID = entityId.toUpperCase().replaceAll(" ", "_");
+			}
+			break;
+		}
+		return fieldID;
 	}
 	
 	/**
@@ -269,6 +312,32 @@ public class R2RMLGenerator {
 		String annId = annBean.getId();
 		String sql = "SELECT " + annBean.getExtractionfield().toUpperCase() + " AS " + annId + "_DATA, "
 				+ ((String)mappedEntities.get(classId)[1]).toUpperCase() + " AS " + classId + "_ID"
+				+ " FROM " + meta.getDataDbTable()
+				+ " WHERE ";
+		String[] condField = new String[]{"TRANSID", "STEPID", annBean.getDatafield()};
+		String[] condValue = new String[]{meta.getParentStepMeta().getParentTransMeta().getName().toUpperCase(), 
+				meta.getDataStepName().toUpperCase(), annBean.getDatavalue()};
+		
+		return this.generateSQLPredicate(sql, condField, condValue);
+	}
+	
+	/**
+	 * Generates SQL Query for Child-defined Entity properties
+	 * @param classId Entity Field ID
+	 * @param fieldIDfromRelation Field ID of Parent Entity
+	 * @param annBean Annotation field
+	 * @return
+	 * @throws Exception
+	 */
+	private String getPropertySQLDefinition(String classId, String fieldIDfromRelation, AnnotationBean annBean) throws Exception {
+		ClassificationBean classBean = (ClassificationBean)mappedEntities.get(classId)[2];
+		String entityUriID = classBean.getUriFieldId();
+		String entityID = entityUriID.matches(FIELD_AS_FUNCTION_PATTERN) ?
+				entityUriID.replaceAll(FIELD_EXTRACTION_PATTERN, fieldIDfromRelation)
+				:fieldIDfromRelation.toUpperCase().replaceAll(" ", "_");
+		String annId = annBean.getId();
+		String sql = "SELECT " + annBean.getExtractionfield().toUpperCase() + " AS " + annId + "_DATA, "
+				+ entityID + " AS " + classId + "_ID"
 				+ " FROM " + meta.getDataDbTable()
 				+ " WHERE ";
 		String[] condField = new String[]{"TRANSID", "STEPID", annBean.getDatafield()};
