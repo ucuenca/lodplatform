@@ -94,6 +94,15 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 	private String fuGraph;
 	private String fuDataset;
 	private String Validate;
+	private String Federada;
+	public String getFederada() {
+		return Federada;
+	}
+
+	public void setFederada(String federada) {
+		Federada = federada;
+	}
+
 	public String getValidate() {
 		return Validate;
 	}
@@ -211,6 +220,7 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 		serviceName = "";
 		inputName = " ";
 		PortName= " ";
+		Federada= " ";
 		Validate = "false";
 	}
 	
@@ -266,7 +276,8 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 		retval.append( "    " ).append( XMLHandler.addTagValue("fuQuery",fuQuery));
 		retval.append( "    " ).append( XMLHandler.addTagValue("PortName",PortName));
 		retval.append( "    " ).append( XMLHandler.addTagValue("Validate",Validate));
-	
+		retval.append( "    " ).append( XMLHandler.addTagValue("Federada",Federada));
+		
 		return retval.toString();
 	}
 
@@ -292,7 +303,7 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 			setFuQuery(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "fuQuery")));
 			setPortName(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "PortName")));
 			setValidate(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "Validate")));
-			
+			setFederada(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "Federada")));
 
 		} catch (Exception e) {
 			throw new KettleXMLException("FusekiLoader plugin unable to read step info from XML node", e);
@@ -318,7 +329,7 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 			rep.saveStepAttribute(id_transformation, id_step, "fuQuery", fuQuery); //$NON-NLS-1$
 			rep.saveStepAttribute(id_transformation, id_step, "PortName", PortName);
 			rep.saveStepAttribute(id_transformation, id_step, "Validate", Validate);
-			
+			rep.saveStepAttribute(id_transformation, id_step, "Federada", Federada);
 		}
 		catch(Exception e){
 			throw new KettleException("Unable to save step into repository: "+id_step, e); 
@@ -348,6 +359,7 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 			fuQuery  = rep.getStepAttributeString(id_step, "fuQuery");
 			PortName = rep.getStepAttributeString(id_step, "PortName");
 			Validate = rep.getStepAttributeString(id_step, "Validate");
+			Federada = rep.getStepAttributeString(id_step, "Federada");
 	 
 		}
 		catch(Exception e){

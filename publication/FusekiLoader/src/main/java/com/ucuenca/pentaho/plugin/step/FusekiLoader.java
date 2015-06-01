@@ -291,7 +291,7 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 			}
 		} else {
 
-			logBasic(" ERROR Tranformation dont started because parameters es empty");
+			logBasic(" ERROR Transformation dont started because parameters are empty");
 
 			status = "ERROR";
 		}
@@ -317,15 +317,26 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 												ja.externalContent, resource3)));
 
 		Resource resource1 = fModel.createResource("#service1");
-
+		if(meta.getFuQuery().equals("query"))
+		{
+			resource1
+			.addProperty(RDF.type, fuseki.Service)
+			.addProperty(FusekiVocab.pServiceName, meta.getServiceName())
+			.addProperty(FusekiVocab.pServiceQueryEP, "query")
+			.addProperty(FusekiVocab.pServiceReadgraphStoreEP,
+					meta.getFuGraph())
+			.addProperty(fuseki.dataset, resource2);
+	
+		}else{
 		resource1
 				.addProperty(RDF.type, fuseki.Service)
 				.addProperty(FusekiVocab.pServiceName, meta.getServiceName())
+				.addProperty(FusekiVocab.pServiceQueryEP, "query")
 				.addProperty(FusekiVocab.pServiceQueryEP, meta.getFuQuery())
 				.addProperty(FusekiVocab.pServiceReadgraphStoreEP,
 						meta.getFuGraph())
 				.addProperty(fuseki.dataset, resource2);
-
+		}
 		FileWriter out;
 		try {
 			out = new FileWriter("plugins/steps/FusekiLoader/fuseki/"
