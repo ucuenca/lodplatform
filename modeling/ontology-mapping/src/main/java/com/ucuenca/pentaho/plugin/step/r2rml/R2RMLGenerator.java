@@ -23,6 +23,7 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.XSD;
 import com.ucuenca.misctools.DatabaseLoader;
+import com.ucuenca.misctools.LOVApiV2;
 import com.ucuenca.misctools.PrefixCCLookUp;
 import com.ucuenca.pentaho.plugin.step.ontologymapping.OntoMapData;
 import com.ucuenca.pentaho.plugin.step.ontologymapping.OntoMapMeta;
@@ -49,7 +50,7 @@ public class R2RMLGenerator {
 	
 	private String baseURI;
 	private Model r2rmlModel;
-	private Map<String, String> prefixes = new HashMap<String, String>();
+	private Map<String, String[]> prefixes = new HashMap<String, String[]>();
 	private Map<String, Object[]> mappedEntities = new HashMap<String, Object[]>();
 	
 	public R2RMLGenerator(StepMetaInterface smi, StepDataInterface sdi) throws KettleException {
@@ -112,7 +113,8 @@ public class R2RMLGenerator {
 					entityRealId = entityId.toUpperCase().replaceAll(" ", "_");
 				}
 				String vocPrefix = classBean.getOntology();
-				this.getOntologyURI(vocPrefix);
+				//this.getOntologyURI(vocPrefix);
+				this.getLOVOntologyURI(vocPrefix);
 				String vocEntity = classBean.getEntity();
 				Resource resource = r2rmlModel.createResource("#TriplesMap"+ id);
 				resource.addProperty(RR.logicalTable, 
@@ -123,8 +125,8 @@ public class R2RMLGenerator {
 						r2rmlModel.createResource()
 							.addProperty(RR.template, this.baseURI + relativeURI + "{" + id + "_ID}")
 							.addProperty(RR.cclass, /*this.getOntologyURI(vocPrefix) +*/
-									ResourceFactory.createProperty( prefixes.get(vocPrefix), 
-											vocEntity.split(prefixes.get(vocPrefix))[1] )
+									ResourceFactory.createProperty( prefixes.get(vocPrefix)[0], 
+											vocEntity.split(prefixes.get(vocPrefix)[0])[1] )
 									)
 					);
 				mappedEntities.put(id, new Object[]{relativeURI, entityRealId, classBean});
@@ -151,7 +153,8 @@ public class R2RMLGenerator {
 			String id = annBean.getId();
 			String vocPrefix = annBean.getOntology();
 			String vocProperty = annBean.getProperty();
-			this.getOntologyURI(vocPrefix);
+			//this.getOntologyURI(vocPrefix);
+			this.getLOVOntologyURI(vocPrefix);
 			Resource resource = r2rmlModel.createResource("#TriplesMap"+ id);
 			
 			Resource objectMapResource = r2rmlModel.createResource();
@@ -178,8 +181,8 @@ public class R2RMLGenerator {
 				.addProperty(RR.predicateObjectMap,
 						r2rmlModel.createResource()
 							.addProperty(RR.predicate,
-									ResourceFactory.createProperty( prefixes.get(vocPrefix), 
-											vocProperty.split(prefixes.get(vocPrefix))[1] )
+									ResourceFactory.createProperty( prefixes.get(vocPrefix)[0], 
+											vocProperty.split(prefixes.get(vocPrefix)[0])[1] )
 							)
 							.addProperty(RR.objectMap, objectMapResource)
 				);
@@ -237,7 +240,8 @@ public class R2RMLGenerator {
 			String entity2 = relBean.getEntityclassid2();
 			Object []entityProp1 = mappedEntities.get(entity1);
 			Object []entityProp2 = mappedEntities.get(entity2);
-			this.getOntologyURI(vocPrefix);
+			//this.getOntologyURI(vocPrefix);
+			this.getLOVOntologyURI(vocPrefix);
 			Resource resource = r2rmlModel.createResource("#TriplesMap"+ id);
 			resource.addProperty(RR.logicalTable, 
 					r2rmlModel.createResource()
@@ -250,8 +254,8 @@ public class R2RMLGenerator {
 				.addProperty(RR.predicateObjectMap,
 						r2rmlModel.createResource()
 							.addProperty(RR.predicate,
-									ResourceFactory.createProperty( prefixes.get(vocPrefix), 
-											vocProperty.split(prefixes.get(vocPrefix))[1] )
+									ResourceFactory.createProperty( prefixes.get(vocPrefix)[0], 
+											vocProperty.split(prefixes.get(vocPrefix)[0])[1] )
 							)
 							.addProperty(RR.objectMap,
 									r2rmlModel.createResource()
@@ -409,14 +413,35 @@ public class R2RMLGenerator {
 	 * @return
 	 * @throws Exception
 	 */
+	@Deprecated
 	private String getOntologyURI(String prefix) throws Exception {
 		prefix = prefix.trim();
 		String URI = "";
 		if(prefixes.containsKey(prefix)) {
-			URI = prefixes.get(prefix);
+			URI = prefixes.get(prefix)[0];
 		} else {
 			URI = PrefixCCLookUp.queryService(prefix);
-			prefixes.put(prefix, URI);
+			prefixes.put(prefix, new String[]{URI});
+			r2rmlModel.setNsPrefix(prefix, URI);
+		}
+		return URI;
+	}
+	
+	/**
+	 * Query ontology base URI from LOV service and added it to the prefix stack
+	 * @param prefix
+	 * @return
+	 * @throws Exception
+	 */
+	private String getLOVOntologyURI(String prefix) throws Exception {
+		prefix = prefix.trim();
+		String URI = "";
+		if(prefixes.containsKey(prefix)) {
+			URI = prefixes.get(prefix)[0];
+		} else {
+			List<String> URIList = LOVApiV2.vocabularySearch(prefix);
+			prefixes.put(prefix, URIList.toArray(new String[URIList.size()]));
+			URI = URIList.get(0);
 			r2rmlModel.setNsPrefix(prefix, URI);
 		}
 		return URI;
