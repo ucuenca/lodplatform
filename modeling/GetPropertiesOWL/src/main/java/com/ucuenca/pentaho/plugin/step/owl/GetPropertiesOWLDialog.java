@@ -619,8 +619,13 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			String myresult=null;
+			if (listresult.size() > 0){
+				myresult=listresult.get(0);
+			}
+				
 			
-			String myresult=listresult.get(0);
+	
 
 				if (myresult != null) {
 					TableItem item = new TableItem(table, SWT.NONE, numt++);
