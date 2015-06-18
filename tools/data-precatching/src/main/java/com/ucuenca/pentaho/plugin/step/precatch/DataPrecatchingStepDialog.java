@@ -305,7 +305,7 @@ public class DataPrecatchingStepDialog extends BaseStepDialog implements StepDia
 		if(changed) {
 			meta.setDbTable( wTableNameField.getText() );
 		}
-		meta.setChanged(!dataStepName.equals(meta.getDataStepName()));
+		meta.setChanged(changed);
 		//meta.setDataStepName(this.dataStepName);
 		meta.setDataStepName(stepname);
 		dispose();
