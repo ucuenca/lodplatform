@@ -70,10 +70,12 @@ import org.pentaho.di.ui.core.widget.TextVar;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.logging.*;
+import com.ucuenca.misctools.LOVApiV2;
 
 /**
  * This class is part of the demo step plug-in implementation. It demonstrates
@@ -608,8 +610,22 @@ public class GetPropertiesOWLDialog extends BaseStepDialog implements
 			Pattern pat = Pattern.compile("^http.*");
 			Matcher mat = pat.matcher(wHelloFieldName.getText());
 			
-		String myresult = ConsultUri(wHelloFieldName.getText().trim());// search
+		//String myresult = ConsultUri(wHelloFieldName.getText().trim());// search
 				// in
+			List<String> listresult=  new ArrayList<String>();;
+			try {
+				listresult = LOVApiV2.vocabularySearch(wHelloFieldName.getText().trim());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			String myresult=null;
+			if (listresult.size() > 0){
+				myresult=listresult.get(0);
+			}
+				
+			
+	
 
 				if (myresult != null) {
 					TableItem item = new TableItem(table, SWT.NONE, numt++);
