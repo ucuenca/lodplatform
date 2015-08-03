@@ -36,6 +36,9 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.core.row.RowDataUtil;
@@ -70,6 +73,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.shared.InvalidPropertyURIException;
 import com.hp.hpl.jena.sparql.core.DatasetGraph;
 import com.hp.hpl.jena.tdb.TDBFactory;
 import com.hp.hpl.jena.tdb.base.file.Location;
@@ -186,11 +190,15 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 	 */
 	public boolean processRow(StepMetaInterface smi, StepDataInterface sdi)
 			throws KettleException {
-
+		
+		
 		// safely cast the step settings (meta) and runtime info (data) to
 		// specific implementations
 		FusekiLoaderMeta meta = (FusekiLoaderMeta) smi;
 		FusekiLoaderData data = (FusekiLoaderData) sdi;
+		
+		System.out.println(meta.getFuGraph());
+		System.out.println(meta.getFuQuery());
 		getRow();
 		String status = "ERROR";
 		if (meta.getValidate().equals("true")) {
@@ -300,13 +308,50 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 	}
 
 	private void createmapping(FusekiLoaderMeta meta, String nombre) {
+		
+		
+		
 		Resource resource3 = fModel.createResource("file:Data/"
 				+ nombre);
+		
+		Resource resourceModel = fModel.createResource("#model");
+				resourceModel.addProperty(RDF.type,ja.MemoryModel)
+							.addProperty(ja.content, fModel.createResource()
+													.addProperty(ja.externalContent, resource3)
+									)	
+				;
+		
+		Resource resourceModel0 = fModel.createResource("#model0");
+				resourceModel0.addProperty(RDF.type,ja.MemoryModel)
+							.addProperty(ja.content, fModel.createResource()
+													.addProperty(ja.externalContent, resource3)
+									)	
+				;
+				
+		//configuracion Dataset
 		Resource resource2 = fModel.createResource("#" + meta.getFuDataset());
+		
+		//base Uri RESOURCE
+		Resource resourceBaseUri = fModel.createResource(meta.getFubaseURI());
+		
+		try {
 		resource2
 				.addProperty(RDF.type, ja.RDFDataset)
-				.addProperty(RDFS.label, meta.getFuDataset())
+				//.addProperty(RDFS.label, meta.getFuDataset())
 				.addProperty(
+						ja.defaultGraph,
+						resourceModel0)
+				.addProperty(ja.namedGraph, fModel.createResource()
+											.addProperty(ja.graphName, resourceBaseUri)
+											.addProperty(ja.graph, resourceModel)
+						)		
+						;
+		}catch(InvalidPropertyURIException e){
+			logBasic(" ERROR Invalida Base URI "+ meta.getFubaseURI());
+		}
+		/* 
+		 *
+		 * .addProperty(
 						ja.defaultGraph,
 						fModel.createResource()
 								.addProperty(RDFS.label, meta.getInputName())
@@ -314,18 +359,52 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 								.addProperty(
 										ja.content,
 										fModel.createResource().addProperty(
-												ja.externalContent, resource3)));
+												ja.externalContent, resource3)));*
+		 */
+		 
 
 		Resource resource1 = fModel.createResource("#service1");
 
 		resource1
 				.addProperty(RDF.type, fuseki.Service)
 				.addProperty(FusekiVocab.pServiceName, meta.getServiceName())
-				.addProperty(FusekiVocab.pServiceQueryEP, meta.getFuQuery())
-				.addProperty(FusekiVocab.pServiceReadgraphStoreEP,
-						meta.getFuGraph())
+			//	.addProperty(FusekiVocab.pServiceQueryEP, meta.getFuQuery())
+			//	.addProperty(FusekiVocab.pServiceReadgraphStoreEP,
+			//			meta.getFuGraph())
 				.addProperty(fuseki.dataset, resource2);
-
+		/*
+		for (int i= 0; i <){
+			
+		}*/
+		List<String> listaPropiedades;
+		listaPropiedades = cleanspaces(meta.getListaPropiedades());
+		List<String> listaValores;
+		listaValores = cleanspaces(meta.getListaValores());
+		String datasetlabel= "";
+		for (int i= 0; i < listaPropiedades.size(); i++){ //obtener valores del combo
+			if (listaPropiedades.get(i).compareTo("fuseki:dataset")==0){
+				datasetlabel =  listaValores.get(i);
+			}
+			if (listaPropiedades.get(i).compareTo("fuseki:serviceQuery")==0){
+				resource1.addProperty(FusekiVocab.pServiceQueryEP, listaValores.get(i));
+			}
+			if (listaPropiedades.get(i).compareTo("fuseki:serviceReadWriteGraphStore")==0){
+				resource1.addProperty(FusekiVocab.pServiceReadgraphStoreEP, listaValores.get(i));
+			}
+			if (listaPropiedades.get(i).compareTo("fuseki:serviceUpload")==0){
+				resource1.addProperty(FusekiVocab.pServiceUploadEP, listaValores.get(i));
+			}
+			if (listaPropiedades.get(i).compareTo("fuseki:serviceUpdate")==0){
+				resource1.addProperty(FusekiVocab.pServiceUpdateEP, listaValores.get(i));
+			}
+			if (listaPropiedades.get(i).compareTo("fuseki:serviceReadGraphStore")==0){
+				resource1.addProperty(FusekiVocab.pServiceUpdateEP, listaValores.get(i));
+			}
+			
+			
+		}
+		resource2.addProperty(RDFS.label, datasetlabel);
+		
 		FileWriter out;
 		try {
 			out = new FileWriter("plugins/steps/FusekiLoader/fuseki/"
@@ -453,6 +532,26 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 		} catch (Exception ex) {
 			// Please handle all the relevant exceptions here
 		}
+	}
+	
+    /**
+     * Metodo para limpiar y pasarle a una lista de string
+     * @param limpiar
+     * @return
+     */
+	public List<String> cleanspaces(String limpiar) {
+
+		// logError("nameontology "+meta.getNameOntology());
+		String replace = limpiar.replace("[", "");
+
+		String replace1 = replace.replace("]", "");
+
+		String replace2 = replace1.replaceAll("\\s+", "");
+
+		List<String> myList = new ArrayList<String>(Arrays.asList(replace2
+				.split(",")));
+
+		return myList;
 	}
 
 }

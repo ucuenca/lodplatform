@@ -43,21 +43,15 @@ public final class LOVApiV2 {
 				in.close();
 				JSONObject jsonRoot = new JSONObject(response.toString());
 				rsJSON = jsonRoot.getJSONArray("results");
-				for(int i = 0; i<rsJSON.length();i++) {
-					JSONObject vocab = rsJSON.getJSONObject(i);
-					URIList.add( vocab.getString("_id") );
-				}
 				dataCache.put(prefix, rsJSON);
 			} else {
 				rsJSON = dataCache.get(prefix);
-				for(int i = 0; i<rsJSON.length();i++) {
-					JSONObject vocab = rsJSON.getJSONObject(i);
-					String URI = vocab.getJSONObject("_source").getString("uri");
-					URIList.add( URI.endsWith("/") ? URI:URI+"#" );
-				}
-				
 			}
-
+			for(int i = 0; i<rsJSON.length();i++) {
+				JSONObject vocab = rsJSON.getJSONObject(i);
+				String URI = vocab.getJSONObject("_source").getString("uri");
+				URIList.add( !URI.endsWith("/") && !URI.endsWith("#") ? URI+"#":URI );
+			}
 		}catch (IOException e) {
 			throw new KettleException("PROBLEM TRYING TO CONNECT TO PREFIX.CC SERVICE", e);
 		}catch (JSONException e) {

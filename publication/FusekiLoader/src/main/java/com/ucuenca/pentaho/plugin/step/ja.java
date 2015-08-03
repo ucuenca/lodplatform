@@ -31,8 +31,10 @@ public class ja{
    public static final Property MemoryModel = property( "MemoryModel" );
    public static final Property content = property( "content" );
    public static final Property externalContent = property( "externalContent" );
-
-
+   
+   public static final Property namedGraph = property("namedGraph");
+   public static final Property graphName = property("graphName");
+   public static final Property graph  = property("graph");
    /**
        The same items of vocabulary, but at the Node level, parked inside a
        nested class so that there's a simple way to refer to them.
@@ -44,7 +46,10 @@ public class ja{
        public static final Node MemoryModel = ja.MemoryModel.asNode();
        public static final Node content = ja.content.asNode();
        public static final Node externalContent = ja.externalContent.asNode();
-
+       
+       public static final Node namedGraph = ja.namedGraph.asNode();
+       public static final Node graphName = ja.graphName.asNode();
+       public static final Node graph  = ja.graph.asNode();
        
        }
 
