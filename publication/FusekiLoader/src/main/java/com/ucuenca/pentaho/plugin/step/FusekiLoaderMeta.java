@@ -22,6 +22,7 @@
 
 package com.ucuenca.pentaho.plugin.step;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -93,7 +94,13 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 	private String fuQuery;
 	private String fuGraph;
 	private String fuDataset;
+	private String fubaseURI;
 	private String Validate;
+	private List<String> configStack = new ArrayList<String>();
+	
+	private String listaValores;
+	private String listaPropiedades;
+	
 	public String getValidate() {
 		return Validate;
 	}
@@ -102,6 +109,8 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 		Validate = validate;
 	}
 
+	
+	
 	public String getPortName() {
 		return PortName;
 	}
@@ -120,6 +129,14 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 
 	public String getServiceName() {
 		return serviceName;
+	}
+	
+	public String getFubaseURI() {
+		return fubaseURI;
+	}
+
+	public void setFubaseURI(String fubaseURI) {
+		this.fubaseURI = fubaseURI;
 	}
 
 	public void setServiceName(String serviceName) {
@@ -149,6 +166,24 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 	public void setFuDataset(String fuDataset) {
 		this.fuDataset = fuDataset;
 	}
+	
+	
+
+	public String getListaValores() {
+		return listaValores;
+	}
+
+	public void setListaValores(String listaValores) {
+		this.listaValores = listaValores;
+	}
+
+	public String getListaPropiedades() {
+		return listaPropiedades;
+	}
+
+	public void setListaPropiedades(String listaPropiedades) {
+		this.listaPropiedades = listaPropiedades;
+	}
 
 	/**
 	 * Constructor should call super() to make sure the base class has a chance to initialize properly.
@@ -163,6 +198,16 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 
 	public void setDirectory(String directory) {
 		this.directory = directory;
+	}
+
+	
+	
+	public List<String> getConfigStack() {
+		return configStack;
+	}
+
+	public void setConfigStack(List<String> configStack) {
+		this.configStack = configStack;
 	}
 
 	/**
@@ -209,6 +254,7 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 		outputField = " ";
 		directory = " ";
 		serviceName = "";
+		fubaseURI = "";
 		inputName = " ";
 		PortName= " ";
 		Validate = "false";
@@ -266,6 +312,10 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 		retval.append( "    " ).append( XMLHandler.addTagValue("fuQuery",fuQuery));
 		retval.append( "    " ).append( XMLHandler.addTagValue("PortName",PortName));
 		retval.append( "    " ).append( XMLHandler.addTagValue("Validate",Validate));
+		retval.append( "    " ).append( XMLHandler.addTagValue("fubaseURI",fubaseURI));
+		retval.append( "    " ).append( XMLHandler.addTagValue("listaPropiedades",listaPropiedades));
+		retval.append( "    " ).append( XMLHandler.addTagValue("listaValores",listaValores));
+		retval.append( XMLHandler.addTagValue( "configStack", this.getConfigStack().toString()));
 	
 		return retval.toString();
 	}
@@ -292,6 +342,10 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 			setFuQuery(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "fuQuery")));
 			setPortName(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "PortName")));
 			setValidate(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "Validate")));
+			setFubaseURI(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "fubaseURI")));
+			setListaPropiedades(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "listaPropiedades")));
+			setListaValores(XMLHandler.getNodeValue(XMLHandler.getSubNode(stepnode, "listaValores")));
+			
 			
 
 		} catch (Exception e) {
@@ -318,6 +372,11 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 			rep.saveStepAttribute(id_transformation, id_step, "fuQuery", fuQuery); //$NON-NLS-1$
 			rep.saveStepAttribute(id_transformation, id_step, "PortName", PortName);
 			rep.saveStepAttribute(id_transformation, id_step, "Validate", Validate);
+			rep.saveStepAttribute( id_transformation, id_step, "configStack", this.configStack.toString() );
+			rep.saveStepAttribute(id_transformation, id_step,"fubaseURI", fubaseURI);
+			rep.saveStepAttribute(id_transformation, id_step, "listaPropiedades", listaPropiedades);
+			rep.saveStepAttribute(id_transformation, id_step, "listaValores", listaValores);
+		      
 			
 		}
 		catch(Exception e){
@@ -348,6 +407,12 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 			fuQuery  = rep.getStepAttributeString(id_step, "fuQuery");
 			PortName = rep.getStepAttributeString(id_step, "PortName");
 			Validate = rep.getStepAttributeString(id_step, "Validate");
+			fubaseURI = rep.getStepAttributeString(id_step,"fubaseURI");
+			listaValores = rep.getStepAttributeString(id_step, "listaValores");
+			listaPropiedades = rep.getStepAttributeString(id_step, "listaPropiedades");
+			
+			String configStack = rep.getStepAttributeString( id_step, "configStack" );
+			configStack = configStack.substring(1, configStack.length()-1);
 	 
 		}
 		catch(Exception e){
@@ -470,7 +535,14 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 					stepMeta);
 			remarks.add(cr);
 		}
-		
+		if (fubaseURI==null){
+			cr = new CheckResult(CheckResult.TYPE_RESULT_ERROR,
+					BaseMessages.getString(PKG,
+							"FusekiLoader.baseUri.empty"),
+					stepMeta);
+			remarks.add(cr);
+			
+		}
     	
 	}
 
