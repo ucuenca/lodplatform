@@ -36,6 +36,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -72,6 +75,8 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
@@ -121,7 +126,7 @@ import java.net.URI;
 
 /** .
  * @author Fabian Peñaloza Marin
- * @version 1
+ * @version 2
  */
 /**
  * This class is part of the demo step plug-in implementation. It demonstrates
@@ -159,7 +164,9 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 	private Text wHelloFieldName;
 	private Text wChooseOutput;
 	private Text wTextServName;
+	private Text BaseUri;
 	private Text wTextServPort;
+	private Text wTextBaseUri;
 	private Text wTextHowService;
 
 	private Button wLoadFile;
@@ -182,6 +189,8 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 	private ModifyListener lsUpdateInstrucctions;
 	private FormData fdmitabla;
 	private Table table;
+	String[] valoresPrecargados = {"myds","data","query"," "};
+	
 	private static String OS = System.getProperty("os.name").toLowerCase();
 	private int numt = 2;
 	private static final Logger log = Logger.getLogger(FusekiLoader.class
@@ -199,6 +208,8 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 	MiHilo1 elHilo = new MiHilo1();
 
 	ExecutorTask task = new ExecutorTask();
+	
+	
 
 	/**
 	 * The constructor should simply invoke super() and save the incoming meta
@@ -419,6 +430,34 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 		fdtextservPort.top = new FormAttachment(wlabelServiceName, margin + 5);
 		// fdtextservPort.right = new FormAttachment(100, 0);
 		wTextServPort.setLayoutData(fdtextservPort);
+		
+		//agregando Base URI
+		
+		// label to service Port
+				Label wlabelBaseUri= new Label(shell, SWT.RIGHT);
+				wlabelBaseUri.setText(BaseMessages.getString(PKG,
+						"FusekiLoader.label.BaseUri"));
+				props.setLook(wlabelBaseUri);
+				FormData fdlBaseUri = new FormData();
+				fdlBaseUri.left = new FormAttachment(0, 0);
+				fdlBaseUri.right = new FormAttachment(middle, -margin);
+				fdlBaseUri.top = new FormAttachment(wlabelServicePort, margin + 5);
+
+				wlabelBaseUri.setLayoutData(fdlBaseUri);
+				// text para service Port
+
+				wTextBaseUri = new Text(shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
+
+				props.setLook(wTextBaseUri);
+				wTextBaseUri.setText("");
+				// wStepname.addModifyListener(lsMod);
+				FormData fdtextBaseUri = new FormData();
+				fdtextBaseUri.left = new FormAttachment(middle, 0);
+				fdtextBaseUri.top = new FormAttachment(wlabelServicePort, margin + 5);
+				fdtextBaseUri.right = new FormAttachment(100, 0);
+				wTextBaseUri.setLayoutData(fdtextBaseUri);
+		
+		
 		// table to parameters
 
 		table = new Table(shell, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
@@ -439,84 +478,151 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 		for (int i = 0; i < titles.length; i++) {
 			TableColumn column = new TableColumn(table, SWT.NONE);
 			column.setText(titles[i]);
-			column.setWidth(150);
-			column.pack();
+			column.setWidth(160);
 		}
+		//setiar datos
+	
+		
+		for (int i = 0; i < 4; i++) {
+		      new TableItem(table, SWT.NONE);
+		    }
+		    final TableItem[] items = table.getItems();
+		    final TableEditor editor2 = new TableEditor(table); 
+		    //final TableEditor editor = new TableEditor(table);
+	
+		    for (int i = 0; i < items.length; i++) {
+		    	
+		      TableEditor editor = new TableEditor(table);
+		      CCombo combo = new CCombo(table, SWT.NONE);
+		      combo.setText("Propiedades");
+		      combo.add("fuseki:dataset");
+		      combo.add("fuseki:serviceReadGraphStore");
+		      combo.add("fuseki:serviceQuery");
+		      combo.add("fuseki:serviceUpload");
+		      combo.add("fuseki:serviceUpdate");
+		      combo.add("fuseki:serviceReadWriteGraphStore");
+		      if(i!=4){combo.select(i);}//seleccionado
+		      editor.grabHorizontal = true;
+		      editor.setEditor(combo, items[i], 0);
+		     /*
+		      editor = new TableEditor(table);
+		     
+				
+		      Text text = new Text(table, SWT.NONE);
+		      
+		      text.setText(valoresPrecargados[i]);
+		      editor.grabHorizontal = true;
+		      editor.setEditor(text, items[i], 1);
+		      items[i].setData("tx",text);
+		      items[i].setText(1, valoresPrecargados[i]);*/
+		      
+		     
+		/*
+		      text.addModifyListener(new ModifyListener() {
+                  
+		    	  public void modifyText(ModifyEvent e) {
+		    		
+		    		  String var = e.toString();
+		    		  System.out.println("modficar entro "+var +" "+e.widget.toString());  
+	                	
+		    		  // String var = text.getText();
+                         Text text = (Text)editor2.getEditor();
+                       editor2.getItem().setText(1, text.getText());
+		    		  //Text text = (Text) e.widget;
+		    	        System.out.println(text.getText());
+                  }
+		      });*/
+		    }
+		    /*
+		    table.addListener(SWT.Selection, new Listener()
+		    {
+		        public void handleEvent(Event event)
+		        {
+		            if(event.detail == SWT.CHECK)
+		            {
+		                TableItem current = (TableItem)event.item;
+
+		                if(current.getChecked())
+		                {
+		                    System.out.println(current.getText(2));
+		                }
+		            }
+		        }
+		    });   */
+		
 		table.setSize(table.computeSize(SWT.DEFAULT, 200));
-		// ---------------------------------------------------------
+		
+		
 		final TableEditor editor = new TableEditor(table);
-		// The editor must have the same size as the cell and must
-		// not be any smaller than 50 pixels.
-		editor.horizontalAlignment = SWT.LEFT;
-		editor.grabHorizontal = true;
-		editor.minimumWidth = 60;
-		// editing the second column
-		final int EDITABLECOLUMN = 1;
-
-		table.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				// Clean up any previous editor control
-				Control oldEditor = editor.getEditor();
-				if (oldEditor != null)
-					oldEditor.dispose();
-
-				// Identify the selected row
-				TableItem item = (TableItem) e.item;
-
-				if (item == null)
-					return;
-
-				// The control that will be the editor must be a child of the
-				// Table
-				Text newEditor = new Text(table, SWT.NONE);
-				newEditor.setText(item.getText(EDITABLECOLUMN));
-				newEditor.addModifyListener(new ModifyListener() {
-					public void modifyText(ModifyEvent me) {
-						Text text = (Text) editor.getEditor();
-						editor.getItem()
-								.setText(EDITABLECOLUMN, text.getText());
-
-					}
-				});
-				newEditor.selectAll();
-				newEditor.setFocus();
-				editor.setEditor(newEditor, item, EDITABLECOLUMN);
-
-				final TableEditor editor2 = new TableEditor(table);
-				// The control that will be the editor must be a child of the
-				// Table
-				Text newEditor1 = new Text(table, SWT.NONE);
-				newEditor1.setText(item.getText(0));
-				newEditor1.addModifyListener(new ModifyListener() {
-					public void modifyText(ModifyEvent me) {
-						Text text = (Text) editor2.getEditor();
-						editor2.getItem().setText(0, text.getText());
-					}
-				});
-				newEditor1.selectAll();
-				newEditor1.setFocus();
-				editor2.setEditor(newEditor1, item, 0);
-
-			}
-		});
-		// ----------------------------------------------------------
-
+        //The editor must have the same size as the cell and must
+        //not be any smaller than 50 pixels.
+       // editor.horizontalAlignment = SWT.LEFT;
+        //editor.grabHorizontal = true;
+        //editor.minimumWidth = 50;
+        // editing the second column
+        final int EDITABLECOLUMN = 1;
+        
+        table.addSelectionListener(new SelectionAdapter() {
+                public void widgetSelected(SelectionEvent e) {
+                        // Clean up any previous editor control
+                        Control oldEditor = editor.getEditor();
+                        if (oldEditor != null) oldEditor.dispose();
+        
+                        // Identify the selected row
+                        TableItem item = (TableItem)e.item;
+                        if (item == null) return;
+        
+                        // The control that will be the editor must be a child of the Table
+                        Text newEditor = new Text(table, SWT.NONE);
+                        newEditor.setText(item.getText(EDITABLECOLUMN));
+                        newEditor.addModifyListener(new ModifyListener() {
+                                public void modifyText(ModifyEvent e) {
+                                        Text text = (Text)editor.getEditor();
+                                        editor.getItem().setText(EDITABLECOLUMN, text.getText());
+                                }
+                        });
+                        newEditor.selectAll();
+                        newEditor.setFocus();
+                        editor.setEditor(newEditor, item, EDITABLECOLUMN);
+                }
+        });
+        //precargar valores
+    	
+   	 	for (int i=0; i<4; i++){
+   	 		table.getItem(i).setText(1, valoresPrecargados[i]);
+   	 		
+   	 	}
+		 Menu menu = new Menu(shell, SWT.POP_UP);
+		    table.setMenu(menu);
+		    MenuItem item = new MenuItem(menu, SWT.PUSH);
+		    item.setText("Delete Selection");
+		    item.addListener(SWT.Selection, new Listener() {
+		      public void handleEvent(Event event) {
+		    	  int fil = table.getSelectionIndex();
+		        table.remove(table.getSelectionIndices());
+		       
+		      }
+		    });
+		
+		// ---------------------------------------------------------
+			
 		// table.setItemCount(3);// para ver las filas por defecto
 		// parametrizando el forma data
 		fdmitabla = new FormData();
 		fdmitabla.left = new FormAttachment(1, 0);
 		fdmitabla.right = new FormAttachment(100, 1);
 
-		fdmitabla.top = new FormAttachment(wTextServPort, margin);
+		fdmitabla.top = new FormAttachment(wTextBaseUri, margin);
 
 		// boton ok y cancel al ultimo
-
+		fdmitabla.height=280;
+		
+		
+		
 		table.setLayoutData(fdmitabla);
 
 		// ---------------------------
-
-		// -------------setiar datos
-		TableItem item = new TableItem(table, SWT.NONE, 0);
+		/*TableItem item = new TableItem(table, SWT.NONE, 0);
 		item.setText(0, "fuseki:dataset");
 		item.setText(1, "myds");
 
@@ -531,37 +637,48 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 		item = new TableItem(table, SWT.NONE, 3);
 
 		item.setText(0, " ");
-		item.setText(1, " ");
+		item.setText(1, " ");*/
+		//agregar fila automaticamente
 		table.setEnabled(true);
 		table.addListener(SWT.MouseDown, new Listener() {
 			public void handleEvent(Event event) {
+				if((table.getItemCount() -1)==table.getSelectionIndex()){
 				Rectangle clientArea = table.getClientArea();
-				Point pt = new Point(event.x, event.y);
-				int index = table.getTopIndex();
-
-				while (index < table.getItemCount()) {
-					boolean visible = false;
-					TableItem item = table.getItem(index);
-					for (int i = 0; i < table.getItemCount(); i++) {
-						Rectangle rect = item.getBounds(i);
-						if (rect.contains(pt)) {
-							// System.out.println("Item " + index + "-" + i);
-							// System.out.println("ver  " + index + "-" +
-							// table.getItemCount());
-							if (index + 1 == table.getItemCount()) {
-								agregarfila(table.getItemCount());
-							}
-						}
-						if (!visible && rect.intersects(clientArea)) {
-							visible = true;
-						}
-					}
-					if (!visible)
-						return;
-					index++;
+				Point pt = new Point(event.x, event.y);				
+				agregarfila();
 				}
 			}
 		});
+		
+
+		
+		/*
+		final int EDITABLECOLUMN = 1;
+		final TableEditor editor = new TableEditor(table);
+	    table.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent e) {
+                    // Clean up any previous editor control
+                    Control oldEditor = editor.getEditor();
+                    if (oldEditor != null) oldEditor.dispose();
+    
+                    // Identify the selected row
+                    TableItem item = (TableItem)e.item;
+                    if (item == null) return;
+    
+                    // The control that will be the editor must be a child of the Table
+                    Text newEditor = new Text(table, SWT.NONE);
+                    newEditor.setText(item.getText(EDITABLECOLUMN));
+                    newEditor.addModifyListener(new ModifyListener() {
+                            public void modifyText(ModifyEvent e) {
+                                    Text text = (Text)editor.getEditor();
+                                    editor.getItem().setText(EDITABLECOLUMN, text.getText());
+                            }
+                    });
+                    newEditor.selectAll();
+                    newEditor.setFocus();
+                    editor.setEditor(newEditor, item, EDITABLECOLUMN);
+            }
+	    	});*/
 
 		// --------------------crear fila nueva
 
@@ -871,7 +988,10 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 		item = new TableItem(table, SWT.NONE, 2);
 
 		item.setText(0, "fuseki:serviceQuery");
-		item.setText(1, meta.getFuQuery());
+		item.setText(1, meta.getFuQuery()); 
+		
+		if(!meta.getFubaseURI().trim().isEmpty()){wTextBaseUri.setText(meta.getFubaseURI());}
+		
 	}
 
 	/**
@@ -894,6 +1014,34 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 	private void ok() {
 		// The "stepname" variable will be the return value for the open()
 		// method.
+	
+		//-----------obtener valores combo
+		meta.getConfigStack().clear();
+
+		 LinkedList listaPropiedades = new LinkedList<String>(); 
+		 LinkedList listaValores = new LinkedList<String>(); 
+		   TableItem[] items = table.getItems();
+		    for (int i = 0; i < items.length; i++) {
+		    	TableItem fila = table.getItem(i);
+		    
+		     
+
+		     String propiedad= fila.getText(0);  //propiedad
+		     String valor= fila.getText(1);  //valor
+		     if(!valor.isEmpty() && propiedad.compareTo("Propiedades")!=0){
+
+		    	 listaPropiedades.add(propiedad);
+		    	 listaValores.add(valor);
+		     }
+		     
+		    meta.setFuGraph(listaPropiedades.toString());
+		    meta.setFuQuery(listaValores.toString());
+			meta.setListaPropiedades(listaPropiedades.toString());
+			meta.setListaValores(listaValores.toString());
+		    }
+		//---------------
+		
+		
 		boolean validado = true;
 		// Setting to step name from the dialog control
 		stepname = wStepname.getText();
@@ -935,21 +1083,37 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 			wTextServPort.setFocus();
 			validado = false;
 		}
+		if (wTextBaseUri.getText().trim().isEmpty()) {
+			MessageBox dialog = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
+			dialog.setText("ERROR");
+			dialog.setMessage(BaseMessages.getString(PKG,
+					"FusekiLoader.baseUri.empty"));
+			dialog.open();
+			wTextBaseUri.setFocus();
+			validado = false;
+		}
+		
+		
 		// close the SWT dialog window
 		meta.setOutputField(wHelloFieldName.getText());
 		meta.setDirectory(wChooseOutput.getText());
 
 		meta.setServiceName(wTextServName.getText());
 		meta.setPortName(wTextServPort.getText());
+		
+		meta.setFubaseURI(wTextBaseUri.getText());
 
-		TableItem miti = table.getItem(0);
-		meta.setFuDataset(miti.getText(1));
-
-		TableItem miti2 = table.getItem(1);
-		meta.setFuGraph(miti2.getText(1));
-
-		TableItem miti3 = table.getItem(2);
-		meta.setFuQuery(miti3.getText(1));
+//		TableItem miti = table.getItem(0);
+//		meta.setFuDataset(miti.getText(1));
+//
+//		TableItem miti2 = table.getItem(1);
+//		meta.setFuGraph(miti2.getText(1));
+//
+//		TableItem miti3 = table.getItem(2);
+//		meta.setFuQuery(miti3.getText(1));
+		
+		
+		
 		if (validado) {
 			meta.setValidate("true");
 		} else {
@@ -984,11 +1148,33 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 
 	}
 
-	private void agregarfila(int r) {
+	private void agregarfila() {
 
-		TableItem item = new TableItem(table, SWT.NONE, r);
-		item.setText(0, "");
-		item.setText(1, "");
+
+	
+		      new TableItem(table, SWT.NONE);
+
+		    TableItem[] items = table.getItems();
+		 
+		      TableEditor editor = new TableEditor(table);
+		      CCombo combo = new CCombo(table, SWT.NONE);
+		      combo.setText("Propiedades");
+		      combo.add("fuseki:dataset");
+		      combo.add("fuseki:serviceReadGraphStore");
+		      combo.add("fuseki:serviceQuery");
+		      combo.add("fuseki:serviceUpload");
+		      combo.add("fuseki:serviceUpdate");
+		      combo.add("fuseki:serviceReadWriteGraphStore");
+		      editor.grabHorizontal = true;
+		      editor.setEditor(combo, items[table.getItemCount()-1], 0);
+		     /* editor = new TableEditor(table);
+		      Text text = new Text(table, SWT.NONE);
+		      text.setText("");
+		      editor.grabHorizontal = true;
+		      editor.setEditor(text, items[table.getItemCount()-1], 1);
+		      editor = new TableEditor(table);*/
+
+		
 
 	}
 
@@ -1180,6 +1366,8 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 
 			String directorio = lookupGetterMethod("getDirectorioOutputRDF");
 			String filename = lookupGetterMethod("getFileoutput");
+			
+			String baseUri = lookupGetterMethod("getBaseUri");
 
 			if (!directorio.equals("") && !filename.equals("")) {
 				this.wHelloFieldName.setText(directorio
@@ -1191,6 +1379,19 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 				dialog.setText("ERROR");
 				dialog.setMessage(BaseMessages.getString(PKG,
 						"FusekiLoader.ERROR.PreviewStepOntology"));
+				dialog.open();
+			}
+			
+			if (!baseUri.equals("") ) {
+				wTextBaseUri.setText(baseUri);
+				meta.setFubaseURI(baseUri);
+		
+
+			} else {
+				MessageBox dialog = new MessageBox(shell, SWT.ICON_ERROR);
+				dialog.setText("ERROR");
+				dialog.setMessage(BaseMessages.getString(PKG,
+						"FusekiLoader.ERROR.PreviewStepOntology") + "baseUri");
 				dialog.open();
 			}
 
