@@ -24,7 +24,7 @@
 	<repositories>
 		<repository>
 			<id>default</id>
-			<url>http://repo1.maven.org/maven/</url>
+			<url>http://repo1.maven.org/maven2/</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -35,7 +35,7 @@
 			</snapshots>
 			<id>central</id>
 			<name>repo</name>
-			<url>http://repository.pentaho.org/artifactory/repo</url>
+			<url>http://nexus.pentaho.org/content/groups/omni</url>
 		</repository>
 
 
