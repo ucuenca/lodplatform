@@ -109,14 +109,6 @@
 					  <outputDirectory>${project.build.directory}/lib</outputDirectory>
                 </artifactItem>
                 <artifactItem>
-						<groupId>org.slf4j</groupId>
-						<artifactId>slf4j-api</artifactId>
-						<version>1.7.6</version>
-						<type>jar</type>
-					  	<overWrite>false</overWrite>
-					  	<outputDirectory>${project.build.directory}/lib</outputDirectory>
-                </artifactItem>
-                <artifactItem>
 					<groupId>org.json</groupId>
 					<artifactId>json</artifactId>
 					<version>20070829</version>
@@ -164,12 +156,6 @@
 	
 	<dependency>
   		<groupId>pentaho-kettle</groupId>
-  		<artifactId>kettle-dbdialog</artifactId>
-  		<version>${pentaho.kettle.version}</version>
-	</dependency>
-	
-	<dependency>
-  		<groupId>pentaho-kettle</groupId>
   		<artifactId>kettle-engine</artifactId>
   		<version>${pentaho.kettle.version}</version>
 	</dependency>
@@ -179,25 +165,42 @@
   		<artifactId>kettle-ui-swt</artifactId>
   		<version>${pentaho.kettle.version}</version>
 	</dependency>
-	<!-- 
-	<dependency>
-    <groupId>org.apache.jena</groupId>
-    <artifactId>apache-jena-libs</artifactId>
-    <type>pom</type>
-    <version>2.12.0</version>
-  </dependency>
-  -->
+
 	<dependency>
 	  <groupId>org.apache.jena</groupId>
 	  <artifactId>jena-core</artifactId>
 	  <version>${apache.jena.version}</version>
 	</dependency>
-	
-	<dependency>
-		<groupId>org.slf4j</groupId>
-		<artifactId>slf4j-api</artifactId>
-		<version>1.7.6</version>
-	</dependency>
+
+  <dependency>
+    <groupId>commons-lang</groupId>
+    <artifactId>commons-lang</artifactId>
+    <version>${commons.lang.version}</version>
+  </dependency>
+
+  <dependency>
+    <groupId>xml-apis</groupId>
+    <artifactId>xml-apis</artifactId>
+    <version>${xml.apis.version}</version>
+  </dependency>
+
+  <dependency>
+    <groupId>pentaho</groupId>
+    <artifactId>metastore</artifactId>
+    <version>${pentaho.kettle.version}</version>
+  </dependency>
+
+  <dependency>
+    <groupId>org.eclipse.swt</groupId>
+    <artifactId>swt-linux-x86_64</artifactId>
+    <version>${org.eclipse.swt.version}</version>
+  </dependency>
+
+  <dependency>
+    <groupId>com.h2database</groupId>
+    <artifactId>h2</artifactId>
+    <version>${h2.database.version}</version>
+  </dependency>
 	
 	<dependency>
 	  <groupId>com.ucuenca</groupId>
