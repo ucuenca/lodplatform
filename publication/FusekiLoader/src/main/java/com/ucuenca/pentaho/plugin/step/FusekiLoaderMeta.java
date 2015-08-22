@@ -97,7 +97,6 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 	private String fubaseURI;
 	private String Validate;
 	private List<String> configStack = new ArrayList<String>();
-	
 	private String listaValores;
 	private String listaPropiedades;
 	
