@@ -27,6 +27,9 @@
     <h2.database.version>1.4.184</h2.database.version>
     <antidot.db2triples.version>1.0.3-SNAPSHOT</antidot.db2triples.version>
     <openrdf.sesame.version>2.6.10</openrdf.sesame.version>
+    <xml.apis.version>1.0.b2</xml.apis.version>
+    <org.eclipse.swt.version>3.7</org.eclipse.swt.version>
+    <commons.lang.version>2.6</commons.lang.version>
   </properties>
   <modules>
     <module>no-released-libs</module>
