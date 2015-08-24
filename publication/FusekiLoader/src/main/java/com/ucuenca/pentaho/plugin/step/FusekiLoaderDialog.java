@@ -37,6 +37,7 @@ import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -46,12 +47,14 @@ import java.util.regex.Pattern;
 
 import org.apache.jena.atlas.json.JSON;
 import org.apache.jena.atlas.json.JsonObject;
+import org.apache.log4j.spi.RootCategory;
 import org.eclipse.jetty.util.thread.ExecutorThreadPool;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -121,12 +124,17 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 
+import java.awt.AWTException;
 import java.awt.Desktop;
+import java.awt.MouseInfo;
+import java.awt.PointerInfo;
+import java.awt.Robot;
+import java.awt.event.InputEvent;
 import java.net.URI;
 
 /** .
  * @author Fabian Peñaloza Marin
- * @version 2
+ * @version 1
  */
 /**
  * This class is part of the demo step plug-in implementation. It demonstrates
@@ -176,6 +184,9 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 	private Button wAddFila;
 	private Button wStopService;
 	private Button wCheckService;
+	
+	private ArrayList combos = new ArrayList();
+	private ArrayList editors = new ArrayList();
 
 	private Listener lsReadUri;
 	private Listener lsLoadFile;
@@ -189,7 +200,7 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 	private ModifyListener lsUpdateInstrucctions;
 	private FormData fdmitabla;
 	private Table table;
-	String[] valoresPrecargados = {"myds","data","query"," "};
+	String[] valoresPrecargados = {"myds","data","query","prueba "};
 	
 	private static String OS = System.getProperty("os.name").toLowerCase();
 	private int numt = 2;
@@ -458,15 +469,10 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 				wTextBaseUri.setLayoutData(fdtextBaseUri);
 		
 		
-		// table to parameters
+		// confgiracion table empieza aqui
 
 		table = new Table(shell, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
-		// transMeta, wClassifyComp, SWT.BORDER | SWT.FULL_SELECTION |
-		// SWT.MULTI, colinf, 0, lsMod, props );
-		// wClassTable =
-		// new TableView(
-		// transMeta, wClassifyComp, SWT.BORDER | SWT.FULL_SELECTION |
-		// SWT.MULTI, colinf, 0, lsMod, props );
+
 
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);
@@ -480,15 +486,40 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 			column.setText(titles[i]);
 			column.setWidth(160);
 		}
-		//setiar datos
-	
+		//verifico si hayconfiguracion en el meta 
+		ArrayList<String> myListPropiedades =  new ArrayList<String>();
+		ArrayList<String> myListValores = new  ArrayList<String>();
+		if (meta.getListaPropiedades() != null) {
+			
+			myListPropiedades = cleanspaces(meta.getListaPropiedades());
+			myListValores = cleanspaces(meta.getListaValores());
+
+			if (!myListPropiedades.get(0).trim().isEmpty()) { // valido que este
+																// cargado con
+																// algun valor
+																// para
+																// agregarlo a
+																// la tabla
+
+				TableItem[] items = table.getItems();
+				for (int i = 0; i < myListPropiedades.size(); i++) {
+					new TableItem(table, SWT.NONE);
+
+				}
+			}
+
+		}else{//vacio 
+			for (int i = 0; i < 3; i++) { //4
+			      new TableItem(table, SWT.NONE);
+			    }
+			
+		}
 		
-		for (int i = 0; i < 4; i++) {
-		      new TableItem(table, SWT.NONE);
-		    }
+		//---------------
+		
+
 		    final TableItem[] items = table.getItems();
 		    final TableEditor editor2 = new TableEditor(table); 
-		    //final TableEditor editor = new TableEditor(table);
 	
 		    for (int i = 0; i < items.length; i++) {
 		    	
@@ -501,65 +532,43 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 		      combo.add("fuseki:serviceUpload");
 		      combo.add("fuseki:serviceUpdate");
 		      combo.add("fuseki:serviceReadWriteGraphStore");
-		      if(i!=4){combo.select(i);}//seleccionado
+		      combo.setEditable(false);
+		      //selecciono la parte del combo
+		      combo.select(i);
+		      if(meta.getListaPropiedades() != null){    //si existe se carga la configuracion anterior
+  
+			    	  String propiedad = myListPropiedades.get(i).trim(); 
+			    	  if (propiedad.compareTo("fuseki:dataset")==0){
+			    		  combo.select(0);
+			    	  }else if (propiedad.compareTo("fuseki:serviceReadGraphStore")==0){
+			    		  combo.select(1);
+			    	  }else if (propiedad.compareTo("fuseki:serviceQuery")==0){
+			    		  combo.select(2);
+			    	  }else if (propiedad.compareTo("fuseki:serviceUpload")==0){
+			    		  combo.select(3);
+			    	  }else if (propiedad.compareTo("fuseki:serviceUpdate")==0){
+			    		  combo.select(4);
+			    	  }else if (propiedad.compareTo("fuseki:serviceReadWriteGraphStore")==0){
+			    		  combo.select(5);
+			    	  } 			  
+		
+		      }
+		    
+		      
 		      editor.grabHorizontal = true;
+		      items[i].setData(editor);
 		      editor.setEditor(combo, items[i], 0);
-		     /*
-		      editor = new TableEditor(table);
-		     
-				
-		      Text text = new Text(table, SWT.NONE);
-		      
-		      text.setText(valoresPrecargados[i]);
-		      editor.grabHorizontal = true;
-		      editor.setEditor(text, items[i], 1);
-		      items[i].setData("tx",text);
-		      items[i].setText(1, valoresPrecargados[i]);*/
-		      
-		     
-		/*
-		      text.addModifyListener(new ModifyListener() {
-                  
-		    	  public void modifyText(ModifyEvent e) {
-		    		
-		    		  String var = e.toString();
-		    		  System.out.println("modficar entro "+var +" "+e.widget.toString());  
-	                	
-		    		  // String var = text.getText();
-                         Text text = (Text)editor2.getEditor();
-                       editor2.getItem().setText(1, text.getText());
-		    		  //Text text = (Text) e.widget;
-		    	        System.out.println(text.getText());
-                  }
-		      });*/
-		    }
-		    /*
-		    table.addListener(SWT.Selection, new Listener()
-		    {
-		        public void handleEvent(Event event)
-		        {
-		            if(event.detail == SWT.CHECK)
-		            {
-		                TableItem current = (TableItem)event.item;
+		      combos.add(combo);
+		      editors.add(editor);		 
 
-		                if(current.getChecked())
-		                {
-		                    System.out.println(current.getText(2));
-		                }
-		            }
-		        }
-		    });   */
+		    }
 		
 		table.setSize(table.computeSize(SWT.DEFAULT, 200));
 		
-		
+		//aqui hago que sea editable la segunda columna
 		final TableEditor editor = new TableEditor(table);
         //The editor must have the same size as the cell and must
         //not be any smaller than 50 pixels.
-       // editor.horizontalAlignment = SWT.LEFT;
-        //editor.grabHorizontal = true;
-        //editor.minimumWidth = 50;
-        // editing the second column
         final int EDITABLECOLUMN = 1;
         
         table.addSelectionListener(new SelectionAdapter() {
@@ -586,28 +595,79 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
                         editor.setEditor(newEditor, item, EDITABLECOLUMN);
                 }
         });
-        //precargar valores
-    	
-   	 	for (int i=0; i<4; i++){
-   	 		table.getItem(i).setText(1, valoresPrecargados[i]);
-   	 		
-   	 	}
+        //aquie se precargar valores de las tres primeras filas
+		
+        if (meta.getListaPropiedades() != null) {
+			for (int i = 0; i < myListValores.size(); i++) {
+				table.getItem(i).setText(1, myListValores.get(i).trim());
+			}
+		} else {
+			for (int i = 0; i < 3; i++) {			
+				table.getItem(i).setText(1, valoresPrecargados[i]);
+			}
+		}
+   	 	
+   	 	//aqui se borra supuestamente 
 		 Menu menu = new Menu(shell, SWT.POP_UP);
 		    table.setMenu(menu);
 		    MenuItem item = new MenuItem(menu, SWT.PUSH);
 		    item.setText("Delete Selection");
 		    item.addListener(SWT.Selection, new Listener() {
 		      public void handleEvent(Event event) {
-		    	  int fil = table.getSelectionIndex();
-		        table.remove(table.getSelectionIndices());
-		       
+	
+		        TableItem[] items = table.getItems();
+		        for (TableItem item : items) {
+		         if(table.indexOf(item) == table.getSelectionIndex()){  
+		        	 if (item.getData() != null) {
+		        		 TableEditor ed = (TableEditor)item.getData();
+		        		 int i = editors.indexOf(ed);
+		        		 
+		        		 CCombo cmb = (CCombo)combos.get(i);
+		        		 cmb.dispose();
+		        		 ed.dispose();
+		        		 
+		        		 editors.remove(ed);
+		        		 combos.remove(cmb);
+		        	 }		        	 
+		        	 
+		        	 int index = table.indexOf(item);
+		             table.remove(index);
+		             
+		             
+		             if (index > 0) {
+		            //	 table.setSelection(table.getItem(0));
+		             }
+		             //item.dispose();
+		             
+		         }
+		        }
+		        wHelloFieldName.setFocus();
+		        try {
+					Robot r = new Robot();
+					//PointerInfo a = MouseInfo.getPointerInfo();
+					//Point b = a.getLocation();
+					r.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+				} catch (AWTException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		        
+		        //TableEditor editor = new TableEditor(table);
+		        //item.dispose()  
+		        //editor.getEditor().redraw() ;	        
+		    	//  int fil = table.getSelectionIndex();
+			    //    table.remove(table.getSelectionIndices());
+       
+		        //
 		      }
 		    });
 		
+	 
+		    
 		// ---------------------------------------------------------
 			
 		// table.setItemCount(3);// para ver las filas por defecto
-		// parametrizando el forma data
+		// parametrizando aqui le ubico en el formulario
 		fdmitabla = new FormData();
 		fdmitabla.left = new FormAttachment(1, 0);
 		fdmitabla.right = new FormAttachment(100, 1);
@@ -621,23 +681,6 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 		
 		table.setLayoutData(fdmitabla);
 
-		// ---------------------------
-		/*TableItem item = new TableItem(table, SWT.NONE, 0);
-		item.setText(0, "fuseki:dataset");
-		item.setText(1, "myds");
-
-		item = new TableItem(table, SWT.NONE, 1);
-		item.setText(0, "fuseki:serviceReadGraphStore");
-		item.setText(1, "data");
-		item = new TableItem(table, SWT.NONE, 2);
-
-		item.setText(0, "fuseki:serviceQuery");
-		item.setText(1, "query");
-
-		item = new TableItem(table, SWT.NONE, 3);
-
-		item.setText(0, " ");
-		item.setText(1, " ");*/
 		//agregar fila automaticamente
 		table.setEnabled(true);
 		table.addListener(SWT.MouseDown, new Listener() {
@@ -650,35 +693,14 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 			}
 		});
 		
-
-		
-		/*
-		final int EDITABLECOLUMN = 1;
-		final TableEditor editor = new TableEditor(table);
-	    table.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
-                    // Clean up any previous editor control
-                    Control oldEditor = editor.getEditor();
-                    if (oldEditor != null) oldEditor.dispose();
-    
-                    // Identify the selected row
-                    TableItem item = (TableItem)e.item;
-                    if (item == null) return;
-    
-                    // The control that will be the editor must be a child of the Table
-                    Text newEditor = new Text(table, SWT.NONE);
-                    newEditor.setText(item.getText(EDITABLECOLUMN));
-                    newEditor.addModifyListener(new ModifyListener() {
-                            public void modifyText(ModifyEvent e) {
-                                    Text text = (Text)editor.getEditor();
-                                    editor.getItem().setText(EDITABLECOLUMN, text.getText());
-                            }
-                    });
-                    newEditor.selectAll();
-                    newEditor.setFocus();
-                    editor.setEditor(newEditor, item, EDITABLECOLUMN);
-            }
-	    	});*/
+		table.addListener(SWT.KeyDown, new Listener() {
+			public void handleEvent(Event arg0) {
+				// TODO Auto-generated method stub
+				if (arg0.keyCode == SWT.DEL) {
+					//System.out.println("aplasto Borrar");
+				}
+			}
+		});
 
 		// --------------------crear fila nueva
 
@@ -978,6 +1000,8 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 		wTextServPort.setText(meta.getPortName());
 		table.removeAll();
 
+		//precargar valores de la tabla si es que existen
+		if (meta.getListaValores()==null){ 
 		TableItem item = new TableItem(table, SWT.NONE, 0);
 		item.setText(0, "fuseki:dataset");
 		item.setText(1, meta.getFuDataset());
@@ -985,10 +1009,25 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 		item = new TableItem(table, SWT.NONE, 1);
 		item.setText(0, "fuseki:serviceReadGraphStore");
 		item.setText(1, meta.getFuGraph());
+		
 		item = new TableItem(table, SWT.NONE, 2);
 
 		item.setText(0, "fuseki:serviceQuery");
-		item.setText(1, meta.getFuQuery()); 
+		item.setText(1, meta.getFuQuery());
+		table.setFocus();
+		
+		}else{
+			ArrayList<String> myListValores = cleanspaces(meta.getListaValores());
+		    for (int i =0;i<myListValores.size();i++){
+		    	TableItem item = new TableItem(table, SWT.NONE, i);
+	
+				item.setText(0, "fuseki:serviceQuery");
+				item.setText(1, myListValores.get(i)); 
+		    	
+		    }
+		    table.setFocus();
+		}
+		
 		
 		if(!meta.getFubaseURI().trim().isEmpty()){wTextBaseUri.setText(meta.getFubaseURI());}
 		
@@ -1021,24 +1060,27 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 		 LinkedList listaPropiedades = new LinkedList<String>(); 
 		 LinkedList listaValores = new LinkedList<String>(); 
 		   TableItem[] items = table.getItems();
-		    for (int i = 0; i < items.length; i++) {
-		    	TableItem fila = table.getItem(i);
-		    
-		     
-
-		     String propiedad= fila.getText(0);  //propiedad
-		     String valor= fila.getText(1);  //valor
-		     if(!valor.isEmpty() && propiedad.compareTo("Propiedades")!=0){
-
-		    	 listaPropiedades.add(propiedad);
-		    	 listaValores.add(valor);
-		     }
-		     
+			for (int i = 0; i < items.length; i++) {
+				TableItem fila = table.getItem(i);
+				
+				CCombo cmb = (CCombo)combos.get(i);
+				//System.out.println( cmb.getText());
+				
+				
+				String propiedad = cmb.getText(); // propiedad
+				String valor = fila.getText(1); // valor
+				if (!valor.isEmpty() && propiedad.compareTo("Propiedades") != 0) {
+					listaPropiedades.add(propiedad);
+					listaValores.add(valor);
+				}
+	
+			}
+	
 		    meta.setFuGraph(listaPropiedades.toString());
 		    meta.setFuQuery(listaValores.toString());
 			meta.setListaPropiedades(listaPropiedades.toString());
 			meta.setListaValores(listaValores.toString());
-		    }
+		   
 		//---------------
 		
 		
@@ -1165,16 +1207,13 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 		      combo.add("fuseki:serviceUpload");
 		      combo.add("fuseki:serviceUpdate");
 		      combo.add("fuseki:serviceReadWriteGraphStore");
+		      combo.setEditable(false);
 		      editor.grabHorizontal = true;
+		      items[table.getItemCount()-1].setData(editor);
 		      editor.setEditor(combo, items[table.getItemCount()-1], 0);
-		     /* editor = new TableEditor(table);
-		      Text text = new Text(table, SWT.NONE);
-		      text.setText("");
-		      editor.grabHorizontal = true;
-		      editor.setEditor(text, items[table.getItemCount()-1], 1);
-		      editor = new TableEditor(table);*/
-
-		
+		      combos.add(combo);
+		      editors.add(editor);		    
+		      
 
 	}
 
@@ -1258,6 +1297,21 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 
 		}
 
+	}
+	
+	public ArrayList<String> cleanspaces(String limpiar) {
+
+		// logError("nameontology "+meta.getNameOntology());
+		String replace = limpiar.replace("[", "");
+
+		String replace1 = replace.replace("]", "");
+
+		String replace2 = replace1.replaceAll("\\s+", "");
+
+		ArrayList<String> myList = new ArrayList<String>(Arrays.asList(replace2
+				.split(",")));
+
+		return myList;
 	}
 
 	private void openUrlInBrowser(String url) { // open in mac

@@ -12,7 +12,7 @@
   <artifactId>data-precatching</artifactId>
   <packaging>jar</packaging>
 
-  <name>data-precatching</name>
+  <name>Data Precatching</name>
   <!-- <url>http://maven.apache.org</url> -->
 
   <properties>
@@ -137,13 +137,7 @@
   		<artifactId>kettle-core</artifactId>
   		<version>${pentaho.kettle.version}</version>
 	</dependency>
-	
-	<dependency>
-  		<groupId>pentaho-kettle</groupId>
-  		<artifactId>kettle-dbdialog</artifactId>
-  		<version>${pentaho.kettle.version}</version>
-	</dependency>
-	
+
 	<dependency>
   		<groupId>pentaho-kettle</groupId>
   		<artifactId>kettle-engine</artifactId>
@@ -154,6 +148,24 @@
   		<groupId>pentaho-kettle</groupId>
   		<artifactId>kettle-ui-swt</artifactId>
   		<version>${pentaho.kettle.version}</version>
+	</dependency>
+
+	 <dependency>
+		<groupId>xml-apis</groupId>
+		<artifactId>xml-apis</artifactId>
+		<version>${xml.apis.version}</version>
+	</dependency>
+
+	<dependency>
+		<groupId>pentaho</groupId>
+		<artifactId>metastore</artifactId>
+		<version>${pentaho.kettle.version}</version>
+	</dependency>
+
+	<dependency>
+		<groupId>org.eclipse.swt</groupId>
+		<artifactId>swt-linux-x86_64</artifactId>
+		<version>${org.eclipse.swt.version}</version>
 	</dependency>
 	
 	<dependency>

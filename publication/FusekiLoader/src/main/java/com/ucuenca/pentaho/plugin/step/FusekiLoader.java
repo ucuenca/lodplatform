@@ -389,7 +389,7 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 				resource1.addProperty(FusekiVocab.pServiceQueryEP, listaValores.get(i));
 			}
 			if (listaPropiedades.get(i).compareTo("fuseki:serviceReadWriteGraphStore")==0){
-				resource1.addProperty(FusekiVocab.pServiceReadgraphStoreEP, listaValores.get(i));
+				resource1.addProperty(FusekiVocab.pServiceReadWriteGraphStoreEP, listaValores.get(i));
 			}
 			if (listaPropiedades.get(i).compareTo("fuseki:serviceUpload")==0){
 				resource1.addProperty(FusekiVocab.pServiceUploadEP, listaValores.get(i));
@@ -398,7 +398,7 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 				resource1.addProperty(FusekiVocab.pServiceUpdateEP, listaValores.get(i));
 			}
 			if (listaPropiedades.get(i).compareTo("fuseki:serviceReadGraphStore")==0){
-				resource1.addProperty(FusekiVocab.pServiceUpdateEP, listaValores.get(i));
+				resource1.addProperty(FusekiVocab.pServiceReadgraphStoreEP, listaValores.get(i));
 			}
 			
 			
