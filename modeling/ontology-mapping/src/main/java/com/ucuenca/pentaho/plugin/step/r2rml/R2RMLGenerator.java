@@ -250,13 +250,15 @@ public class R2RMLGenerator {
 				.addProperty(RR.subjectMap,
 						r2rmlModel.createResource()
 							.addProperty(RR.template, this.baseURI + (String)entityProp1[0] + "{" + entity1 + "_ID}")
-				)
-				.addProperty(RR.predicateObjectMap,
+				);
+				//fixing problem with URI without LOD URI name conventions
+				Property vocab = (vocProperty.split(prefixes.get(vocPrefix)[0]).length > 1) ?
+						ResourceFactory.createProperty( prefixes.get(vocPrefix)[0], 
+								vocProperty.split(prefixes.get(vocPrefix)[0])[1] )
+						:ResourceFactory.createProperty(vocProperty);
+				resource.addProperty(RR.predicateObjectMap,
 						r2rmlModel.createResource()
-							.addProperty(RR.predicate,
-									ResourceFactory.createProperty( prefixes.get(vocPrefix)[0], 
-											vocProperty.split(prefixes.get(vocPrefix)[0])[1] )
-							)
+							.addProperty(RR.predicate, vocab)
 							.addProperty(RR.objectMap,
 									r2rmlModel.createResource()
 									.addProperty(RR.template, this.baseURI + (String)entityProp2[0] + "{" + entity2 + "_ID}")
