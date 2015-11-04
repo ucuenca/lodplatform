@@ -29,5 +29,26 @@
  
    ) .
 
+## Initialize text query
+[] ja:loadClass       "org.apache.jena.query.text.TextQuery" .
+# A TextDataset is a regular dataset with a text index.
+text:TextDataset      rdfs:subClassOf   ja:RDFDataset .
+# Lucene index
+text:TextIndexLucene  rdfs:subClassOf   text:TextIndex .
+# Solr index
+text:TextIndexSolr    rdfs:subClassOf   text:TextIndex .
+
+:text_dataset rdf:type     text:TextDataset ;
+    text:dataset   <#myds> ;
+    text:index     <#indexLucene> ;
+    .
+
+<#indexLucene> a text:TextIndexLucene ;
+    text:directory <file:Lucene> ;
+    ##text:directory "mem" ;
+    text:entityMap <#entMap> ;
+    .
+
+
 ## ---------------------------------------------------------------
 ## 
