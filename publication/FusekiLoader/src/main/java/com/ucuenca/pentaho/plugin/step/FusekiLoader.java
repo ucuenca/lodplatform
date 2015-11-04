@@ -429,8 +429,15 @@ public class FusekiLoader extends BaseStep implements StepInterface {
                 boolean applyFullText = false;
                 if (indexProperties!=null && !indexProperties.isEmpty()){
                     applyFullText=true;
+                    int countIndexProperties=0;
                     for (String pr: indexProperties){
-                        fulltext += "[ text:field \"text\" ; text:predicate <"+pr+"> ]\n";
+                        countIndexProperties++;
+                        if (countIndexProperties ==1 ){
+                            fulltext += "[ text:field \"text\" ; text:predicate <"+pr+"> ]\n";
+                        }else{
+                            fulltext += "[ text:field \"text_"+countIndexProperties+"\" ; text:predicate <"+pr+"> ]\n";
+                        }
+                        
                     }
                 }
                 
