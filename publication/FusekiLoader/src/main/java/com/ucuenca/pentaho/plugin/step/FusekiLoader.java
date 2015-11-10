@@ -459,6 +459,13 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 "    text:directory <file:Lucene> ;\n" +
 "    ##text:directory \"mem\" ;\n" +
 "    text:entityMap <#entMap> ;\n" +
+"    text:storeValues true;\n" +
+                        
+"    text:analyzer [\n" +
+"    a text:LocalizedAnalyzer ;\n" +
+"    text:language \"es\"\n" +
+"    ]\n"+
+                        
 "    .\n" +
 "# Mapping in the index\n" +
 "# URI stored in field \"uri\"\n" +
@@ -466,6 +473,7 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 "<#entMap> a text:EntityMap ;\n" +
 "    text:entityField      \"uri\" ;\n" +
 "    text:defaultField     \"text\" ;\n" +
+"    text:langField        \"lang\" ;\n" +
 "    text:map (\n" +fulltext+
 
                         
