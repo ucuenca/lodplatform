@@ -92,7 +92,7 @@ public class R2RMLGenerator {
             while (rsClass.next()) {
                 ClassificationBean classBean = new ClassificationBean(rsClass);
                 String relativeURI = classBean.getRelativeUri() != null && classBean.getRelativeUri().length() > 0
-                        && classBean.getRelativeUri().matches("([a-z0-9]*)(\\/|#)") ? classBean.getRelativeUri() : "";
+                        && classBean.getRelativeUri().matches("(#)?([a-z0-9]*)(\\/|#)") ? classBean.getRelativeUri() : "";
                 String id = classBean.getId();
                 String entityId = classBean.getUriFieldId();
                 String entityRealId = "";
@@ -126,7 +126,7 @@ public class R2RMLGenerator {
                 )
                         .addProperty(RR.subjectMap,
                                 r2rmlModel.createResource()
-                                .addProperty(RR.template, this.baseURI + relativeURI + "{" + id + "_ID}")
+                                .addProperty((relativeURI.compareTo("#external#")==0)?RR.column:RR.template, (relativeURI.compareTo("#external#")==0)?"" + id + "_ID":this.baseURI + relativeURI + "{" + id + "_ID}")
                                 .addProperty(RR.cclass, /*this.getOntologyURI(vocPrefix) +*/
                                         ResourceFactory.createProperty(prefixes.get(vocPrefix)[0],
                                                 vocEntity.split(prefixes.get(vocPrefix)[0])[1])
