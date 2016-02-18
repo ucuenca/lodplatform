@@ -1,5 +1,7 @@
 #!/bin/sh
 
+java -cp fuseki-server.jar jena.textindexer -desc=config.ttl || true
+
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information

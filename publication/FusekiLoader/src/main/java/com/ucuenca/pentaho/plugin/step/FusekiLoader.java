@@ -381,6 +381,9 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 		List<String> listaValores;
 		listaValores = cleanspaces(meta.getListaValores());
 		String datasetlabel= "";
+                //JO adding fulltext support
+                List<String> indexProperties=null;
+                //JO*
 		for (int i= 0; i < listaPropiedades.size(); i++){ //obtener valores del combo
 			if (listaPropiedades.get(i).compareTo("fuseki:dataset")==0){
 				datasetlabel =  listaValores.get(i);
@@ -400,8 +403,13 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 			if (listaPropiedades.get(i).compareTo("fuseki:serviceReadGraphStore")==0){
 				resource1.addProperty(FusekiVocab.pServiceReadgraphStoreEP, listaValores.get(i));
 			}
-			
-			
+		//JO adding fulltext support
+                        if (listaPropiedades.get(i).compareTo("lucene:fulltext")==0){
+				//resource1.addProperty(FusekiVocab.pServiceReadgraphStoreEP, listaValores.get(i));
+                            String properties[] = listaValores.get(i).split(";");
+                            indexProperties=Arrays.asList(properties);
+			}
+			//JO*
 		}
 		resource2.addProperty(RDFS.label, datasetlabel);
 		
@@ -416,7 +424,66 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 			logBasic(e.toString());
 
 		}
+//JO adding fulltexy support
+                String fulltext="";
+                boolean applyFullText = false;
+                if (indexProperties!=null && !indexProperties.isEmpty()){
+                    applyFullText=true;
+                    int countIndexProperties=0;
+                    for (String pr: indexProperties){
+                        countIndexProperties++;
+                        if (countIndexProperties ==1 ){
+                            fulltext += "[ text:field \"text\" ; text:predicate <"+pr+"> ]\n";
+                        }else{
+                            fulltext += "[ text:field \"text_"+countIndexProperties+"\" ; text:predicate <"+pr+"> ]\n";
+                        }
+                        
+                    }
+                }
+                
+                String confiAdd="## Initialize text query\n" +
+"[] ja:loadClass       \"org.apache.jena.query.text.TextQuery\" .\n" +
+"# A TextDataset is a regular dataset with a text index.\n" +
+"text:TextDataset      rdfs:subClassOf   ja:RDFDataset .\n" +
+"# Lucene index\n" +
+"text:TextIndexLucene  rdfs:subClassOf   text:TextIndex .\n" +
+"# Solr index\n" +
+"text:TextIndexSolr    rdfs:subClassOf   text:TextIndex .\n" +
+"\n" +
+":text_dataset rdf:type     text:TextDataset ;\n" +
+"    text:dataset   <#myds> ;\n" +
+"    text:index     <#indexLucene> ;\n" +
+"    .\n" +
+"\n" +
+"<#indexLucene> a text:TextIndexLucene ;\n" +
+"    text:directory <file:Lucene> ;\n" +
+"    ##text:directory \"mem\" ;\n" +
+"    text:entityMap <#entMap> ;\n" +
+"    text:storeValues true;\n" +
+                        
+"    text:analyzer [\n" +
+"    a text:LocalizedAnalyzer ;\n" +
+"    text:language \"es\"\n" +
+"    ]\n"+
+                        
+"    .\n" +
+"# Mapping in the index\n" +
+"# URI stored in field \"uri\"\n" +
+"# rdfs:label is mapped to field \"text\"\n" +
+"<#entMap> a text:EntityMap ;\n" +
+"    text:entityField      \"uri\" ;\n" +
+"    text:defaultField     \"text\" ;\n" +
+"    text:langField        \"lang\" ;\n" +
+"    text:map (\n" +fulltext+
 
+                        
+"         ) .";
+                
+                if(!applyFullText){
+                    confiAdd="";
+                }
+                
+                //JO*
 		try {
 			File file = new File(
 					"plugins/steps/FusekiLoader/fuseki/configO.ttl");
@@ -435,8 +502,13 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 			}
 			reader2.close();
 
-			String newtext = oldtext + "" + oldtext2;
+			String newtext = oldtext +"\n"+ confiAdd+"\n" + oldtext2;
 
+                        
+                        if(applyFullText){
+                            newtext = newtext.replaceAll("                <#myds> ;", "                :text_dataset ;");
+                        }
+                        
 			FileWriter writer = new FileWriter(
 					"plugins/steps/FusekiLoader/fuseki/config.ttl");
 			writer.write(newtext);

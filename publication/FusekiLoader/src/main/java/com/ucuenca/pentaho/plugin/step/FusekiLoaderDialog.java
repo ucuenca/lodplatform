@@ -532,6 +532,9 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 		      combo.add("fuseki:serviceUpload");
 		      combo.add("fuseki:serviceUpdate");
 		      combo.add("fuseki:serviceReadWriteGraphStore");
+                      //JO adding fulltext support
+                      combo.add("lucene:fulltext");
+                      //JO*
 		      combo.setEditable(false);
 		      //selecciono la parte del combo
 		      combo.select(i);
@@ -550,8 +553,12 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 			    		  combo.select(4);
 			    	  }else if (propiedad.compareTo("fuseki:serviceReadWriteGraphStore")==0){
 			    		  combo.select(5);
+			    	  }
+                                  //JO adding fulltext support
+                                  else if (propiedad.compareTo("lucene:fulltext")==0){
+			    		  combo.select(6);
 			    	  } 			  
-		
+                                  //JO*
 		      }
 		    
 		      
@@ -1207,7 +1214,10 @@ public class FusekiLoaderDialog extends BaseStepDialog implements
 		      combo.add("fuseki:serviceUpload");
 		      combo.add("fuseki:serviceUpdate");
 		      combo.add("fuseki:serviceReadWriteGraphStore");
-		      combo.setEditable(false);
+                      //JO adding fulltext support
+                      combo.add("lucene:fulltext");
+		      //JO*
+                      combo.setEditable(false);
 		      editor.grabHorizontal = true;
 		      items[table.getItemCount()-1].setData(editor);
 		      editor.setEditor(combo, items[table.getItemCount()-1], 0);

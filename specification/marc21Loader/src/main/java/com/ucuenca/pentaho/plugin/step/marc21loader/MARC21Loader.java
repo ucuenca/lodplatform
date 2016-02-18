@@ -432,7 +432,7 @@ public class MARC21Loader extends BaseStep implements StepInterface {
 	// Run is were the action happens!
 	//
 	//
-	/*
+	
 	public void run()
 	{
 		logBasic("Starting to run...");
@@ -453,5 +453,5 @@ public class MARC21Loader extends BaseStep implements StepInterface {
 			logBasic("Finished, processed "+linesInput+" rows, written "+linesWritten+" lines.");
 			markStop();
 		}
-	}*/
+	}
 }
