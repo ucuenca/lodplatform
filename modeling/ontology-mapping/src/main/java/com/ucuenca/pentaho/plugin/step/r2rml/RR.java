@@ -40,6 +40,8 @@ public class RR{
    public static final Property column = property( "column" );
    public static final Property datatype = property( "datatype" );
    public static final Property language = property( "language" );
+   public static final Property termType = property( "termType" );
+   public static final Property IRI = property( "IRI" );
    
 
    /**
@@ -61,6 +63,8 @@ public class RR{
        public static final Node column = RR.column.asNode();
        public static final Node datatype = RR.datatype.asNode();
        public static final Node language = RR.language.asNode();
+       public static final Node termType = RR.termType.asNode();
+       public static final Node IRI = RR.IRI.asNode();
        
        }
 
