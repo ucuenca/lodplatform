@@ -105,7 +105,7 @@ public class R2RMLGenerator {
                          Matcher matcherFnc = patternFnc.matcher(id);
                          String function = matcherFnc.find() ? matcherFnc.group(1):null;
                          */
-                        /*String sqlField = entityId.replaceAll("\\$\\{(.*)\\}", classBean.getFieldName(field));
+ /*String sqlField = entityId.replaceAll("\\$\\{(.*)\\}", classBean.getFieldName(field));
                          entityRealId = this.processFieldFunction(data.CLASSIFICATIONTABLE, 
                          sqlField, "ID = '" + id + "'");*/
 
@@ -126,7 +126,7 @@ public class R2RMLGenerator {
                 )
                         .addProperty(RR.subjectMap,
                                 r2rmlModel.createResource()
-                                .addProperty((relativeURI.compareTo("#external#")==0)?RR.column:RR.template, (relativeURI.compareTo("#external#")==0)?"" + id + "_ID":this.baseURI + relativeURI + "{" + id + "_ID}")
+                                .addProperty((relativeURI.compareTo("#external#") == 0) ? RR.column : RR.template, (relativeURI.compareTo("#external#") == 0) ? "" + id + "_ID" : this.baseURI + relativeURI + "{" + id + "_ID}")
                                 .addProperty(RR.cclass, /*this.getOntologyURI(vocPrefix) +*/
                                         ResourceFactory.createProperty(prefixes.get(vocPrefix)[0],
                                                 vocEntity.split(prefixes.get(vocPrefix)[0])[1])
@@ -170,8 +170,7 @@ public class R2RMLGenerator {
             if (annBean.getLanguage().length() > 0) {
                 objectMapResource.addProperty(RR.language, annBean.getLanguage());
             }
-            
-            
+
             String sqlDefinition = entityIDfromRelation != null
                     ? this.getPropertySQLDefinition(classId, entityIDfromRelation, annBean)
                     : this.getPropertySQLDefinition(classId, annBean);
@@ -182,7 +181,7 @@ public class R2RMLGenerator {
             )
                     .addProperty(RR.subjectMap,
                             r2rmlModel.createResource()
-                            .addProperty(RR.template, this.baseURI + mappedEntities.get(classId)[0] + "{" + classId + "_ID}")
+                            .addProperty((mappedEntities.get(classId)[0].toString().compareTo("#external#") == 0) ? RR.column : RR.template, ((mappedEntities.get(classId)[0].toString().compareTo("#external#") == 0) ? "" + classId + "_ID" : this.baseURI + mappedEntities.get(classId)[0] + "{" + classId + "_ID}"))
                     )
                     .addProperty(RR.predicateObjectMap,
                             r2rmlModel.createResource()
@@ -209,12 +208,12 @@ public class R2RMLGenerator {
         String[] condValue = new String[]{meta.getParentStepMeta().getParentTransMeta().getName().toUpperCase(),
             meta.getParentStepMeta().getName().toUpperCase(), classID};
         relationQuery = this.generateSQLPredicate(relationQuery, condField, condValue);
-        
+
         ////JO
         //Adding inverse relation support
-        relationQuery +=" AND ID NOT LIKE 'IR%' ";
+        relationQuery += " AND ID NOT LIKE 'IR%' ";
         //*JO
-        
+
         String parentRelationQuery = "SELECT URI_FIELD_ID FROM CLASSMAPPING WHERE ";
         condField = new String[]{"TRANSID", "STEPID"};
         condValue = new String[]{meta.getParentStepMeta().getParentTransMeta().getName().toUpperCase(),
@@ -263,8 +262,13 @@ public class R2RMLGenerator {
             )
                     .addProperty(RR.subjectMap,
                             r2rmlModel.createResource()
-                            .addProperty(RR.template, this.baseURI + (String) entityProp1[0] + "{" + entity1 + "_ID}")
+                            .addProperty((entityProp1[0].toString().compareTo("#external#") == 0) ? RR.column : RR.template, ((entityProp1[0].toString().compareTo("#external#") == 0) ? "" + entity1 + "_ID" : this.baseURI + (String) entityProp1[0] + "{" + entity1 + "_ID}"))
                     );
+
+            Resource addProperty = r2rmlModel.createResource();
+            if (entityProp2[0].toString().compareTo("#external#") == 0) {
+                addProperty=addProperty.addProperty(RR.termType, RR.IRI);
+            }
             //fixing problem with URI without LOD URI name conventions
             Property vocab = (vocProperty.split(prefixes.get(vocPrefix)[0]).length > 1)
                     ? ResourceFactory.createProperty(prefixes.get(vocPrefix)[0],
@@ -274,8 +278,8 @@ public class R2RMLGenerator {
                     r2rmlModel.createResource()
                     .addProperty(RR.predicate, vocab)
                     .addProperty(RR.objectMap,
-                            r2rmlModel.createResource()
-                            .addProperty(RR.template, this.baseURI + (String) entityProp2[0] + "{" + entity2 + "_ID}")
+                            addProperty
+                            .addProperty((entityProp2[0].toString().compareTo("#external#") == 0) ? RR.column : RR.template, ((entityProp2[0].toString().compareTo("#external#") == 0) ? "" + entity2 + "_ID" : this.baseURI + (String) entityProp2[0] + "{" + entity2 + "_ID}"))
                     )
             );
         }
@@ -402,15 +406,15 @@ public class R2RMLGenerator {
                 + " FROM " + meta.getDataDbTable()
                 + " WHERE ";
         ClassificationBean classBean2 = (ClassificationBean) entityProp2[2];
-        
+
         //JO
         //Adding inverse relation support
-        Boolean InverseRelation= relBean.getId().startsWith("IR");
-        if(InverseRelation){
+        Boolean InverseRelation = relBean.getId().startsWith("IR");
+        if (InverseRelation) {
             classBean2 = (ClassificationBean) entityProp1[2];
         }
         //*JO
-        
+
         String[] condField = new String[]{"TRANSID", "STEPID", classBean2.getDatafield1(),
             classBean2.getDatafield2(), classBean2.getDatafield3()};
         String[] condValue = new String[]{meta.getParentStepMeta().getParentTransMeta().getName().toUpperCase(),
