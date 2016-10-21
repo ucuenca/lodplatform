@@ -23,9 +23,12 @@
 package com.ucuenca.pentaho.plugin.step.oai;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.core.row.RowMeta;
+import org.pentaho.di.core.row.RowMetaInterface;
 import org.pentaho.di.trans.Trans;
 import org.pentaho.di.trans.TransMeta;
 import org.pentaho.di.trans.step.BaseStep;
@@ -45,25 +48,73 @@ public class OAILoader extends BaseStep implements StepInterface {
 		super(s, stepDataInterface, c, t, dis);
 	}
 
+        
+        
+        public void init_ResumptionToken (StepMetaInterface smi, StepDataInterface sdi) throws KettleException{
+            OAILoaderMeta meta = (OAILoaderMeta) smi;
+            RowMetaInterface antRow = getInputRowMeta();
+            
+            
+            
+            
+           // meta.setInitialResumptionToken(IRT);
+        }
+        
+        
+        
 	public boolean init(StepMetaInterface smi, StepDataInterface sdi) {
 		// Casting to step-specific implementation classes is safe
 		OAILoaderMeta meta = (OAILoaderMeta) smi;
 		OAILoaderData data = (OAILoaderData) sdi;
 		data.getDataLoader().setBaseStep(this);
-		data.initOAIHarvester(meta, data, false);
-
+		//
+                
 		return super.init(meta, data);
 	}
 
 	public boolean processRow(StepMetaInterface smi, StepDataInterface sdi)
 			throws KettleException {
+            
+            
+            
 
 		// safely cast the step settings (meta) and runtime info (data) to
 		// specific implementations
 		OAILoaderMeta meta = (OAILoaderMeta) smi;
 		OAILoaderData data = (OAILoaderData) sdi;
-		if(data.listRecords == null) throw new KettleException("ERROR WHILE RETRIEVING OAI RECORDS");
+		
 		if (first) {
+                    
+                    String IRT = null;
+                    
+                    try{
+                        Object[] row = getRow();
+                        RowMetaInterface inputRowMeta = getInputRowMeta();
+                        String[] fieldNames = inputRowMeta.getFieldNames();
+                        String FilaTI = null;
+                        int pFilaTI = -1;
+                        for (int w = 0; w < fieldNames.length; w++) {
+                            if (fieldNames[w].compareTo("ResponseT") == 0) {
+                                FilaTI = fieldNames[w];
+                                pFilaTI = w;
+                                break;
+                            }
+                        }
+                        IRT = ((String) row[pFilaTI]).trim();
+                    }catch(Exception w){
+                    
+                    }
+                    if (IRT !=null && IRT.compareTo("")==0){
+                        IRT=null;
+                    }
+                    data.fromDate=IRT;
+                    
+                    
+                    
+                    data.initOAIHarvester(meta, data, false);
+                    
+                    if(data.listRecords == null) throw new KettleException("ERROR WHILE RETRIEVING OAI RECORDS");    
+                    
 			first = false;
 			data.outputRowMeta = new RowMeta();
 			meta.getFields(data.outputRowMeta, getStepname(), null, null, this);

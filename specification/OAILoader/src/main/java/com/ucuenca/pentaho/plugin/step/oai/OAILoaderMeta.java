@@ -258,6 +258,9 @@ public class OAILoaderMeta extends BaseStepMeta implements StepMetaInterface {
 		/*
 		 * This implementation appends the outputField to the row-stream
 		 */
+                
+                
+                r.setValueMetaList(new ArrayList());
 
 		ValueMetaInterface id = new ValueMeta(BaseMessages.getString(PKG, "OAILoader.InputData.IdRecord"), ValueMetaInterface.TYPE_STRING);
 		id.setOrigin(origin);
@@ -275,6 +278,12 @@ public class OAILoaderMeta extends BaseStepMeta implements StepMetaInterface {
 		data.setLength(10000);
 		r.addValueMeta(data);		
 		
+                
+                ValueMetaInterface time = new ValueMeta(BaseMessages.getString(PKG, "OAILoader.InputData.ResponseTime"), ValueMetaInterface.TYPE_STRING);
+		time.setOrigin(origin);
+		time.setLength(100);
+		r.addValueMeta(time);	
+                
 	}
 
 	/**

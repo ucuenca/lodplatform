@@ -66,10 +66,10 @@ public class ListRecords extends HarvesterVerb {
      */
  
     //sgonzalez parametro schemas
-    public ListRecords(String baseURL, String resumptionToken, Schema... schemas)
+    public ListRecords(String baseURL, String resumptionToken/*, String from*/, Schema... schemas)
     throws IOException, ParserConfigurationException, SAXException,
     TransformerException {
-        super(getRequestURL(baseURL, resumptionToken), schemas);
+        super(getRequestURL(baseURL, resumptionToken/*, from*/), schemas);
     }
     
     /**
@@ -90,6 +90,28 @@ public class ListRecords extends HarvesterVerb {
             throw new NoSuchFieldException(schemaLocation);
         }
     }
+    
+    /**
+     * Get the oai:resumptionToken from the response
+     * 
+     * @return the oai:resumptionToken value
+     * @throws TransformerException
+     * @throws NoSuchFieldException
+     */
+    public String getResponeDate()
+    throws TransformerException, NoSuchFieldException {
+        String schemaLocation = getSchemaLocation();
+        if (schemaLocation.indexOf(SCHEMA_LOCATION_V2_0) != -1) {
+            return getSingleString("/oai20:OAI-PMH/oai20:responseDate");
+        } else if (schemaLocation.indexOf(SCHEMA_LOCATION_V1_1_LIST_RECORDS) != -1) {
+            return getSingleString("/oai11_ListRecords:ListRecords/oai11_ListRecords:responseDate");
+        } else {
+            throw new NoSuchFieldException(schemaLocation);
+        }
+    }
+    
+    
+    
     
     public String getPrueba()
     	    throws TransformerException, NoSuchFieldException {
@@ -127,9 +149,10 @@ public class ListRecords extends HarvesterVerb {
      * @return
      */
     private static String getRequestURL(String baseURL,
-            String resumptionToken) {
+            String resumptionToken/*, String from*/) {
         StringBuffer requestURL =  new StringBuffer(baseURL);
         requestURL.append("?verb=ListRecords");
+        //if (from != null) requestURL.append("&from=").append(from);
         requestURL.append("&resumptionToken=").append(URLEncoder.encode(resumptionToken));
         return requestURL.toString();
     }
