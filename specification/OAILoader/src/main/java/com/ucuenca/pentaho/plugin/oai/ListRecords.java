@@ -92,9 +92,9 @@ public class ListRecords extends HarvesterVerb {
     }
     
     /**
-     * Get the oai:resumptionToken from the response
+     * Get the oai:ResponseDate from the response
      * 
-     * @return the oai:resumptionToken value
+     * @return the oai:ResponseDate value
      * @throws TransformerException
      * @throws NoSuchFieldException
      */

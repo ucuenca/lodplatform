@@ -28,18 +28,12 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.StringTokenizer;
 
-import javax.xml.transform.TransformerException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathFactory;
 
 import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.core.row.RowMetaInterface;
 import org.pentaho.di.trans.step.BaseStepData;
 import org.pentaho.di.trans.step.StepDataInterface;
 import org.pentaho.di.trans.step.StepMetaInterface;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -50,8 +44,7 @@ import com.ucuenca.misctools.DatabaseLoader;
 import com.ucuenca.pentaho.plugin.oai.ListRecords;
 import com.ucuenca.pentaho.plugin.oai.ListSets;
 import com.ucuenca.pentaho.plugin.oai.Schema;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.commons.lang.exception.ExceptionUtils;
 
 /**
  * This class is part of the demo step plug-in implementation. It demonstrates
@@ -259,16 +252,13 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
         data.outputRowMeta = data.outputRowMeta == null ? dataLoader
                 .getMetaFieldsDef(smi) : data.outputRowMeta;
 
-        
-        String ResponseDate="";
-        
-        
+        String ResponseDate = "";
+
         try {
-            ResponseDate=data.listRecords.getResponeDate();
+            ResponseDate = data.listRecords.getResponeDate();
         } catch (Exception ex) {
         }
-        
-        
+
         try {
             if (dataIndex == 0 && recordIndex == 0) {
                 this.records = data.listRecords.getNodeList(meta.getXpath());
@@ -284,6 +274,13 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
 
             if (datos.size() == 0) {
                 Node nNode1 = records.item(recordIndex);
+                if (nNode1 == null) {
+                    //No data
+                    if (databaseLoad) {
+                        DatabaseLoader.closeConnection();
+                    }
+                    return false;
+                }
                 Node nNodeHeader = null;
                 Node nNode2 = null;
 
@@ -370,7 +367,6 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
 
                 if (data.resumptionToken == null || data.resumptionToken.length() == 0) {
 
-                    
                     data.listRecords = null;
                     dataLoader.logBasic("No more resumption token found, end was reached.");
                     if (databaseLoad) {
@@ -411,7 +407,8 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
             }
 
         } catch (Exception e) {
-            dataLoader.logBasic("Error: " + e.toString());
+
+            dataLoader.logBasic("Error: " + e.toString() + "" + ExceptionUtils.getFullStackTrace(e));
         }
         return hasMoreData;
 

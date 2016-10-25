@@ -13,178 +13,214 @@ import org.pentaho.di.trans.step.BaseStep;
 import org.pentaho.di.trans.step.StepMetaInterface;
 
 /**
- * Creates a DataBase loader to precatch data (that a PDI step will generate ) 
- * into a DataBase Schema. 
- * 
+ * Creates a DataBase loader to precatch data (that a PDI step will generate )
+ * into a DataBase Schema.
+ *
  * @author santteegt
  *
  */
 public class StepDataLoader {
-	
-	/** RowMeta associated with the step */
-	private RowMetaInterface outputRowMeta;
-	/** PDI Step to precatch data */
-	private BaseStep step;
-	/** PDI Step name */
-	private String stepName;
-	/** Boolean.TRUE if step will call the DB loading process */
-	private Boolean databaseLoad = Boolean.FALSE;
-	/** Table name where the process load data **/
-	private String tableName;
-	/** Boolean.TRUE if the instacne has already created the table */ 
-	private Boolean createdTable = Boolean.FALSE;
-	/** List of table fields with its associated constraints. 
-	 * For table creation and insertion purposes.
-	 */
-	private Map<String, String> tableFields;
-	/** SQL DML sentence for insertion processes */
-	private String sqlInsertion;
-	/** Current table row sequence */
-	public Integer sequence;
-	
-	public StepDataLoader(String tableName) {
-		this.tableName = tableName;
-		sequence = 0;
-	}
-	
-	public RowMetaInterface getOutputRowMeta() {
-		return this.outputRowMeta;
-	}
-	
-	public void setOutputRowMeta(RowMetaInterface outputRowMeta) {
-		this.outputRowMeta = outputRowMeta;
-	}
-	
-	public String getStepName() {
-		return this.stepName;
-	}
-	
-	public void setStepName(String stepName) {
-		this.stepName = stepName;
-	}
-	
-	public Boolean getDatabaseLoad() {
-		return this.databaseLoad;
-	}
 
-	public void setDatabaseLoad(Boolean databaseLoad) {
-		this.databaseLoad = databaseLoad;
-	}
+    /**
+     * RowMeta associated with the step
+     */
+    private RowMetaInterface outputRowMeta;
+    /**
+     * PDI Step to precatch data
+     */
+    private BaseStep step;
+    /**
+     * PDI Step name
+     */
+    private String stepName;
+    /**
+     * Boolean.TRUE if step will call the DB loading process
+     */
+    private Boolean databaseLoad = Boolean.FALSE;
+    /**
+     * Table name where the process load data *
+     */
+    private String tableName;
+    /**
+     * Boolean.TRUE if the instacne has already created the table
+     */
+    private Boolean createdTable = Boolean.FALSE;
+    /**
+     * List of table fields with its associated constraints. For table creation
+     * and insertion purposes.
+     */
+    private Map<String, String> tableFields;
+    /**
+     * SQL DML sentence for insertion processes
+     */
+    private String sqlInsertion;
+    /**
+     * Current table row sequence
+     */
+    public Integer sequence;
 
-	/**
-	 * Gets the PDI step row metadata
-	 * @param smi Step metadata class
-	 * @return Row metadata
-	 * @throws KettleException
-	 */
-	public RowMetaInterface getMetaFieldsDef(StepMetaInterface smi)throws KettleException {
-		//OAILoaderMeta meta = (OAILoaderMeta) smi;
-		outputRowMeta = new RowMeta();
-		smi.getFields(outputRowMeta, this.stepName, null, null, null, null, null);
-		return outputRowMeta;
-	}
-	
-	public void setBaseStep(BaseStep step) {
-		this.step = step;
+    public StepDataLoader(String tableName) {
+        this.tableName = tableName;
+        sequence = 0;
     }
-    
+
+    public RowMetaInterface getOutputRowMeta() {
+        return this.outputRowMeta;
+    }
+
+    public void setOutputRowMeta(RowMetaInterface outputRowMeta) {
+        this.outputRowMeta = outputRowMeta;
+    }
+
+    public String getStepName() {
+        return this.stepName;
+    }
+
+    public void setStepName(String stepName) {
+        this.stepName = stepName;
+    }
+
+    public Boolean getDatabaseLoad() {
+        return this.databaseLoad;
+    }
+
+    public void setDatabaseLoad(Boolean databaseLoad) {
+        this.databaseLoad = databaseLoad;
+    }
+
+    /**
+     * Gets the PDI step row metadata
+     *
+     * @param smi Step metadata class
+     * @return Row metadata
+     * @throws KettleException
+     */
+    public RowMetaInterface getMetaFieldsDef(StepMetaInterface smi) throws KettleException {
+        //OAILoaderMeta meta = (OAILoaderMeta) smi;
+        outputRowMeta = new RowMeta();
+        smi.getFields(outputRowMeta, this.stepName, null, null, null, null, null);
+        return outputRowMeta;
+    }
+
+    public void setBaseStep(BaseStep step) {
+        this.step = step;
+    }
+
     public BaseStep getBaseStep() {
-    	return this.step;
+        return this.step;
     }
-	
+
     /**
      * Creates a map with table fields and their associated constraints
+     *
      * @param smi Step metadata class
      * @return map with table fields and their associated constraints
      * @throws Exception
      */
-	private Map<String, String> getFields(StepMetaInterface smi) throws Exception {
-		if(tableFields == null) {
-			tableFields = new LinkedHashMap<String, String>();
-			tableFields.put("TRANSID", "VARCHAR(50)");
-			tableFields.put("STEPID", "VARCHAR(50)");
-			tableFields.put("SEQUENCE", "INTEGER"); 
-			if(outputRowMeta == null) this.getMetaFieldsDef(smi);
-			for(ValueMetaInterface fieldMeta:outputRowMeta.getValueMetaList()) {
-				String fieldName = fieldMeta.getName().toUpperCase().replaceAll(" ", "_");
-				String definition = "";
-				switch(fieldMeta.getType()) {
-					case ValueMetaInterface.TYPE_INTEGER: {
-						
-					}
-					default : { //Manage any other field type as String
-						definition = "VARCHAR(" + fieldMeta.getLength() + ")";
-					}
-				}
-				tableFields.put(fieldName, definition);
-			}
-			tableFields.put("PRIMARY KEY", "(TRANSID, STEPID, SEQUENCE)");
-		}
-		return this.tableFields;	
-	}
-	
-	/**
-	 * Insert a data row into table schema
-	 * @param smi Step metadata class
-	 * @param values Row Values generated by the PDI Step 
-	 * @throws Exception
-	 */
-	public void insertTableRow(StepMetaInterface smi, Object[] values) throws Exception {
-    	if(!createdTable) {
-    		DatabaseLoader.createTable(tableName, this.getFields(smi));
-    		createdTable = Boolean.TRUE;
-    		this.cleanTableStepData(new Object[]{values[0], values[1]});
-    	}
-		try {
-			int totalFields = values.length;
-			this.sqlInsertion = "INSERT INTO " + tableName + " VALUES(";
-			while(--totalFields >= 1) this.sqlInsertion += "?,";
-			this.sqlInsertion += "?)";
-			DatabaseLoader.executeUpdate(this.sqlInsertion, values);
-			this.logDebug(this.sqlInsertion, values);
-		}catch(Exception e) {
-			logBasic("ERROR EXECUTING SQL INSERT: "+ e.getMessage());
-		}
+    private Map<String, String> getFields(StepMetaInterface smi) throws Exception {
+        if (tableFields == null) {
+            tableFields = new LinkedHashMap<String, String>();
+            tableFields.put("TRANSID", "VARCHAR(50)");
+            tableFields.put("STEPID", "VARCHAR(50)");
+            tableFields.put("SEQUENCE", "INTEGER");
+            if (outputRowMeta == null) {
+                this.getMetaFieldsDef(smi);
+            }
+            for (ValueMetaInterface fieldMeta : outputRowMeta.getValueMetaList()) {
+                String fieldName = fieldMeta.getName().toUpperCase().replaceAll(" ", "_");
+                String definition = "";
+                switch (fieldMeta.getType()) {
+                    case ValueMetaInterface.TYPE_INTEGER: {
+
+                    }
+                    default: { //Manage any other field type as String
+                        definition = "VARCHAR(" + fieldMeta.getLength() + ")";
+                    }
+                }
+                tableFields.put(fieldName, definition);
+            }
+            tableFields.put("PRIMARY KEY", "(TRANSID, STEPID, SEQUENCE)");
+        }
+        return this.tableFields;
     }
-	
-	/**
-	 * Delete all data previously associated with the PDI transformation
-	 * @param pkValues
-	 * @return
-	 * @throws Exception
-	 */
-	private Boolean cleanTableStepData(Object[] pkValues)throws Exception {
-    	return DatabaseLoader.executeUpdate("DELETE FROM " + tableName + " WHERE TRANSID = ? AND STEPID = ?", pkValues);
+
+    public void init_(StepMetaInterface smi, Object[] values) throws Exception {
+        if (!createdTable) {
+            DatabaseLoader.createTable(tableName, this.getFields(smi));
+            createdTable = Boolean.TRUE;
+            this.cleanTableStepData(new Object[]{values[0], values[1]});
+        }
+
     }
-	
-	/**
-	 * Logging options for StepData classes
-	 * @param message
-	 * @param throwException
-	 * @throws KettleException
-	 */
-	public void logBasic(String message, Boolean... throwException) throws KettleException{
-    	if(!databaseLoad && step !=null) {
-    		step.logBasic(message);
-    	} else {
-    		System.out.println(message);
-    	}
-    	if(throwException.length > 0 && throwException[0]) {
-    		throw new KettleException(message);
-    	}
-    	
+
+    /**
+     * Insert a data row into table schema
+     *
+     * @param smi Step metadata class
+     * @param values Row Values generated by the PDI Step
+     * @throws Exception
+     */
+    public void insertTableRow(StepMetaInterface smi, Object[] values) throws Exception {
+        if (!createdTable) {
+            DatabaseLoader.createTable(tableName, this.getFields(smi));
+            createdTable = Boolean.TRUE;
+            this.cleanTableStepData(new Object[]{values[0], values[1]});
+        }
+        try {
+            int totalFields = values.length;
+            this.sqlInsertion = "INSERT INTO " + tableName + " VALUES(";
+            while (--totalFields >= 1) {
+                this.sqlInsertion += "?,";
+            }
+            this.sqlInsertion += "?)";
+            DatabaseLoader.executeUpdate(this.sqlInsertion, values);
+            this.logDebug(this.sqlInsertion, values);
+        } catch (Exception e) {
+            logBasic("ERROR EXECUTING SQL INSERT: " + e.getMessage());
+        }
     }
-	
-	/**
-	 * Logging options for StepData classes
-	 * @param message
-	 * @param throwException
-	 * @throws KettleException
-	 */
-	public void logDebug(String message, Object... arguments) throws KettleException{
-    	if(!databaseLoad && step !=null && step.isDebug()) {
-    		step.logDebug(message, arguments);
-    	}
+
+    /**
+     * Delete all data previously associated with the PDI transformation
+     *
+     * @param pkValues
+     * @return
+     * @throws Exception
+     */
+    private Boolean cleanTableStepData(Object[] pkValues) throws Exception {
+        return DatabaseLoader.executeUpdate("DELETE FROM " + tableName + " WHERE TRANSID = ? AND STEPID = ?", pkValues);
     }
-	
+
+    /**
+     * Logging options for StepData classes
+     *
+     * @param message
+     * @param throwException
+     * @throws KettleException
+     */
+    public void logBasic(String message, Boolean... throwException) throws KettleException {
+        if (!databaseLoad && step != null) {
+            step.logBasic(message);
+        } else {
+            System.out.println(message);
+        }
+        if (throwException.length > 0 && throwException[0]) {
+            throw new KettleException(message);
+        }
+
+    }
+
+    /**
+     * Logging options for StepData classes
+     *
+     * @param message
+     * @param throwException
+     * @throws KettleException
+     */
+    public void logDebug(String message, Object... arguments) throws KettleException {
+        if (!databaseLoad && step != null && step.isDebug()) {
+            step.logDebug(message, arguments);
+        }
+    }
+
 };
