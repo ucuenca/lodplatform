@@ -134,7 +134,11 @@ public class StepDataLoader {
 
                     }
                     default: { //Manage any other field type as String
-                        definition = "VARCHAR(" + fieldMeta.getLength() + ")";
+                        int length = fieldMeta.getLength();
+                        if (length < 0 ){
+                            length=0;
+                        }
+                        definition = "VARCHAR(" + length + ")";
                     }
                 }
                 tableFields.put(fieldName, definition);

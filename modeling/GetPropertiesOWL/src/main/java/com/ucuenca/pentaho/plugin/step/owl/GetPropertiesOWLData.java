@@ -71,6 +71,9 @@ import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.ucuenca.misctools.StepDataLoader;
 import com.ucuenca.misctools.DatabaseLoader;
 import com.hp.hpl.jena.shared.*;
+import java.util.Collection;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFLanguages;
 /**
  * This class is part of the demo step plug-in implementation.
  * It demonstrates the basics of developing a plug-in step for PDI. 
@@ -168,13 +171,27 @@ public class GetPropertiesOWLData extends BaseStepData implements StepDataInterf
 		
 		try {
 			dataLoader.logBasic("work in model " +myList.get(ii));
+                        dataLoader.logBasic("trying ... RDF XML");
 			data.model.read(myList.get(ii));
 			dataLoader.logBasic("the load model is ok");
 		} catch (Exception eox) {
-			dataLoader.logBasic(" ERROR " + eox +" Unload model " +myListNames.get(ii) +" from  [" + myList.get(ii));
-			//Model model2 = FileManager.get().loadModel(myList.get(ii), myListNames.get(ii), "RDF/XML");
-			//logError(" ERROR " + eox +" Unload model " +myListNames.get(ii) +" from URI [" + myList.get(ii));
-			//data.model = (OntModel) FileManager.get().loadModel(myList.get(ii),"RDF/XML");
+                    //dataLoader.logBasic(" ERROR " + eox +" Unload model " +myListNames.get(ii) +" from  [" + myList.get(ii));
+                    //Model model2 = FileManager.get().loadModel(myList.get(ii), myListNames.get(ii), "RDF/XML");
+                    //logError(" ERROR " + eox +" Unload model " +myListNames.get(ii) +" from URI [" + myList.get(ii));
+                    //data.model = (OntModel) FileManager.get().loadModel(myList.get(ii),"RDF/XML");
+                    Collection<Lang> registeredLanguages = RDFLanguages.getRegisteredLanguages();
+                    for (Lang c: registeredLanguages){
+                        try{
+                            dataLoader.logBasic("trying ... "+c.getName());
+                            data.model.read(myList.get(ii), c.getName());
+                            dataLoader.logBasic("the load model is ok");
+                            break;
+                        }catch(Exception e){
+                        
+                        }
+                    }
+                        
+                        
 		}
 
 		
