@@ -637,7 +637,8 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	        BaseMessages.getString( PKG, "OntologyMapping.Field.Datatype" ), ColumnInfo.COLUMN_TYPE_CCOMBO, 
 	        DataTypeProcessor.getDataTypes()),
 	      new ColumnInfo(
-	        BaseMessages.getString( PKG, "OntologyMapping.Field.Language" ), ColumnInfo.COLUMN_TYPE_CCOMBO, 
+	        BaseMessages.getString( PKG, "OntologyMapping.Field.Language" ), ColumnInfo.COLUMN_TYPE_TEXT, //Cambiar a texto
+                //BaseMessages.getString( PKG, "OntologyMapping.Field.Language" ), ColumnInfo.COLUMN_TYPE_CCOMBO, 
 	        new String[]{"es-es", "en-us"})};
 	    
 	    colann[0].setReadOnly(Boolean.TRUE);
