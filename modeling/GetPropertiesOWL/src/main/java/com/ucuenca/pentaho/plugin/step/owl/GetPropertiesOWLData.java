@@ -302,7 +302,7 @@ public class GetPropertiesOWLData extends BaseStepData implements StepDataInterf
 		ii++;
 		if (ii >= myList.size()) {
 			repetir = false;
-                        ii=0;
+                        //ii=0;
 			if(databaseLoad) // to close theconnection
 				try {
 					DatabaseLoader.closeConnection();
