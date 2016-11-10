@@ -170,6 +170,7 @@ public class GetPropertiesOWLData extends BaseStepData implements StepDataInterf
 
 		
 		try {
+                        data.model= ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 			dataLoader.logBasic("work in model " +myList.get(ii));
                         dataLoader.logBasic("trying ... RDF XML");
 			data.model.read(myList.get(ii));
@@ -301,6 +302,7 @@ public class GetPropertiesOWLData extends BaseStepData implements StepDataInterf
 		ii++;
 		if (ii >= myList.size()) {
 			repetir = false;
+                        //ii=0;
 			if(databaseLoad) // to close theconnection
 				try {
 					DatabaseLoader.closeConnection();
