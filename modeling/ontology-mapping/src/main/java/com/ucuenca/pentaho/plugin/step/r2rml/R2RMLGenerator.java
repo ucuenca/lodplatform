@@ -119,6 +119,13 @@ public class R2RMLGenerator {
                 //this.getOntologyURI(vocPrefix);
                 this.getLOVOntologyURI(vocPrefix);
                 String vocEntity = classBean.getEntity();
+                Property createProperty = ResourceFactory.createProperty(vocEntity);
+                if (prefixes.get(vocPrefix)!=null && prefixes.get(vocPrefix).length>0 && vocEntity.split(prefixes.get(vocPrefix)[0]).length>=2){
+                    createProperty = ResourceFactory.createProperty(prefixes.get(vocPrefix)[0], vocEntity.split(prefixes.get(vocPrefix)[0])[1]);
+                }
+                
+                
+                
                 Resource resource = r2rmlModel.createResource("#TriplesMap" + id);
                 resource.addProperty(RR.logicalTable,
                         r2rmlModel.createResource()
@@ -128,8 +135,7 @@ public class R2RMLGenerator {
                                 r2rmlModel.createResource()
                                 .addProperty((relativeURI.compareTo("#external#") == 0) ? RR.column : RR.template, (relativeURI.compareTo("#external#") == 0) ? "" + id + "_ID" : this.baseURI + relativeURI + "{" + id + "_ID}")
                                 .addProperty(RR.cclass, /*this.getOntologyURI(vocPrefix) +*/
-                                        ResourceFactory.createProperty(prefixes.get(vocPrefix)[0],
-                                                vocEntity.split(prefixes.get(vocPrefix)[0])[1])
+                                        createProperty
                                 )
                         );
                 mappedEntities.put(id, new Object[]{relativeURI, entityRealId, classBean});
@@ -171,6 +177,12 @@ public class R2RMLGenerator {
                 objectMapResource.addProperty(RR.language, annBean.getLanguage());
             }
 
+            Property createProperty = ResourceFactory.createProperty(vocProperty);
+                if (prefixes.get(vocPrefix)!=null && prefixes.get(vocPrefix).length>0 && vocProperty.split(prefixes.get(vocPrefix)[0]).length>=2){
+                    createProperty = ResourceFactory.createProperty(prefixes.get(vocPrefix)[0],   vocProperty.split(prefixes.get(vocPrefix)[0])[1]);
+                }
+            
+            
             String sqlDefinition = entityIDfromRelation != null
                     ? this.getPropertySQLDefinition(classId, entityIDfromRelation, annBean)
                     : this.getPropertySQLDefinition(classId, annBean);
@@ -186,8 +198,7 @@ public class R2RMLGenerator {
                     .addProperty(RR.predicateObjectMap,
                             r2rmlModel.createResource()
                             .addProperty(RR.predicate,
-                                    ResourceFactory.createProperty(prefixes.get(vocPrefix)[0],
-                                            vocProperty.split(prefixes.get(vocPrefix)[0])[1])
+                                    createProperty
                             )
                             .addProperty(RR.objectMap, objectMapResource)
                     );
@@ -269,11 +280,20 @@ public class R2RMLGenerator {
             if (entityProp2[0].toString().compareTo("#external#") == 0) {
                 addProperty=addProperty.addProperty(RR.termType, RR.IRI);
             }
-            //fixing problem with URI without LOD URI name conventions
-            Property vocab = (vocProperty.split(prefixes.get(vocPrefix)[0]).length > 1)
+            
+            Property vocab=ResourceFactory.createProperty(vocProperty);
+                if (prefixes.get(vocPrefix)!=null && prefixes.get(vocPrefix).length>0 &&vocProperty.split(prefixes.get(vocPrefix)[0]).length>=2){
+                    vocab = (vocProperty.split(prefixes.get(vocPrefix)[0]).length > 1)
                     ? ResourceFactory.createProperty(prefixes.get(vocPrefix)[0],
                             vocProperty.split(prefixes.get(vocPrefix)[0])[1])
                     : ResourceFactory.createProperty(vocProperty);
+                }
+            
+            //fixing problem with URI without LOD URI name conventions
+            //Property vocab = (vocProperty.split(prefixes.get(vocPrefix)[0]).length > 1)
+            //        ? ResourceFactory.createProperty(prefixes.get(vocPrefix)[0],
+              //              vocProperty.split(prefixes.get(vocPrefix)[0])[1])
+              //      : ResourceFactory.createProperty(vocProperty);
             resource.addProperty(RR.predicateObjectMap,
                     r2rmlModel.createResource()
                     .addProperty(RR.predicate, vocab)
@@ -481,9 +501,11 @@ public class R2RMLGenerator {
             URI = prefixes.get(prefix)[0];
         } else {
             List<String> URIList = LOVApiV2.vocabularySearch(prefix);
-            prefixes.put(prefix, URIList.toArray(new String[URIList.size()]));
-            URI = URIList.get(0);
-            r2rmlModel.setNsPrefix(prefix, URI);
+            if (URIList.size()>0){
+                prefixes.put(prefix, URIList.toArray(new String[URIList.size()]));
+                URI = URIList.get(0);
+                r2rmlModel.setNsPrefix(prefix, URI);
+            }
         }
         return URI;
     }
