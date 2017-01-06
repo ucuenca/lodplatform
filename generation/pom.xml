@@ -13,5 +13,6 @@
   <name>LOD Generation PDI Plugins</name>
   <modules>
 	<module>RDFGeneration</module>
+	<module>LinkingSource</module>
   </modules>
 </project>
