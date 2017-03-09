@@ -47,7 +47,7 @@ public class R2RMLGenerator {
             + " FROM ";
 
     private static final String FIELD_AS_FUNCTION_PATTERN = "(.*)\\$\\{(.*)\\}(.*)";
-    private static final String FIELD_EXTRACTION_PATTERN = "\\$\\{(.*)\\}";
+    private static final String FIELD_EXTRACTION_PATTERN = "\\$\\{([^{}]*)\\}";
 
     private String baseURI;
     private Model r2rmlModel;
