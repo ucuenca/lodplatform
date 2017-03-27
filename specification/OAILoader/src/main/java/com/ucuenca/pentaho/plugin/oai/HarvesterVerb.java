@@ -276,6 +276,10 @@ public abstract class HarvesterVerb {
                 responseCode = HttpURLConnection.HTTP_UNAVAILABLE;
             }
             
+            if (responseCode==500){
+                throw new IOException("Internal Server Error");
+            }
+            
             if (responseCode == HttpURLConnection.HTTP_UNAVAILABLE) {
                 long retrySeconds = con.getHeaderFieldInt("Retry-After", -1);
                 if (retrySeconds == -1) {

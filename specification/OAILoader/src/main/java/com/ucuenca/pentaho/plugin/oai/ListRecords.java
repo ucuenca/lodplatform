@@ -1,19 +1,17 @@
-
 /**
- Copyright 2006 OCLC, Online Computer Library Center
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
- 
- http://www.apache.org/licenses/LICENSE-2.0
- 
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
+ * Copyright 2006 OCLC, Online Computer Library Center
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package com.ucuenca.pentaho.plugin.oai;
 
 import java.io.IOException;
@@ -23,22 +21,23 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import org.xml.sax.SAXException;
 
-
-
 /**
- * This class represents an ListRecords response on either the server or
- * on the client
+ * This class represents an ListRecords response on either the server or on the
+ * client
  *
  * @author Jeffrey A. Young, OCLC Online Computer Library Center
  */
 public class ListRecords extends HarvesterVerb {
+
     /**
      * Mock object constructor (for unit testing purposes)
      */
+    public boolean End = false;
+
     public ListRecords() {
         super();
     }
-    
+
     /**
      * Client-side ListRecords verb constructor
      *
@@ -47,16 +46,17 @@ public class ListRecords extends HarvesterVerb {
      * @exception SAXException the xml response is bad
      * @exception IOException an I/O error occurred
      */
-  //sgonzalez parametro schemas
+    //sgonzalez parametro schemas
     public ListRecords(String baseURL, String from, String until,
             String set, String metadataPrefix, Schema... schemas)
-    throws IOException, ParserConfigurationException, SAXException,
-    TransformerException {
+            throws IOException, ParserConfigurationException, SAXException,
+            TransformerException {
         super(getRequestURL(baseURL, from, until, set, metadataPrefix), schemas);
     }
-    
+
     /**
      * Client-side ListRecords verb constructor (resumptionToken version)
+     *
      * @param baseURL
      * @param resumptionToken
      * @throws IOException
@@ -64,23 +64,26 @@ public class ListRecords extends HarvesterVerb {
      * @throws SAXException
      * @throws TransformerException
      */
- 
     //sgonzalez parametro schemas
     public ListRecords(String baseURL, String resumptionToken/*, String from*/, Schema... schemas)
-    throws IOException, ParserConfigurationException, SAXException,
-    TransformerException {
+            throws IOException, ParserConfigurationException, SAXException,
+            TransformerException {
         super(getRequestURL(baseURL, resumptionToken/*, from*/), schemas);
     }
-    
+
     /**
      * Get the oai:resumptionToken from the response
-     * 
+     *
      * @return the oai:resumptionToken value
      * @throws TransformerException
      * @throws NoSuchFieldException
      */
     public String getResumptionToken()
-    throws TransformerException, NoSuchFieldException {
+            throws TransformerException, NoSuchFieldException {
+        if (End) {
+            return "";
+        }
+
         String schemaLocation = getSchemaLocation();
         if (schemaLocation.indexOf(SCHEMA_LOCATION_V2_0) != -1) {
             return getSingleString("/oai20:OAI-PMH/oai20:ListRecords/oai20:resumptionToken");
@@ -90,16 +93,16 @@ public class ListRecords extends HarvesterVerb {
             throw new NoSuchFieldException(schemaLocation);
         }
     }
-    
+
     /**
      * Get the oai:ResponseDate from the response
-     * 
+     *
      * @return the oai:ResponseDate value
      * @throws TransformerException
      * @throws NoSuchFieldException
      */
     public String getResponeDate()
-    throws TransformerException, NoSuchFieldException {
+            throws TransformerException, NoSuchFieldException {
         String schemaLocation = getSchemaLocation();
         if (schemaLocation.indexOf(SCHEMA_LOCATION_V2_0) != -1) {
             return getSingleString("/oai20:OAI-PMH/oai20:responseDate");
@@ -109,22 +112,20 @@ public class ListRecords extends HarvesterVerb {
             throw new NoSuchFieldException(schemaLocation);
         }
     }
-    
-    
-    
-    
+
     public String getPrueba()
-    	    throws TransformerException, NoSuchFieldException {
-    	        String schemaLocation = getSchemaLocation();
-    	        if (schemaLocation.indexOf(SCHEMA_LOCATION_V2_0) != -1) {
-    	            return getSingleString("/oai20:OAI-PMH/oai20:ListRecords/oai20:field");
-    	        } else if (schemaLocation.indexOf(SCHEMA_LOCATION_V1_1_LIST_RECORDS) != -1) {
-    	        	//getNodeList(xpath)
-    	            return getSingleString("/oai11_ListRecords:ListRecords/oai11_ListRecords:field");
-    	        } else {
-    	            throw new NoSuchFieldException(schemaLocation);
-    	        }
-    	    }
+            throws TransformerException, NoSuchFieldException {
+        String schemaLocation = getSchemaLocation();
+        if (schemaLocation.indexOf(SCHEMA_LOCATION_V2_0) != -1) {
+            return getSingleString("/oai20:OAI-PMH/oai20:ListRecords/oai20:field");
+        } else if (schemaLocation.indexOf(SCHEMA_LOCATION_V1_1_LIST_RECORDS) != -1) {
+            //getNodeList(xpath)
+            return getSingleString("/oai11_ListRecords:ListRecords/oai11_ListRecords:field");
+        } else {
+            throw new NoSuchFieldException(schemaLocation);
+        }
+    }
+
     /**
      * Construct the query portion of the http request
      *
@@ -133,24 +134,31 @@ public class ListRecords extends HarvesterVerb {
     private static String getRequestURL(String baseURL, String from,
             String until, String set,
             String metadataPrefix) {
-        StringBuffer requestURL =  new StringBuffer(baseURL);
+        StringBuffer requestURL = new StringBuffer(baseURL);
         requestURL.append("?verb=ListRecords");
-        if (from != null) requestURL.append("&from=").append(from);
-        if (until != null) requestURL.append("&until=").append(until);
-        if (set != null) requestURL.append("&set=").append(set);
+        if (from != null) {
+            requestURL.append("&from=").append(from);
+        }
+        if (until != null) {
+            requestURL.append("&until=").append(until);
+        }
+        if (set != null) {
+            requestURL.append("&set=").append(set);
+        }
         requestURL.append("&metadataPrefix=").append(metadataPrefix);
         return requestURL.toString();
     }
-    
+
     /**
      * Construct the query portion of the http request (resumptionToken version)
+     *
      * @param baseURL
      * @param resumptionToken
      * @return
      */
     private static String getRequestURL(String baseURL,
             String resumptionToken/*, String from*/) {
-        StringBuffer requestURL =  new StringBuffer(baseURL);
+        StringBuffer requestURL = new StringBuffer(baseURL);
         requestURL.append("?verb=ListRecords");
         //if (from != null) requestURL.append("&from=").append(from);
         requestURL.append("&resumptionToken=").append(URLEncoder.encode(resumptionToken));

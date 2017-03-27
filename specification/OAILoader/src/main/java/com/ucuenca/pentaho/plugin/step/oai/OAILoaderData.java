@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.StringTokenizer;
 
-
 import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.core.row.RowMetaInterface;
 import org.pentaho.di.trans.step.BaseStepData;
@@ -297,7 +296,7 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
                                 .getPreviousSibling()
                                 .isSameNode(
                                         nNode1.getParentNode().getParentNode()
-                                        .getPreviousSibling())) {
+                                                .getPreviousSibling())) {
                             headerIndex++;
                         }
                     }
@@ -364,6 +363,8 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
                 this.recordIndex = 0;
                 this.headerIndex = 0;
                 data.resumptionToken = data.listRecords.getResumptionToken();
+                
+                ListRecords aux=data.listRecords;
 
                 if (data.resumptionToken == null || data.resumptionToken.length() == 0) {
 
@@ -383,16 +384,27 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
                                 data.resumptionToken);
                         this.header = null;
                     } catch (IOException e) {
-                        // TODO Auto-generated catch block
-                        dataLoader
-                                .logBasic("IOException while trying to resume from "
-                                        + data.resumptionToken
-                                        + ", trying again.");
 
-                        data.listRecords = new ListRecords(meta.getInputURI(),
-                                data.resumptionToken);
-                        this.header = null;
+                        if (e.getMessage().compareTo("Internal Server Error") == 0) {
+                            dataLoader
+                                    .logBasic("Internal Server Error HTTP 500 from "
+                                            + data.resumptionToken
+                                            + ", unexpectedly ending harvesting (Contact repository's admin for support).");
+                            
+                            data.listRecords=aux;
+                            data.listRecords.End=true;
+                            
+                        } else {
+                            // TODO Auto-generated catch block
+                            dataLoader
+                                    .logBasic("IOException while trying to resume from "
+                                            + data.resumptionToken
+                                            + ", trying again.");
 
+                            data.listRecords = new ListRecords(meta.getInputURI(),
+                                    data.resumptionToken);
+                            this.header = null;
+                        }
                     } catch (SAXException e) {
                         dataLoader
                                 .logBasic("SAXException while trying to resume from "
