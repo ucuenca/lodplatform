@@ -4,3 +4,8 @@
 @import "{{ site.theme }}";
 
 img[alt=ImageFramP] { width: 100px; }
+
+img[src$="centerme"] {
+  display:block;
+  margin: 0 auto;
+}
