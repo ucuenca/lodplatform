@@ -3,8 +3,8 @@
 
 @import "{{ site.theme }}";
 
-img[alt=ImageLOD] { width: 300px; }
-img[alt=ImageFramP] { width: 400px; }
+img[alt=ImageLOD] { width: 400px; }
+img[alt=ImageFramP] { width: 350px; }
 
 img[src$="centerme"] {
   display:block;
