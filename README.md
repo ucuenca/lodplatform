@@ -34,7 +34,10 @@ A continuación se detalla cada una de las fases del proceso de publicación de 
 Esta etapa principalmente se centrar en definir las fuentes de los datos que seran  procesados y convertidos siguiendo los principios de Linked Open Data. Para este proceso el framework ofrece varios  plugins para la lectura de datos sobre distintas fuentes (base de datos, servicio web, etc), asi como el procesamiento de  distintos formatos  de datos (csv, excel, json, xml, etc). La mayoria de los plugins que pueden ser empleados en esta fase son propios de Pentaho, sin embargo para casos particulares es posible desarrollar plugins personalizados. En este caso se han desarrollado dos plugins especiales orientados a la lectura de  recursos bibliográficos.
 
 #### PLUGIN OAI-LOADER ####
+El protocolo  [OAI-PMH](https://www.openarchives.org/pmh/) es un mecanismo adoptado ampliamente por repositorios digitales para la comunicación y cosecha de metadatos. Mediante el plugin OAI-LOADER es posible acceder a los servicios de los repositoriso digitales como *DSPACE* para la extracción de metadatos.
 
+#### PLUGIN MARC21 ####
+Este plugin permite la lectura de metadatos de recursos bibliográficos que se encuentren en  formato [MARC 21](https://www.loc.gov/marc/bibliographic/ecbdspa.html). Este formato es ampliamente empleado para el almacenamiento y transferencia de recursos bibliográficos tanto físicos como digitales debido a la gran cantidad de campos especializados que dispone.
 
 
 
