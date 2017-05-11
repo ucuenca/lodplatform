@@ -37,10 +37,10 @@ Esta etapa principalmente se centrar en definir las fuentes de los datos que ser
 |---------|----------|
 |  ![TextInput](./Images/TextInput.PNG?style=centermetab)   | Lectura de archivos de texto   |
 |  ![CSVInput](./Images/CSVInput.PNG?style=centermetab)     | Lectura de archivos separados por comas    |
-|  ![CSVInput](./Images/XMLInput.PNG?style=centermetab)     | Lectura de archivos XML    |
+|  ![CSVInput](./Images/XMLInput.PNG?style=centermetab2)     | Lectura de archivos XML    |
 |  ![CSVInput](./Images/TableInput.PNG?style=centermetab)   | Lectura de tablas de base de datos    |
 |  ![CSVInput](./Images/HTTPInput.PNG?style=centermetab)    | LLamada de servicios web en diversos formatos    |
-|  ![CSVInput](./Images/ExcelInput.PNG?style=centermetab)  | Entrada de datos desde archivos Excel    |
+|  ![CSVInput](./Images/ExcelInput.PNG?style=centermetab2)  | Entrada de datos desde archivos Excel    |
 
 
 
