@@ -52,7 +52,7 @@ La mayoria de los plugins que pueden ser empleados en esta fase son propios de P
 | Plugin  | Soporte |
 |---------|----------|
 |  ![OAI](./Images/OAI.PNG?style=centermetab3)   | El protocolo  [OAI-PMH](https://www.openarchives.org/pmh/) es un mecanismo adoptado ampliamente por repositorios digitales para la comunicación y cosecha de metadatos. Mediante el plugin OAI-LOADER es posible acceder a los servicios de los repositoriso digitales como *DSPACE* para la extracción de metadatos.   |
-|  ![MARC](./Images/Marc21.PNG?style=centermetab4)     | sdEste plugin permite la lectura de metadatos de recursos bibliográficos que se encuentren en  formato [MARC 21](https://www.loc.gov/marc/bibliographic/ecbdspa.html). Este formato es ampliamente empleado para el almacenamiento y transferencia de recursos bibliográficos tanto físicos como digitales debido a la gran cantidad de campos especializados que dispone.    |
+|  ![MARC](./Images/Marc21.PNG?style=centermetab4)     | Este plugin permite la lectura de metadatos de recursos bibliográficos que se encuentren en  formato [MARC 21](https://www.loc.gov/marc/bibliographic/ecbdspa.html). Este formato es ampliamente empleado para el almacenamiento y transferencia de recursos bibliográficos tanto físicos como digitales debido a la gran cantidad de campos especializados que dispone.    |
 
 
 Para obtener más información acerca del funcionamiento y configuraciones de los plugins de lectura, acceder a la sección del [manual](./Especificación.md)
