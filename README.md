@@ -83,12 +83,27 @@ Una actividad importante en el proceso de generación de datos enlazados es la l
 |  ![CSVInput](./Images/ValueM.png?style=centermetab5)     | Con este plugin se pueden mapear valores de los campos con otros, lo cual es útil cuando se quiere realizar estandarizaciones.    |
 |  ![CSVInput](./Images/StringOP.png?style=centermetab5)   | Permite realizar operaciones con cadenas de caracteres, como remover números, eliminar caracteres especiales, quitar espacios en blanco entre otros.   |
 
+Una vez los datos han sido procesados se dispone de un plugin de almacenamiento temporal **Data Pre catching**, que permite que los datos ya procesados liberen la memoria y puedan ser manipulados en  los pasos posteriores.
 
-
+![ImageDatap](./Images/DataP.PNG?style=centerme)
   
 ####  3.2 Conversión de datos ####
+Una vez los datos han sido acondicionados y se encuentran libres de errores se procede a describirlos semánticamente empleando los vocabularios de las ontologias previamente cargados. Para realizar este proceso se dispone de un plugin  llamado **Ontology & Data Mapping** ,el cual permite vincular cada uno de los campos de los recursos y los propios recursos  con determinado vocabulario semántico. Dicha vinculación (Mapping) funcionan como reglas con lo cual los datos seran descritos automaticamente siguiendo el estandar RDF. Dentro de este proceso se distinguen 3 diferentes procesos de mapeo:
+
+- Mapeos de Clasificación:  En este se definen  los registros o datos como un tipo específico de recurso.  Ejemplo
+   
+   | Id Record | Field |  Data    |  Ontología      |  Vocabulario |  
+   |-----------|--------|---------|---|---------|   
+   |1 | IdentificadorDocumento  | 123   |              |  asdasd   |   kkkjkj |
+   ![ImageDatap](./Images/DataP.PNG?style=centerme)
+
+   
+   
+- Mapeos de Propiedades:
+- Mapeos de Relación:
+
   
-#####  3.3 Enlace (Linking)  ####
+####  3.3 Enlace (Linking)  ####
 
 relaciones entre recursos que permiten generar datos enlazados de calidad
 
