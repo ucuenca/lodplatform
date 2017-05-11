@@ -39,7 +39,7 @@ El protocolo  [OAI-PMH](https://www.openarchives.org/pmh/) es un mecanismo adopt
 #### PLUGIN MARC21 ####
 Este plugin permite la lectura de metadatos de recursos bibliográficos que se encuentren en  formato [MARC 21](https://www.loc.gov/marc/bibliographic/ecbdspa.html). Este formato es ampliamente empleado para el almacenamiento y transferencia de recursos bibliográficos tanto físicos como digitales debido a la gran cantidad de campos especializados que dispone.
 
-[Espe](./Especificacion.md)
+[Espe](./Especificación.md)
 
 ** Build Status **
 
