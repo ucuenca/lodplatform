@@ -91,6 +91,7 @@ Una vez los datos han sido procesados se dispone de un plugin de almacenamiento 
 Una vez los datos han sido acondicionados y se encuentran libres de errores se procede a describirlos semánticamente empleando los vocabularios de las ontologias previamente cargados. Para realizar este proceso se dispone de un plugin  llamado **Ontology & Data Mapping** ,el cual permite vincular cada uno de los campos de los recursos y los propios recursos  con determinado vocabulario semántico. Dicha vinculación (Mapping) funcionan como reglas con lo cual los datos seran descritos automaticamente siguiendo el estandar RDF. Dentro de este proceso se distinguen 3 diferentes procesos de mapeo:
 
 - Mapeos de Clasificación:  En este se definen  los registros o datos como un tipo específico de recurso.  Ejemplo
+   
    ![ImageDatap](./Images/ClasMap.PNG?style=centerme)
 
    
