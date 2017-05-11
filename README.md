@@ -55,7 +55,7 @@ La mayoria de los plugins que pueden ser empleados en esta fase son propios de P
 |  ![MARC](./Images/Marc21.PNG?style=centermetab4)     | sdEste plugin permite la lectura de metadatos de recursos bibliográficos que se encuentren en  formato [MARC 21](https://www.loc.gov/marc/bibliographic/ecbdspa.html). Este formato es ampliamente empleado para el almacenamiento y transferencia de recursos bibliográficos tanto físicos como digitales debido a la gran cantidad de campos especializados que dispone.    |
 
 
-[Espe](./Especificación.md)
+Para obtener más información acerca del funcionamiento y configuraciones de los plugins de lectura, acceder a la sección del [manual](./Especificación.md)
 
 ** Build Status **
 
