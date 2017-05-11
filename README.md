@@ -31,7 +31,23 @@ Para que el framework  pueda soportar el proceso de generación y publicación d
 A continuación se detalla cada una de las fases del proceso de publicación de datos enlazados y asi como los componentes del framework que se emplea para soportarlas.
 
 ### 1. Especificación ###
-Esta etapa principalmente se centrar en definir las fuentes de los datos que seran  procesados y convertidos siguiendo los principios de Linked Open Data. Para este proceso el framework ofrece varios  plugins para la lectura de datos sobre distintas fuentes (base de datos, servicio web, etc), asi como el procesamiento de  distintos formatos  de datos (csv, excel, json, xml, etc). La mayoria de los plugins que pueden ser empleados en esta fase son propios de Pentaho, sin embargo para casos particulares es posible desarrollar plugins personalizados. En este caso se han desarrollado dos plugins especiales orientados a la lectura de  recursos bibliográficos.
+Esta etapa principalmente se centrar en definir las fuentes de los datos que seran  procesados y convertidos siguiendo los principios de Linked Open Data. Para este proceso el framework ofrece varios  plugins para la lectura de datos sobre distintas fuentes (base de datos, servicio web, etc), asi como el procesamiento de  distintos formatos  de datos (csv, excel, json, xml, etc). 
+
+| Plugin  | Soporte |
+|---------|----------|
+|  ![TextInput](./Images/TextInput.PNG?style=centerme)   | Lectura de archivos de texto   |
+|  ![CSVInput](./Images/CSVInput.PNG?style=centerme)     | Lectura de archivos separados por comas    |
+|  ![CSVInput](./Images/XMLInput.PNG?style=centerme)     | Lectura de archivos XML    |
+|  ![CSVInput](./Images/TableInput.PNG?style=centerme)   | Lectura de tablas de base de datos    |
+|  ![CSVInput](./Images/HTTPInput.PNG?style=centerme)    | LLamada de servicios web en diversos formatos    |
+|  ![CSVInput](./Images/ExcelInput.PNG?style=centerme)  | Entrada de datos desde archivos Excel    |
+
+
+
+
+
+
+La mayoria de los plugins que pueden ser empleados en esta fase son propios de Pentaho, sin embargo para casos particulares es posible desarrollar plugins personalizados. En este caso se han desarrollado dos plugins especiales orientados a la lectura de  recursos bibliográficos.
 
 #### PLUGIN OAI-LOADER ####
 El protocolo  [OAI-PMH](https://www.openarchives.org/pmh/) es un mecanismo adoptado ampliamente por repositorios digitales para la comunicación y cosecha de metadatos. Mediante el plugin OAI-LOADER es posible acceder a los servicios de los repositoriso digitales como *DSPACE* para la extracción de metadatos.
