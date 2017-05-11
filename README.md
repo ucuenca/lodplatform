@@ -78,10 +78,10 @@ Una actividad importante en el proceso de generación de datos enlazados es la l
 
 | Plugin  | Soporte |
 |---------|----------|
-|  ![TextInput](./Images/ReplaceSt.png?style=centermetab3)   | Brinda la posibilidad de realizar reemplazos sobre cadenas de caracteres, con lo cual se puede eliminar caracteres desconocidos o erróneos.   |
-|  ![CSVInput](./Images/SplitF.png?style=centermetab3)     | Se puede utilizar cuando se tiene más de un tipo de información en un campo y se requiere separarla.   |
-|  ![CSVInput](./Images/ValueM.png?style=centermetab3)     | Con este plugin se pueden mapear valores de los campos con otros, lo cual es útil cuando se quiere realizar estandarizaciones.    |
-|  ![CSVInput](./Images/StringOP.png?style=centermetab3)   | Permite realizar operaciones con cadenas de caracteres, como remover números, eliminar caracteres especiales, quitar espacios en blanco entre otros.   |
+|  ![TextInput](./Images/ReplaceSt.png?style=centermetab5)   | Brinda la posibilidad de realizar reemplazos sobre cadenas de caracteres, con lo cual se puede eliminar caracteres desconocidos o erróneos.   |
+|  ![CSVInput](./Images/SplitF.png?style=centermetab5)     | Se puede utilizar cuando se tiene más de un tipo de información en un campo y se requiere separarla.   |
+|  ![CSVInput](./Images/ValueM.png?style=centermetab5)     | Con este plugin se pueden mapear valores de los campos con otros, lo cual es útil cuando se quiere realizar estandarizaciones.    |
+|  ![CSVInput](./Images/StringOP.png?style=centermetab5)   | Permite realizar operaciones con cadenas de caracteres, como remover números, eliminar caracteres especiales, quitar espacios en blanco entre otros.   |
 
 
 
