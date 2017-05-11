@@ -64,7 +64,7 @@ En esta etapa se debe identificar, seleccionar o generar vocabularios que permit
  - Archivo:  Carga los vocaburios desde un archivo con formato compatible con la definición de esquemas ontologicos por ejemplo OWL.
  - Web : Es posible cargar vocabulario ontologio  definiendo unicamente su prefijo. Ejemplo foaf, dcterms, etc.
  
-![ImageFramP](./Images/GetProp.PNG?style=centerme)
+![ImageGetProp](./Images/GetProp.PNG?style=centerme)
  
 Este plugin sirve como paso previo al proceso  asignación de vocabularios  (*Mapping*) en la fase de generación. 
 
