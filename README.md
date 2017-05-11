@@ -57,6 +57,17 @@ La mayoria de los plugins que pueden ser empleados en esta fase son propios de P
 
 Para obtener más información acerca del funcionamiento y configuraciones de los plugins de lectura, acceder a la sección del [manual](./Especificación.md)
 
+
+### 2. Modelamiento ###
+
+En esta etapa se debe identificar, seleccionar o generar vocabularios que permitan describir semánticamente los datos de las fuentes disponibles de acuerdo a su dominio. En este caso el framework provee el plugin llamado **Get Properties OWL** con el cual se puede cargar los vocabularios de ontologias tanto de las que se encuentran disponibles en la web, como las creadas localmente. Para esto brinda dos tipos de carga: 
+ - Archivo:  Carga los vocaburios desde un archivo con formato compatible con la definición de esquemas ontologicos por ejemplo OWL.
+ - Web : Es posible cargar vocabulario ontologio  definiendo unicamente su prefijo. Ejemplo foaf, dcterms, etc.
+ 
+![ImageFramP](./Images/GetProp.PNG?style=centerme)
+ 
+Este plugin sirve como paso previo al proceso  asignación de vocabularios  (*Mapping*) en la fase de generación. 
+
 ** Build Status **
 
 [ ![Codeship Status for lod/LODPlatform](https://codeship.com/projects/f70d1860-b628-0132-afb1-32912015c090/status?branch=master)](https://codeship.com/projects/70968)
