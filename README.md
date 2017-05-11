@@ -66,7 +66,31 @@ En esta etapa se debe identificar, seleccionar o generar vocabularios que permit
  
 ![ImageGetProp](./Images/GetProp.PNG?style=centerme)
  
-Este plugin sirve como paso previo al proceso  asignación de vocabularios  (*Mapping*) en la fase de generación. 
+Este plugin sirve como paso previo al proceso  asignación de vocabularios  (*Mapping*) en la fase de generación.
+
+### 3. Generación  ###
+
+El objetivo central de esta etapa es la conversión de datos a formato RDF, para lo cual se  consideran aspectos como la fiabilidad de los datos y la detección de recursos similares entre fuentes. Para llevar a cabo este objetivo por lo tanto, se realizan varias actividades tales  como limpieza de datos, conversión de datos a formato RDF y generación de enlaces.
+
+####  3.1 Limpieza de datos ####
+Una actividad importante en el proceso de generación de datos enlazados es la limpieza de datos. Dentro de esta actividad se adecuan, estandarizan y aseguran la calidad minima de los datos para poder generar datos enlazados de calidad. Para realizar esta actividad el framework posee un desempeño destacable al estar basado en una herramienta ETL que dispone de varias componentes nativos para la trasnformación, estandarización y en general procesamiento de datos. Dentro de los plugins mas empleados en esta etapa son:
+
+
+| Plugin  | Soporte |
+|---------|----------|
+|  ![TextInput](./Images/ReplaceSt.png?style=centermetab)   | Brinda la posibilidad de realizar reemplazos sobre cadenas de caracteres, con lo cual se puede eliminar caracteres desconocidos o erróneos.   |
+|  ![CSVInput](./Images/SplitF.png?style=centermetab)     | Se puede utilizar cuando se tiene más de un tipo de información en un campo y se requiere separarla.   |
+|  ![CSVInput](./Images/ValueM.png?style=centermetab2)     | Con este plugin se pueden mapear valores de los campos con otros, lo cual es útil cuando se quiere realizar estandarizaciones.    |
+|  ![CSVInput](./Images/StringOP.png?style=centermetab)   | Permite realizar operaciones con cadenas de caracteres, como remover números, eliminar caracteres especiales, quitar espacios en blanco entre otros.   |
+
+
+
+  
+####  3.2 Conversión de datos ####
+  
+#####  3.3 Enlace (Linking)  ####
+
+relaciones entre recursos que permiten generar datos enlazados de calidad
 
 ** Build Status **
 
