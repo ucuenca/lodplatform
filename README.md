@@ -49,11 +49,11 @@ Esta etapa principalmente se centrar en definir las fuentes de los datos que ser
 
 La mayoria de los plugins que pueden ser empleados en esta fase son propios de Pentaho, sin embargo para casos particulares es posible desarrollar plugins personalizados. En este caso se han desarrollado dos plugins especiales orientados a la lectura de  recursos bibliográficos.
 
-#### PLUGIN OAI-LOADER ####
-El protocolo  [OAI-PMH](https://www.openarchives.org/pmh/) es un mecanismo adoptado ampliamente por repositorios digitales para la comunicación y cosecha de metadatos. Mediante el plugin OAI-LOADER es posible acceder a los servicios de los repositoriso digitales como *DSPACE* para la extracción de metadatos.
+| Plugin  | Soporte |
+|---------|----------|
+|  ![TextInput](./Images/OAI.PNG?style=centermetab)   | El protocolo  [OAI-PMH](https://www.openarchives.org/pmh/) es un mecanismo adoptado ampliamente por repositorios digitales para la comunicación y cosecha de metadatos. Mediante el plugin OAI-LOADER es posible acceder a los servicios de los repositoriso digitales como *DSPACE* para la extracción de metadatos.   |
+|  ![CSVInput](./Images/Marc21.PNG?style=centermetab2)     | Este plugin permite la lectura de metadatos de recursos bibliográficos que se encuentren en  formato [MARC 21](https://www.loc.gov/marc/bibliographic/ecbdspa.html). Este formato es ampliamente empleado para el almacenamiento y transferencia de recursos bibliográficos tanto físicos como digitales debido a la gran cantidad de campos especializados que dispone.    |
 
-#### PLUGIN MARC21 ####
-Este plugin permite la lectura de metadatos de recursos bibliográficos que se encuentren en  formato [MARC 21](https://www.loc.gov/marc/bibliographic/ecbdspa.html). Este formato es ampliamente empleado para el almacenamiento y transferencia de recursos bibliográficos tanto físicos como digitales debido a la gran cantidad de campos especializados que dispone.
 
 [Espe](./Especificación.md)
 
