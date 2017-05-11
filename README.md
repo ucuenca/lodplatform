@@ -41,9 +41,6 @@ Este plugin permite la lectura de metadatos de recursos bibliográficos que se e
 
 
 
-
-
-
 ** Build Status **
 
 [ ![Codeship Status for lod/LODPlatform](https://codeship.com/projects/f70d1860-b628-0132-afb1-32912015c090/status?branch=master)](https://codeship.com/projects/70968)
