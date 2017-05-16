@@ -96,9 +96,13 @@ Una vez los datos han sido acondicionados y se encuentran libres de errores se p
 
    
    
-- Mapeos de Propiedades:
-- Mapeos de Relación:
+- Mapeos de Propiedades: Mediante esta opción se asocian propiedades obtenidas de los datos a los recursos definidos anteriormente. Ejemplo. 
+   ![ImageDatap](./Images/PropMap.PNG?style=centerme)
 
+
+
+- Mapeos de Relación: Permite especificar relaciones entre recursos. Por ejemplo.
+  ![ImageDatap](./Images/RelMap.PNG?style=centerme)
   
 ####  3.3 Enlace (Linking)  ####
 
