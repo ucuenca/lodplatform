@@ -88,7 +88,11 @@ Una vez los datos han sido procesados se dispone de un plugin de almacenamiento 
 ![ImageDatap](./Images/DataP.PNG?style=centerme)
   
 ####  3.2 Conversión de datos ####
-Una vez los datos han sido acondicionados y se encuentran libres de errores se procede a describirlos semánticamente empleando los vocabularios de las ontologias previamente cargados. Para realizar este proceso se dispone de un plugin  llamado **Ontology & Data Mapping** ,el cual permite vincular cada uno de los campos de los recursos y los propios recursos  con determinado vocabulario semántico. Dicha vinculación (Mapping) funcionan como reglas con lo cual los datos seran descritos automaticamente siguiendo el estandar RDF. Dentro de este proceso se distinguen 3 diferentes procesos de mapeo:
+Una vez los datos han sido acondicionados y se encuentran libres de errores se procede a describirlos semánticamente empleando los vocabularios de las ontologias previamente cargados. Para realizar este proceso se dispone de un plugin  llamado **Ontology & Data Mapping** ,el cual permite vincular cada uno de los campos de los recursos y los propios recursos  con determinado vocabulario semántico. Dicha vinculación (Mapping) funcionan como reglas con lo cual los datos seran descritos automaticamente siguiendo el estandar RDF. 
+
+  ![ImageDatap](./Images/OntoMap.PNG?style=centerme)
+
+Dentro de este proceso se distinguen 3 diferentes procesos de mapeo:
 
 - Mapeos de Clasificación:  En este se definen  los registros o datos como un tipo específico de recurso.  Ejemplo
    
@@ -104,8 +108,7 @@ Una vez los datos han sido acondicionados y se encuentran libres de errores se p
 - Mapeos de Relación: Permite especificar relaciones entre recursos. Por ejemplo.
   ![ImageDatap](./Images/RelMap.PNG?style=centerme)
   
-  El plugin **Ontology & Data Mapping**   que permite definir los mapeos de los datos con el vocabulario, es el siguiente:
-  ![ImageDatap](./Images/OntoMap.PNG?style=centerme)
+
   
   Una vez se han generado los archivos de mapping, estos deben ser ingresados en otro plugin (**R2RMLtoRDF**) que permite que las reglas definidas se apliquen sobre los datos para finalmente obtener estos datos en un archivo RDF.  Mediante el plugin  se puede representar los datos con la sintaxis RDF-XML, N3, Turtle, etc.
   
