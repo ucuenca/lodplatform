@@ -101,6 +101,7 @@ Dentro de este proceso se distinguen 3 diferentes procesos de mapeo:
    
    
 - Mapeos de Propiedades: Mediante esta opción se asocian propiedades obtenidas de los datos a los recursos definidos anteriormente. Ejemplo. 
+
    ![ImageDatap](./Images/PropMap2.PNG?style=centerme)
 
 
@@ -110,14 +111,28 @@ Dentro de este proceso se distinguen 3 diferentes procesos de mapeo:
   
 
   
-  Una vez se han generado los archivos de mapping, estos deben ser ingresados en otro plugin (**R2RMLtoRDF**) que permite que las reglas definidas se apliquen sobre los datos para finalmente obtener estos datos en un archivo RDF.  Mediante el plugin  se puede representar los datos con la sintaxis RDF-XML, N3, Turtle, etc.
+Una vez se han generado los archivos de mapping, estos deben ser ingresados en otro plugin (**R2RMLtoRDF**) que permite que las reglas definidas se apliquen sobre los datos para finalmente obtener estos datos en un archivo RDF.  Mediante el plugin  se puede representar los datos con la sintaxis RDF-XML, N3, Turtle, etc.
   
  ![ImageDatap](./Images/R2RML.PNG?style=centerme)
-  
-  
+ 
 ####  3.3 Enlace (Linking)  ####
+Para aprovechar de todas las caracteristicas y ventajas que ofrece las tecnologias de Linked Data, es necesario generar enlaces entre recursos de distintas fuentes. Esto permite que la información se enriquezca con cada fuente  disponible y aumenten la cantidad de información que se puede extraer. Para el enlace de datos se ha desarrollado un plugin específico (Silk Plugin) que permite utilizar la potencialidad de [SILK Workbench](http://silkframework.org/) de forma integrada y sencilla para encontrar los recursos similares entre dos fuentes. Por ahora este plugin funciona únicamente para realizar proceso de enlace entre autores y se destaca por contar con un proceso de validación mediante desambiguación semántica. En el proceso de desambiguación los autores son caracterizados por sus  obras para posteriormente generar una  métrica semántica de similaridad, que determinara si dos autores hacen referencia o no a una misma persona.
 
-relaciones entre recursos que permiten generar datos enlazados de calidad
+ ![ImageDatap](./Images/SILK.PNG?style=centerme)
+ 
+  
+###  4. Publicación  ###
+En esta etapa se centran los esfuerzos en mejorar la visibilidad de los datos obtenidos de las etapa de generación, para que puedan ser consumidos por las  entidades interesadas. Para llevar a cabo esta  tarea se almacenan regularmente los datos en un triplestore que generalmente disponde de un medio de acceso a los datos (Sparql Endpoint). Para solventar esta fase, el framework dispone de un plugin especializado conocido como **Fuseki Loader**, el cual permite configurar los parametros básicos para el despligue del triplestore [Fuseki](https://jena.apache.org/documentation/fuseki2/) con los datos generados del proceso anterior. Asi mismo, es posible configurar un punto de acceso a los datos para que puedan ser consumidos dessde  la web.
+
+ ![ImageDatap](./Images/FusekiLoader.PNG?style=centerme)
+
+###  5. Explotación  ###
+
+Esta etapa contempla el uso o desarrollo de herramientas, en función de  mejorar el aprovechamiento de los datos generados orientado a los usuarios. En este caso se dispone del plugin **ELDA Loader**, el cual ofrece la posibilidad de generar una página de descripción de los recursos, en la cual se puede  consumir y navegar por la información generada en formato RDF de una forma más amigable al usuario.
+
+ ![ImageDatap](./Images/EldaLoader.PNG?style=centerme)
+
+
 
 ** Build Status **
 
