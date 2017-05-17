@@ -104,6 +104,14 @@ Una vez los datos han sido acondicionados y se encuentran libres de errores se p
 - Mapeos de Relación: Permite especificar relaciones entre recursos. Por ejemplo.
   ![ImageDatap](./Images/RelMap.PNG?style=centerme)
   
+  El plugin **Ontology & Data Mapping**   que permite definir los mapeos de los datos con el vocabulario, es el siguiente:
+  ![ImageDatap](./Images/OntoMap.PNG?style=centerme)
+  
+  Una vez se han generado los archivos de mapping, estos deben ser ingresados en otro plugin (****) que permite que las reglas definidas se apliquen sobre los datos para finalmente obtener estos datos en un archivo RDF.  Mediante el plugin  se puede representar los datos con la sintaxis RDF-XML, N3, Turtle, etc.
+  
+ ![ImageDatap](./Images/R2RML.PNG?style=centerme)
+  
+  
 ####  3.3 Enlace (Linking)  ####
 
 relaciones entre recursos que permiten generar datos enlazados de calidad
