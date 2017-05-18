@@ -69,6 +69,9 @@ Adicionalmente a las configuraciones generales, el plugin dispone de configuraci
 - URI Field ID: Campo de los registros dentro del flujo que pasara a convertirse en el identificador único de cada recurso. Por ejemplo Data: Nombre.
 - Data Field/Data Value : Campo y valor que debe tener un registro para que sea considerado en el mapeo. Por ejemplo Field/Autor
 
+![EntConfig](./Images/entity.png?style=centerme)
+![PropConfig](./Images/relationmap.png?style=centerme)
+![RelConfig](./Images/propertymap.png?style=centerme)
 
 
 #### RDF GENERATION ####
