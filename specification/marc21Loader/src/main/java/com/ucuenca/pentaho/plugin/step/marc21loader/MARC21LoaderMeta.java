@@ -336,6 +336,11 @@ public class MARC21LoaderMeta extends BaseStepMeta implements StepMetaInterface 
 		mfn.setLength(50);
 		mfn.setOrigin(name);
 		row.addValueMeta(mfn);
+                
+                ValueMetaInterface secuencia = new ValueMeta("Secuencia", ValueMetaInterface.TYPE_STRING);
+		secuencia.setLength(2);
+		secuencia.setOrigin(name);
+		row.addValueMeta(secuencia);
 		
 		// Atributo Campo
 		ValueMetaInterface campo = new ValueMeta("Campo", ValueMetaInterface.TYPE_INTEGER);
