@@ -317,7 +317,7 @@ public class MARC21LoaderDialog extends BaseStepDialog implements StepDialogInte
 						{
 							String str = dialog.getFilterPath()+System.getProperty("file.separator")+dialog.getFileName();
 							wMarcURL.setText(str);
-							wMarcFields.setText("020a@022a@040a@040b@041a@082a@082c@100a@100b@100d@110a@110e@110g@245a@245b@245c@245h@245n@245p@246a@246b@246f@246g@250a@250b@300a@300b@300c@300e@310a@362a@490a@490n@490p@490v@490x@500a@502a@504a@520a@653a@700a@700b@700d@700e@710a@710b@710e@710g@773g@773t@856a@856u@900a@900f@900k@900l@900m@900n@900o@900p@900q@900r@900y");
+							wMarcFields.setText("5@020a@022a@40b@040a@040b@041a@082a@082c@100a@100b@100d@110a@110e@110g@245a@245b@245c@245h@245n@245p@246a@246b@246f@246g@250a@250b@260a@260b@260c@300a@300b@300c@300e@310a@362a@490a@490n@490p@490v@490x@500a@502a@504a@505a@520a@650a@653a@700a@700b@700d@700e@710a@710b@710e@710g@773g@773t@852a@852c@852f@852k@852l@852m@852p@852q@852r@852t@856a@856u@900a@900f@900k@900l@900m@900n@900o@900p@900q@900r@900y@980d@980o@998a");
 							/*if (str.toUpperCase().endsWith(".MRC") && (wMarcFields.getText()==null || wMarcFields.getText().length()==0) )
 							{
 							    String strdbf = str.substring(0,str.length()-4);
@@ -338,7 +338,7 @@ public class MARC21LoaderDialog extends BaseStepDialog implements StepDialogInte
 						{
 							String str = dialog.getFilterPath();
 							wMarcURL.setText(str);
-							wMarcFields.setText("020a@022a@040a@040b@041a@082a@082c@100a@100b@100d@110a@110e@110g@245a@245b@245c@245h@245n@245p@246a@246b@246f@246g@250a@250b@300a@300b@300c@300e@310a@362a@490a@490n@490p@490v@490x@500a@502a@504a@520a@653a@700a@700b@700d@700e@710a@710b@710e@710g@773g@773t@856a@856u@900a@900f@900k@900l@900m@900n@900o@900p@900q@900r@900y");
+							wMarcFields.setText("5@020a@022a@40b@040a@040b@041a@082a@082c@100a@100b@100d@110a@110e@110g@245a@245b@245c@245h@245n@245p@246a@246b@246f@246g@250a@250b@260a@260b@260c@300a@300b@300c@300e@310a@362a@490a@490n@490p@490v@490x@500a@502a@504a@505a@520a@650a@653a@700a@700b@700d@700e@710a@710b@710e@710g@773g@773t@852a@852c@852f@852k@852l@852m@852p@852q@852r@852t@856a@856u@900a@900f@900k@900l@900m@900n@900o@900p@900q@900r@900y@980d@980o@998a");
 							/*if (str.toUpperCase().endsWith(".MRC") && (wMarcFields.getText()==null || wMarcFields.getText().length()==0) )
 							{
 							    String strdbf = str.substring(0,str.length()-4);
