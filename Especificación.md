@@ -59,9 +59,13 @@ Estas configuraciones se enfocan en ajustes generales del propio plugin, necesar
 - Output Directory: Ruta en la cual se almacenara el archivo de mapeo generado en sintaxis R2RML.
 
 
-#### Configuraciones Específicas de Mapeo ####
+##### Configuraciones Específicas de Mapeo #####
 
 Adicionalmente a las configuraciones generales, el plugin dispone de configuraciones específicas dependiendo del tipo de mapeo que se esta realizando. Entre este tipo de mapeos se encuentra:
+
+Configuración de  Entidades
+
+![EntConfig](./Images/entity.png?style=centerme)
 
 - ID: Un identifícador que se genera automáticamente para identificar el mapeo definido de entidades.
 - Ontology/ Entity: Nombre de la ontologia y el vocabulario específico con el cual se relacionara un registro para definirlo como recurso. Ejemplo: foaf/foaf:person
@@ -69,9 +73,23 @@ Adicionalmente a las configuraciones generales, el plugin dispone de configuraci
 - URI Field ID: Campo de los registros dentro del flujo que pasara a convertirse en el identificador único de cada recurso. Por ejemplo Data: Nombre.
 - Data Field/Data Value : Campo y valor que debe tener un registro para que sea considerado en el mapeo. Por ejemplo Field/Autor
 
-![EntConfig](./Images/entity.png?style=centerme)
+Configuración de  Propiedades
+
 ![PropConfig](./Images/relationmap.png?style=centerme)
+
+- EntityClassID: Permite definir el ID de la entidad mapeada con la cual se relacionaran las propiedades declaradas.
+- Ontology/ Property: En estos campos se definen la ontología y el vocabulario que se usa para representar la relación de propiedad. Ejemplo: foaf/foaf:name
+- Extraction Field: Campo del registro del cual tomara el valor la propiedad. Por ejemplo Data: Antonio Ramirez.
+- Data Field/Data Value : Campo y valor que debe cumplir el registro para aplicarse la regla de mapeo por propiedad. Ejemplo: Field /Nombre del autor.
+- Data Type: Definición del tipo de dato que representa la propiedad. Por Ejemplo: String.
+
+Configuración de  Relaciones
+
 ![RelConfig](./Images/propertymap.png?style=centerme)
+
+- ID: Un identifícador que se genera automáticamente para identificar el mapeo definido para definir las relaciones entre recursos. EntityClassID 1 / EntityClassID 2 : Permite definir el ID de la primera y segunda entidad que van a ser relacionadas.
+- Ontology/ Property: En estos campos se definen la ontología y el vocabulario con el cual se identificara la relación. Ejemplo (dcterms/dcterm:contributor)
+
 
 
 #### RDF GENERATION ####
