@@ -37,10 +37,10 @@ Esta etapa principalmente se centrar en definir las fuentes de los datos que ser
 |---------|----------|
 |  ![TextInput](./Images/TextInput.PNG?style=centermetab)   | Lectura de archivos de texto   |
 |  ![CSVInput](./Images/CSVInput.PNG?style=centermetab)     | Lectura de archivos separados por comas    |
-|  ![CSVInput](./Images/XMLInput2.PNG?style=centermetab2)     | Lectura de archivos XML    |
-|  ![CSVInput](./Images/TableInput.PNG?style=centermetab)   | Lectura de tablas de base de datos    |
-|  ![CSVInput](./Images/HTTPInput.PNG?style=centermetab)    | LLamada de servicios web en diversos formatos    |
-|  ![CSVInput](./Images/ExcelInput.PNG?style=centermetab2)  | Entrada de datos desde archivos Excel    |
+|  ![XMLInput](./Images/XMLInput2.PNG?style=centermetab2)     | Lectura de archivos XML    |
+|  ![TableInput](./Images/TableInput.PNG?style=centermetab)   | Lectura de tablas de base de datos    |
+|  ![HTTPInput](./Images/HTTPInput.PNG?style=centermetab)    | LLamada de servicios web en diversos formatos    |
+|  ![EXCELInput](./Images/ExcelInput.PNG?style=centermetab2)  | Entrada de datos desde archivos Excel    |
 
 
 
@@ -79,9 +79,9 @@ Una actividad importante en el proceso de generación de datos enlazados es la l
 | Plugin  | Soporte |
 |---------|----------|
 |  ![TextInput](./Images/ReplaceSt.png?style=centermetab5)   | Brinda la posibilidad de realizar reemplazos sobre cadenas de caracteres, con lo cual se puede eliminar caracteres desconocidos o erróneos.   |
-|  ![CSVInput](./Images/SplitF.png?style=centermetab5)     | Se puede utilizar cuando se tiene más de un tipo de información en un campo y se requiere separarla.   |
-|  ![CSVInput](./Images/ValueM.png?style=centermetab5)     | Con este plugin se pueden mapear valores de los campos con otros, lo cual es útil cuando se quiere realizar estandarizaciones.    |
-|  ![CSVInput](./Images/StringOP.png?style=centermetab5)   | Permite realizar operaciones con cadenas de caracteres, como remover números, eliminar caracteres especiales, quitar espacios en blanco entre otros.   |
+|  ![SPLIT](./Images/SplitF.png?style=centermetab5)     | Se puede utilizar cuando se tiene más de un tipo de información en un campo y se requiere separarla.   |
+|  ![VALUE](./Images/ValueM.png?style=centermetab5)     | Con este plugin se pueden mapear valores de los campos con otros, lo cual es útil cuando se quiere realizar estandarizaciones.    |
+|  ![STRING](./Images/StringOP.png?style=centermetab5)   | Permite realizar operaciones con cadenas de caracteres, como remover números, eliminar caracteres especiales, quitar espacios en blanco entre otros.   |
 
 Una vez los datos han sido procesados se dispone de un plugin de almacenamiento temporal **Data Pre catching**, que permite que los datos ya procesados liberen la memoria y puedan ser manipulados en  los pasos posteriores.
 
