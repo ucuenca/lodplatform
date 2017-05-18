@@ -1,7 +1,8 @@
 
 
-### Componentes ###
+## COMPONENTES ESPECIALIZADOS DEL FRAMEWORK ##
 
+### FASE DE ESPECIFICACIÓN ###
 ####  OAI-PMH Loader ####
 Este plugin permite la lectura de repositorios digitales que dispongan del servicio OAI-PMH.
 
@@ -23,6 +24,7 @@ Plugin para la lectura de registros  desde ficheros en formato MARC 21.
 - Generate Marc XML: Esta opción permite exportar  la información del fichero MARC a XML.
 - Field to load separate with @: Permite definir los campos marc 21,  que seran extraídos del fichero. Para definir varios campos se requiere separarlos mediante @.
 
+### FASE DE MODELAMIENTO ###
 #### GET PROPERTIES OWL ####
 Carga los modelos ontológicos y su  vocabulario 
 
@@ -34,6 +36,7 @@ Carga los modelos ontológicos y su  vocabulario
 - Delete Record: Permite borrar una ontología seleccionada en la grilla inferior.
 - Precatch Data: Con esta opción se puede precargar el vocabulario en el framework y facilitar el acceso a los atributos de la ontología  en el componente **Ontology&DataMapping**
 
+### FASE DE GENERACIÓN ###
 #### Data Pretcaching ####
 Este plugin es empleado para guardar temporalmente los datos luego del proceso de limpieza y facilitar su lectura desde los plugins de Mapping (**Ontology&DataMapping**) y generación (**RDF GENERATION**)  de RDF.
 
@@ -63,7 +66,9 @@ Estas configuraciones se enfocan en ajustes generales del propio plugin, necesar
 
 Adicionalmente a las configuraciones generales, el plugin dispone de configuraciones específicas dependiendo del tipo de mapeo que se esta realizando. Entre este tipo de mapeos se encuentra:
 
-Configuración de  Entidades (Classification)
+**Configuración de  Entidades (Classification)**
+
+En este se definen los registros o datos como un tipo específico de recurso.
 
 ![EntConfig](./Images/entity.png?style=centerme)
 
@@ -73,7 +78,9 @@ Configuración de  Entidades (Classification)
 - URI Field ID: Campo de los registros dentro del flujo que pasara a convertirse en el identificador único de cada recurso. Por ejemplo Data: Nombre.
 - Data Field/Data Value : Campo y valor que debe tener un registro para que sea considerado en el mapeo. Por ejemplo Field/Autor
 
-Configuración de  Propiedades (Annotation)
+**Configuración de  Propiedades (Annotation)**
+
+Mediante esta opción se asocian propiedades obtenidas de los datos a los recursos definidos anteriormente.
 
 ![RelConfig](./Images/propertymap.png?style=centerme)
 
@@ -83,22 +90,30 @@ Configuración de  Propiedades (Annotation)
 - Data Field/Data Value : Campo y valor que debe cumplir el registro para aplicarse la regla de mapeo por propiedad. Ejemplo: Field /Nombre del autor.
 - Data Type: Definición del tipo de dato que representa la propiedad. Por Ejemplo: String.
 
-Configuración de  Relaciones (Relation)
+**Configuración de  Relaciones (Relation)**
+
+Permite especificar relaciones entre recursos.
 
 ![PropConfig](./Images/relationmap.png?style=centerme)
 
-- ID: Un identifícador que se genera automáticamente para identificar el mapeo definido para definir las relaciones entre recursos. EntityClassID 1 / EntityClassID 2 : Permite definir el ID de la primera y segunda entidad que van a ser relacionadas.
+- ID: Un identifícador que se genera automáticamente para identificar el mapeo definido para definir las relaciones entre recursos. EntityClassID 1 / EntityClassID 2 : Permite definir el ID de la primera y segunda entidad que van a ser relacionadas. Si se coloca una 
 - Ontology/ Property: En estos campos se definen la ontología y el vocabulario con el cual se identificara la relación. Ejemplo (dcterms/dcterm:contributor)
 
 
 
 #### RDF GENERATION ####
+Este plugin aplica las reglas definidas en el proceso de mapping a los datos para obtener el archivo descritos como RDF.
 
 ![GeneConfig](./Images/generatorconfig.png?style=centerme)
 
+- R2RML File: Permite definir la ruta del archivo R2RML generado en el plugin anterior.
+- SQL Vendor: Con esta opción se puede seleccionar el proveedor de la base de datos. Por defecto es H2.
+- Data Base URL: Ruta de la base de datos donde se encuentra los datos transformados en cache.
+- Data Base Schema: Esquema de la base de datos.
+- Username/Password: Credenciales para acceder a la base de datos.
 - Data base URI: URI absoluta para los recursos.
 - RDF output File: Ruta de salida con el archivo RDF.
 - RDF output Format: Formato específico en el cual se generara el RDF. (Disponible XML y TTL).
-- Retrieve DB connection from input step: Con este botón podemos recuperar las configuraciones de base de datos realizadas en el plugin \Data Precatching".
+- Retrieve DB connection from input step: Con este botón podemos recuperar las configuraciones de base de datos realizadas en el plugin **Data Precatching**.
 
 
