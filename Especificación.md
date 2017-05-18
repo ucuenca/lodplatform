@@ -63,7 +63,7 @@ Estas configuraciones se enfocan en ajustes generales del propio plugin, necesar
 
 Adicionalmente a las configuraciones generales, el plugin dispone de configuraciones específicas dependiendo del tipo de mapeo que se esta realizando. Entre este tipo de mapeos se encuentra:
 
-Configuración de  Entidades
+Configuración de  Entidades (Classification)
 
 ![EntConfig](./Images/entity.png?style=centerme)
 
@@ -73,9 +73,9 @@ Configuración de  Entidades
 - URI Field ID: Campo de los registros dentro del flujo que pasara a convertirse en el identificador único de cada recurso. Por ejemplo Data: Nombre.
 - Data Field/Data Value : Campo y valor que debe tener un registro para que sea considerado en el mapeo. Por ejemplo Field/Autor
 
-Configuración de  Propiedades
+Configuración de  Propiedades (Annotation)
 
-![PropConfig](./Images/relationmap.png?style=centerme)
+![RelConfig](./Images/propertymap.png?style=centerme)
 
 - EntityClassID: Permite definir el ID de la entidad mapeada con la cual se relacionaran las propiedades declaradas.
 - Ontology/ Property: En estos campos se definen la ontología y el vocabulario que se usa para representar la relación de propiedad. Ejemplo: foaf/foaf:name
@@ -83,9 +83,9 @@ Configuración de  Propiedades
 - Data Field/Data Value : Campo y valor que debe cumplir el registro para aplicarse la regla de mapeo por propiedad. Ejemplo: Field /Nombre del autor.
 - Data Type: Definición del tipo de dato que representa la propiedad. Por Ejemplo: String.
 
-Configuración de  Relaciones
+Configuración de  Relaciones (Relation)
 
-![RelConfig](./Images/propertymap.png?style=centerme)
+![PropConfig](./Images/relationmap.png?style=centerme)
 
 - ID: Un identifícador que se genera automáticamente para identificar el mapeo definido para definir las relaciones entre recursos. EntityClassID 1 / EntityClassID 2 : Permite definir el ID de la primera y segunda entidad que van a ser relacionadas.
 - Ontology/ Property: En estos campos se definen la ontología y el vocabulario con el cual se identificara la relación. Ejemplo (dcterms/dcterm:contributor)
