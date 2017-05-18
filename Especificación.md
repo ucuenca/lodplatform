@@ -116,4 +116,28 @@ Este plugin aplica las reglas definidas en el proceso de mapping a los datos par
 - RDF output Format: Formato específico en el cual se generara el RDF. (Disponible XML y TTL).
 - Retrieve DB connection from input step: Con este botón podemos recuperar las configuraciones de base de datos realizadas en el plugin **Data Precatching**.
 
+##### LINKING SILK PLUGIN ####
+Permite descubrir enlaces de similaridad entre recursos. Por el momento, funciona para descubrir enlaces entre autores de diferentes fuentes en base a sus documentos. 
+
+![GeneConfig](./Images/Linkconfig.png?style=centerme)
+
+- Insert First Endpoint/Graph: Sirve para definir el primer endpoint o endpoint base y su grafo con el cual se ejecutara el proceso de Linking.
+- Insert Second Endpoint/Graph: Sirve para definir el segundo endpoint o endpoint objetivo y su grafo con el cual se ejecutara el proceso de Linking.
+- File SLS (Opcional) : Con esta opción se puede cargar directamente un archivos SLS de SILK que contenga las configuraciones que se desean ejecutar.
+- Threshold for metrics: Permite definir el umbral de la métrica de similitud empleado en el proceso de encontrar recursos similares.
+- Threshold for refine process: Permite definir los umbrales para el proceso de validación empleando metricas semánticas.
+- Linking File Output: En este campo se define la ruta con los resultados del proceso de enlace.
+
+
+##### FUSEKI LOADER ####
+El plugin de Fuseki permite desplegar un triplestore fuseki para almacenar los datos generados como RDF y brindar un servicio de acceso SPARQL Endpoint.
+
+![GeneConfig](./Images/fusekiconfig.png?style=centerme)
+
+- Input Dataset: En este campo se define la ruta del archivo que se desea almacenar y desplegar en fuseki.
+- Service Name: Campo opcional en donde se define el nombre que se le puede dar al servicio.
+- Service Port: Puerto por el cual se puede acceder al servicio.
+- Graph URI: Sirve para definir un grafo en el cual almacenar la información dentro del triple-store.
+- Choose Directory : Permite definir la ruta de salida de la aplicación Fuseki.
+- Grilla de configuración : En esta sección se pueden definir reglas que se aplicarán al almacenar los datos en el triple-store Fuseki.
 
