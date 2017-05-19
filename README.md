@@ -129,7 +129,7 @@ Mas detalles acerca  del plugin de enlace y desambiguación  en la sección del 
 ###  4. Publicación  ###
 En esta etapa se centran los esfuerzos en mejorar la visibilidad de los datos obtenidos de las etapa de generación, para que puedan ser consumidos por las  entidades interesadas. Para llevar a cabo esta  tarea se almacenan regularmente los datos en un triplestore que generalmente disponde de un medio de acceso a los datos (Sparql Endpoint). Para solventar esta fase, el framework dispone de un plugin especializado conocido como **Fuseki Loader**, el cual permite configurar los parametros básicos para el despligue del triplestore [Fuseki](https://jena.apache.org/documentation/fuseki2/) con los datos generados del proceso anterior. Asi mismo, es posible configurar un punto de acceso a los datos para que puedan ser consumidos dessde  la web.
 
- ![ImageDatap](./Images/FusekiLoader.PNG?style=centerme)
+ ![ImageDatap](./Images/FUSEKIplugin.PNG?style=centerme)
  
  Mas detalles acerca  del plugin de publicación,  en la sección del manual [Publicación](./Especificación.md#fuseki-loader).
 
