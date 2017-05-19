@@ -55,7 +55,7 @@ La mayoria de los plugins que pueden ser empleados en esta fase son propios de P
 |  ![MARC](./Images/Marc21.PNG?style=centermetab4)     | Este plugin permite la lectura de metadatos de recursos bibliográficos que se encuentren en  formato [MARC 21](https://www.loc.gov/marc/bibliographic/ecbdspa.html). Este formato es ampliamente empleado para el almacenamiento y transferencia de recursos bibliográficos tanto físicos como digitales debido a la gran cantidad de campos especializados que dispone.    |
 
 
-Para obtener más información acerca del funcionamiento y configuraciones de los plugins de lectura, acceder a la sección del [manual](./Especificación.md)
+Para obtener más información acerca del funcionamiento y configuraciones de los plugins de lectura, acceder a la sección del [manual](./Especificación.md#fase-de-especificaciÓn)
 
 
 ### 2. Modelamiento ###
@@ -67,6 +67,8 @@ En esta etapa se debe identificar, seleccionar o generar vocabularios que permit
 ![ImageGetProp](./Images/GetProp.PNG?style=centerme)
  
 Este plugin sirve como paso previo al proceso  asignación de vocabularios  (*Mapping*) en la fase de generación.
+
+Informacón acerca de  la interfaz y configuración de este plugin en la sección del  [Modelamiento](./Especificación.md#fase-de-modelamiento) del manual.
 
 ### 3. Generación  ###
 
@@ -115,16 +117,21 @@ Una vez se han generado los archivos de mapping, estos deben ser ingresados en o
   
  ![ImageDatap](./Images/R2RML.PNG?style=centerme)
  
+
+  Mas detalles  acerca de la  interfaz y configuración de los plugins de generación en la sección del manual [Generación](./Especificación.md#fase-de-generaciÓn).
 ####  3.3 Enlace (Linking)  ####
 Para aprovechar de todas las caracteristicas y ventajas que ofrece las tecnologias de Linked Data, es necesario generar enlaces entre recursos de distintas fuentes. Esto permite que la información se enriquezca con cada fuente  disponible y aumenten la cantidad de información que se puede extraer. Para el enlace de datos se ha desarrollado un plugin específico (Silk Plugin) que permite utilizar la potencialidad de [SILK Workbench](http://silkframework.org/) de forma integrada y sencilla para encontrar los recursos similares entre dos fuentes. Por ahora este plugin funciona únicamente para realizar proceso de enlace entre autores y se destaca por contar con un proceso de validación mediante desambiguación semántica. En el proceso de desambiguación los autores son caracterizados por sus  obras para posteriormente generar una  métrica semántica de similaridad, que determinara si dos autores hacen referencia o no a una misma persona.
 
  ![ImageDatap](./Images/SILK.PNG?style=centerme)
  
-  
+Mas detalles acerca  del plugin de enlace y desambiguación  en la sección del manual [Enlace](./Especificación.md#linking-silk-plugin).
+ 
 ###  4. Publicación  ###
 En esta etapa se centran los esfuerzos en mejorar la visibilidad de los datos obtenidos de las etapa de generación, para que puedan ser consumidos por las  entidades interesadas. Para llevar a cabo esta  tarea se almacenan regularmente los datos en un triplestore que generalmente disponde de un medio de acceso a los datos (Sparql Endpoint). Para solventar esta fase, el framework dispone de un plugin especializado conocido como **Fuseki Loader**, el cual permite configurar los parametros básicos para el despligue del triplestore [Fuseki](https://jena.apache.org/documentation/fuseki2/) con los datos generados del proceso anterior. Asi mismo, es posible configurar un punto de acceso a los datos para que puedan ser consumidos dessde  la web.
 
  ![ImageDatap](./Images/FusekiLoader.PNG?style=centerme)
+ 
+ Mas detalles acerca  del plugin de publicación,  en la sección del manual [Publicación](./Especificación.md#fuseki-loader).
 
 ###  5. Explotación  ###
 
@@ -132,7 +139,7 @@ Esta etapa contempla el uso o desarrollo de herramientas, en función de  mejora
 
  ![ImageDatap](./Images/EldaLoader.PNG?style=centerme)
 
-
+Mas detalles acerca  del plugin de explotación  en la sección del manual [Explotación](./Especificación.md#elda-loader).
 
 ** Build Status **
 
