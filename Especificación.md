@@ -119,7 +119,7 @@ Este plugin aplica las reglas definidas en el proceso de mapping a los datos par
 ##### LINKING SILK PLUGIN ####
 Permite descubrir enlaces de similaridad entre recursos. Por el momento, funciona para descubrir enlaces entre autores de diferentes fuentes en base a sus documentos. 
 
-![GeneConfig](./Images/Linkconfig.png?style=centerme)
+![LinkConfig](./Images/Linkconfig.png?style=centerme)
 
 - Insert First Endpoint/Graph: Sirve para definir el primer endpoint o endpoint base y su grafo con el cual se ejecutara el proceso de Linking.
 - Insert Second Endpoint/Graph: Sirve para definir el segundo endpoint o endpoint objetivo y su grafo con el cual se ejecutara el proceso de Linking.
@@ -132,7 +132,7 @@ Permite descubrir enlaces de similaridad entre recursos. Por el momento, funcion
 ##### FUSEKI LOADER ####
 El plugin de Fuseki permite desplegar un triplestore fuseki para almacenar los datos generados como RDF y brindar un servicio de acceso SPARQL Endpoint.
 
-![GeneConfig](./Images/fusekiconfig.png?style=centerme)
+![fusekiConfig](./Images/fusekiconfig.png?style=centerme)
 
 - Input Dataset: En este campo se define la ruta del archivo que se desea almacenar y desplegar en fuseki.
 - Service Name: Campo opcional en donde se define el nombre que se le puede dar al servicio.
@@ -140,4 +140,16 @@ El plugin de Fuseki permite desplegar un triplestore fuseki para almacenar los d
 - Graph URI: Sirve para definir un grafo en el cual almacenar la información dentro del triple-store.
 - Choose Directory : Permite definir la ruta de salida de la aplicación Fuseki.
 - Grilla de configuración : En esta sección se pueden definir reglas que se aplicarán al almacenar los datos en el triple-store Fuseki.
+
+#### ELDA LOADER ####
+Este plugin permite configurar y desplegar el servicio de API ELDA, el cual ofrece una interfaz de descripción de los recursos en la web de datos publicados  como RDF en los SPARQL ENDPOINT.
+
+![EldaConfig](./Images/Eldaconfig.png?style=centerme)
+
+- Sparql Service: Endpoint Sparql del cual se tomara los datos.
+- Base URI: URI del grafo en el cual se encuentran los datos que se desean explotar.
+- Load Values: Carga los datos (entidades y propiedades) de una fuente en la grilla de configuración.
+- Output directory: Ubicación de salida del software ELDA configurado y listo para ser desplegado.
+- Grillas de configuración: En esta sección se pueden seleccionar las elementos encontrados en el endpoint (entidades y propiedades) que se desean visualizar mediante ELDA. Además es posible renombrar en la columna "Label" los elementos seleccionados para facilitar su interpretación por el usuario.
+
 
