@@ -141,7 +141,9 @@ Esta etapa contempla el uso o desarrollo de herramientas, en función de  mejora
 
 Mas detalles acerca  del plugin de explotación  en la sección del manual [Explotación](./Especificación.md#elda-loader).
 
-** Build Status **
+### DEMO ###
+Una demostración en video del funcionamiento del framework se puede acceder a traves del siguiente  enlace:
+
 
 [ ![Codeship Status for lod/LODPlatform](https://codeship.com/projects/f70d1860-b628-0132-afb1-32912015c090/status?branch=master)](https://codeship.com/projects/70968)
 
