@@ -137,7 +137,7 @@ En esta etapa se centran los esfuerzos en mejorar la visibilidad de los datos ob
 
 Esta etapa contempla el uso o desarrollo de herramientas, en función de  mejorar el aprovechamiento de los datos generados orientado a los usuarios. En este caso se dispone del plugin **ELDA Loader**, el cual ofrece la posibilidad de generar una página de descripción de los recursos, en la cual se puede  consumir y navegar por la información generada en formato RDF de una forma más amigable al usuario.
 
- ![ImageDatap](./Images/EldaLoader.PNG?style=centerme)
+ ![ImageDatap](./Images/ELDAPlugin.PNG?style=centerme)
 
 Mas detalles acerca  del plugin de explotación  en la sección del manual [Explotación](./Especificación.md#elda-loader).
 
