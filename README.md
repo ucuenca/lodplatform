@@ -146,6 +146,8 @@ Una demostración del funcionamiento del framework para repositorios digitales, 
 
 [![LOD-GF](http://img.youtube.com/vi/orMefphD1yg/0.jpg)](https://www.youtube.com/watch?v=orMefphD1yg)
 
+Ejemplos de la aplicación del framework sobre distintos escenarios  se pueden encontrar en el reporte técnico en el siguiente [enlace](./technicalReport/frameworktech.pdf) (Disponible unicamente en español).
+
 [ ![Codeship Status for lod/LODPlatform](https://codeship.com/projects/f70d1860-b628-0132-afb1-32912015c090/status?branch=master)](https://codeship.com/projects/70968)
 
 
