@@ -46,8 +46,21 @@ Para idiomas se han encontrado dos representaciones diferentes para el idioma es
 - esp
 
 
-Para solucionar este y otros problemas se requieren flujos de transformación de los datos, que fueron generados con los plugins nativos de Kettle. Para mayor información acerca de estos procesos  revisar la  documentacion de Pentaho Data Integration. Para este ejemplo en particular revisar transformación de ejemplo.
+Para solucionar este y otros problemas se requieren flujos de transformación que acondicionen y corrigan los problemas encontrados en los datos, para esto fueron utilizados la gran variedad de plugins nativos de Kettle. Para mayor información acerca de estos procesos  revisar la  documentacion de Pentaho Data Integration. Para este ejemplo en particular revisar transformación de ejemplo.
 
+![Image1Input](./Images/TrasnfLimpieza.PNG?style=centerme)
+
+
+Los datos una vez se han pasado por los flujos de limpieza, deben ser almacenados temporalmente en una base de datos para evitar sobrecargar la memoria. Para realizar este proceso se dispone del plugin "Data Pre-Catching" , al cual debe enviarse los datos de forma normalizada con los siguientes campos:
+- Id Record: Identificador del recurso. Ejemplo "oai:localhost:123456789/333" para documento.
+- Field: Indica el tipo de dato  que contiene el campo Data. Ejemplo "Título" 
+- Data: Valor de interes. Ejemplo. "Enriquecimiento Semántico..."
+
+El plugin al ser insertado en la transformación automaticamente se cargara con los datos por defecto, por lo que no es necesario realizar algun cambio sobre la configuración para su funcionamiento. La base de datos con los datos y otras configuraciones  se crearan en la carpeta del usuario.
+
+![Image1Input](./Images/UCUEdatapre.png?style=centerme)
+
+#### Conversión ####
 
 
 
