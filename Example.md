@@ -32,12 +32,24 @@ El proceso de limpieza busca mejorar la estandarización y calidad de los datos 
 Datos adicionales no correspondientes a los nombre propios de autores, por ejemplo:
 - Recalde Moreno, Dr. Celso
 - Torres Arroba, Fernando Javier Ph.D
+
 Dos nombres pertenecientes a diferentes autores en un solo campo:
 - Castro Muñoz, Celia María;Chang Gómez, José Vicente
 - Rivas Tarazona, RossanaOsorio Llanos, Ana Cecilia
+
 Nombres completos sin separador entre nombres y apellidos.
-- Poma Salazar M´onica Eulalia
+- Poma Salazar Mónica Eulalia
 - Hidalgo David
+
+Para idiomas se han encontrado dos representaciones diferentes para el idioma español, tal como se muestra a continuación:
+- es
+- esp
+
+
+Para solucionar este y otros problemas se requieren flujos de transformación de los datos, que fueron generados con los plugins nativos de Kettle. Para mayor información acerca de estos procesos  revisar la  documentacion de Pentaho Data Integration. Para este ejemplo en particular revisar transformación de ejemplo.
+
+
+
 
 
 
