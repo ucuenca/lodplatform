@@ -130,6 +130,19 @@ Se obtendra la siguiente tripleta:
 
 \<http://190.15.141.66:8899/ucuenca/recurso/141> \<http://purl.org/dc/terms/title> "Diseño e implementación de servicios especializados para el portal del Centro de Documentación Juan Bautista Vázquez"^^\<http://www.w3.org/2001/XMLSchema#string>
 
+En la regla de asociación (A011) se define la asignación de una propiedad de nombre a la persona declarada en la regla (C012), por lo tanto dado una entrada:
+
+| Id Record | Field | Data    |  
+|---------|----------|--------|
+| BRITO_RIVAS__MAURICIO_RODRIGO |  NombreCreator     |   Brito Rivas, Mauricio Rodrigo      |
+
+*La entrada mencionada fue creada, mediante un proceso de transformación en el proceso de  limpieza de datos.
+		
+
+Se obtiene la siguiente tripleta para las propiedades de Personas:
+
+\<http://190.15.141.66:8899/ucuenca/contribuyente/BRITO_RIVAS__MAURICIO_RODRIGO> \<http://xmlns.com/foaf/0.1/name> "Brito Rivas, Mauricio Rodrigo" .
+
 
 ![Image1Input](./Images/UCUEREL.png?style=centerme)
 
