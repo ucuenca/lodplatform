@@ -56,13 +56,82 @@ Los datos una vez se han pasado por los flujos de limpieza, deben ser almacenado
 - Field: Indica el tipo de dato  que contiene el campo Data. Ejemplo "Título" 
 - Data: Valor de interes. Ejemplo. "Enriquecimiento Semántico..."
 
-El plugin al ser insertado en la transformación automaticamente se cargara con los datos por defecto, por lo que no es necesario realizar algun cambio sobre la configuración para su funcionamiento. La base de datos con los datos y otras configuraciones  se crearan en la carpeta del usuario.
+El plugin al ser insertado en la transformación automáticamente se cargara con los datos por defecto, por lo que no es necesario realizar algun cambio sobre la configuración para su funcionamiento. La base de datos con los datos y otras configuraciones  se crearan en la carpeta del usuario.
 
 ![Image1Input](./Images/UCUEdatapre.png?style=centerme)
 
 #### Conversión ####
+Una vez se dispone de los datos y el vocabulario cargado, se procede a generar las reglas de asociación que permitiran generar  la descripción en RDF. Para realizar esta actividad se utiliza el plugin "Ontology & Data Mapping".  Dentro del plugin existen configuraciones generales tales, como:
 
 
+![Image1Input](./Images/UCUEMAP1.png?style=centerme)
+
+
+- Ontologies Step:  Nombre asignado al plugin de carga de vocabulario. Por defecto "Get Properties OWL".
+- Data Step: Nombre asignado al plugin de cache. Por defecto "Data Precatching".
+- Data Base URI: URI base para todos los recursos. Es recomendable que esta dirección apunte a un servidor accesible y en el cual se puede levantar un servicio para visualizar los recursos. Para este caso se ha incluido la fuente de origen del recurso para facilitar su identificación.
+- Output Directory: Salida del archivo de reglas.
+
+
+La definición de las reglas entre los vocabularios y los datos constan de 3 apartados:
+ **Clasificación**
+En este apartado se declaran los recursos existentes en los datos. Por ejemplo Documentos, Personas, Colecciones, etc. Para generar las reglas de asociaciación este apartado dispone de varios campos. 
+- ID: Identificador de la regla de clasificación. Puede ser empleado  para identificar a los recursos en los siguientes apartados.
+- Ontology y  Entity: Ontologia y vocabulario con el cual se identificara al recurso.
+- Relative URI: URI relativa que identifica al tipo de recurso y se sumara a la URI base.
+- URI Field ID: Campo del cual se extraera el identificador  unico del recurso. Dentro de este campo se pueden realizar operaciones tales como substring() para tomar unicamente parte de un campo como clave o upper() para pasar el campo clave a mayúsculas. Con este identificador se completara la URI del recurso.
+- Data Field y  Data Value: Campo y valor que se buscara en cada una de las filas de los datos y por la cual se aplicara dicha regla. Dentro del campo data value se puede usar operadores como "%" que indican que pudede ir  cualquier valor despues del patron previamente definido.
+
+![Image1Input](./Images/UCUEClassification.png?style=centerme)
+
+En el primer caso (C001) por ejemplo cuando se encuentre los siguientes datos:
+
+| Id Record | Field | Data  |
+|---------|----------|--------|
+|oai:localhost:123456789/141   | Identifier   |   oai:localhost:123456789/141      |
+
+Mediante la configuración generada se crea la siguiente tripleta:
+
+\<http://190.15.141.66:8899/ucuenca/recurso/141> a \<http://purl.org/ontology/bibo/Thesis> 
+
+Para el caso de personas (C012), dada la siguiente entrada:
+
+| Id Record | Field | Data    |  
+|---------|----------|--------|
+| oai:localhost:123456789/141 | dc/contributor/author/none   |   Brito Rivas, Mauricio Rodrigo     |
+
+
+Se genera la siguiente tripleta:
+
+\<http://190.15.141.66:8899/ucuenca/contribuyente/BRITO_RIVAS__MAURICIO_RODRIGO> a \<http://xmlns.com/foaf/0.1/Person>
+
+**Anotación**
+
+Este apartado permite asociar propiedades de tipo literal a los recursos y dispone de algunos campos similares a los presentados anteriormente:
+
+- ID: Identificador de la regla de anotación. 
+- Entity Class ID: Permite referenciar al identificador de  una regla de clasificación. En otras palabras permite referenciar al recursos declarado.
+- Ontology y  Property: Ontologia y vocabulario con el cual se identificara la relación de propiedad.
+- Extraction Field: Campo del cual se extraera el valor de la propiedad generalmente Data.
+- Data Field y  Data Value: Campo y valor que se buscara en cada una de las filas de los datos y por la cual se aplicara dicha regla en la generación de una relación de propiedad.
+- Data Type: Permite seleccionar el tipo de campo con el cual se identificara a la propiedad generada.
+
+
+
+![Image1Input](./Images/UCUEAnotation.png?style=centerme)
+
+En  la regla de asociación (A001) se define la asignación de una propiedad de título al documento declarado en la regla (C001) por lo tanto dado una entrada:
+
+| Id Record | Field | Data    |  
+|---------|----------|--------|
+| oai:localhost:123456789/141 |  dc/title/es_ES     |   Diseño e implementación de servicios especializados para el portal ...      |
+
+Se obtendra la siguiente tripleta:
+
+\<http://190.15.141.66:8899/ucuenca/recurso/141> \<http://purl.org/dc/terms/title> "Diseño e implementación de servicios especializados para el portal del Centro de Documentación Juan Bautista Vázquez"^^\<http://www.w3.org/2001/XMLSchema#string>
+
+
+![Image1Input](./Images/UCUEREL.png?style=centerme)
 
 
 
