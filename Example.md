@@ -169,5 +169,31 @@ Dada la misma relación anterior da como resultado la siguiente  tripleta.
 
 \<http://190.15.141.66:8899/ucuenca/contribuyente/BRITO_RIVAS__MAURICIO_RODRIGO> \<http://rdaregistry.info/Elements/a/P50195> \<http://190.15.141.66:8899/ucuenca/recurso/141> 
 
+Para obtener finalmente el archivo en formato RDF se debe utilizar el plugin "R2MLtoRDF2" que mapea las reglas definidas con los datos. Algunos de los  datos previamente definidos  pueden cargarse en este plugin  automáticamente mediante el botón "Retrieve DBConnection From Input Step". Algunos campos que puede requerir definirse son:
+
+- RDF Output File: Ruta del archivo RDF de salida.
+- RDF Output Format: Formato del archivo RDF. Ejemplo Turtle o RDF/XML.
 
 
+![Image1Input](./Images/UCUERDFGen.png?style=centerme)
+
+
+Para obtener el archivo como RDF, se debe ejecutar el proceso de transformación hasta este punto. Posteriormente a este paso se puede proseguir con el etapa de publicación.
+
+### Publicación ###
+
+Para dar visibilidad a los datos obtenidos y permitir su acceso al publico, se pueden almacenar los datos en un triplestore como FUSEKI. Para desplegar este servicio el framework dispone del plugin  "FUSEKI LOADER"  el cual debe configurarse con los siguientes parametros.
+
+![Image1Input](./Images/UCUEFUSEKI.png?style=centerme)
+
+- Input Data Set: Archivo RDF obtenido del paso anterior.
+- Service Name: Nombre del servicio que formara parte de la URL de acceso al endpoint SPARQL. Por defecto "myservice"
+- Service Port: Puerto por el cual se levantara el servicio de SPARQL Endpoint. Por defecto 3030.
+- Graph URI: URI del grafo que contendra el conjunto de datos.
+- Choose a Directory: Directorio de salida de los archivos y dependencias.
+
+Algunos de los campos se cargan automáticamente mediante el boton "Load File". En la tabla posterior se puede configurar ciertas caracteristicas como permisos de modificación de los datos.
+- Fuseki:serviceReadGraphStore : Habilita permisos unicamente de  lectura. Por defecto.
+- Fuseki:ServiceUpload: Permite subir nuevos dataset al fuseki.
+- Fuseki:ServiceUpdate: Habilita el servicio de actualización de los datos a tráves  del endpoint. 
+- Fuseki:ServiceReadWriteGraphStore: Habilita permisos de lectura y escritura a traves del endpoint.
