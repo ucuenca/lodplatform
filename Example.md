@@ -165,7 +165,9 @@ Se genera la tripleta:
 
 Existe otro tipo de relaciones que ocurren de forma inversa a las declaradas, es decir van desde el recurso 2 al recurso 1. Para declarar estas relaciones basta con  definir una relación como IR. Adicionalmente hay que invertir el orden del recurso 1 y el 2 tal como se puede apreciar en la relación (IR004).
 
-Dada la misma relación anterior da como resultado, se genera la nueva  tripleta.
+Dada la misma relación anterior da como resultado la siguiente  tripleta.
 
 \<http://190.15.141.66:8899/ucuenca/contribuyente/BRITO_RIVAS__MAURICIO_RODRIGO> \<http://rdaregistry.info/Elements/a/P50195> \<http://190.15.141.66:8899/ucuenca/recurso/141> 
+
+
 
