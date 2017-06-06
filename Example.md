@@ -98,8 +98,7 @@ Para el caso de personas (C012), dada la siguiente entrada:
 
 | Id Record | Field | Data    |  
 |---------|----------|--------|
-| oai:localhost:123456789/141 | dc/contributor/author/none   |   Brito Rivas, Mauricio Rodrigo     |
-
+| oai:localhost:123456789/141 | dc/contributor/author/none   |   BRITO_RIVAS__MAURICIO_RODRIGO     |
 
 Se genera la siguiente tripleta:
 
@@ -115,8 +114,6 @@ Este apartado permite asociar propiedades de tipo literal a los recursos y dispo
 - Extraction Field: Campo del cual se extraera el valor de la propiedad generalmente Data.
 - Data Field y  Data Value: Campo y valor que se buscara en cada una de las filas de los datos y por la cual se aplicara dicha regla en la generación de una relación de propiedad.
 - Data Type: Permite seleccionar el tipo de campo con el cual se identificara a la propiedad generada.
-
-
 
 ![Image1Input](./Images/UCUEAnotation.png?style=centerme)
 
@@ -144,8 +141,31 @@ Se obtiene la siguiente tripleta para las propiedades de Personas:
 \<http://190.15.141.66:8899/ucuenca/contribuyente/BRITO_RIVAS__MAURICIO_RODRIGO> \<http://xmlns.com/foaf/0.1/name> "Brito Rivas, Mauricio Rodrigo" .
 
 
+
+**Relation**
+
+En este apartado se definen relaciones entre los recursos definidos previamente. Para esto cuanta de los siguientes campos:
+
+- ID: Identificador de la regla de relación entre recursos.
+- Entity ClassID 1: Identificador del primer recurso. Desde el cual parte la relación.
+- Ontology y Property: Ontologia y vocabulario que representa  a la propiedad que relaciona los recursos.
+- Entity ClassID 2: Identificar del segundo recurso. Al cual llega la relación.
+
 ![Image1Input](./Images/UCUEREL.png?style=centerme)
 
+En la regla de relación (R001) se especifica la relación de los recursos tipo  documentos (C001) con el de  personas (C012) mediante la relación de creador.  Esto significa que dada la siguiente entrada:
 
+| Id Record | Field | Data    |  
+|---------|----------|--------|
+| oai:localhost:123456789/141 | dc/contributor/author/none   |   BRITO_RIVAS__MAURICIO_RODRIGO     |
 
+Se genera la tripleta:
+
+\<http://190.15.141.66:8899/ucuenca/recurso/141> \<http://purl.org/dc/terms/creator> \<http://190.15.141.66:8899/ucuenca/contribuyente/BRITO_RIVAS__MAURICIO_RODRIGO>
+
+Existe otro tipo de relaciones que ocurren de forma inversa a las declaradas, es decir van desde el recurso 2 al recurso 1. Para declarar estas relaciones basta con  definir una relación como IR. Adicionalmente hay que invertir el orden del recurso 1 y el 2 tal como se puede apreciar en la relación (IR004).
+
+Dada la misma relación anterior da como resultado, se genera la nueva  tripleta.
+
+\<http://190.15.141.66:8899/ucuenca/contribuyente/BRITO_RIVAS__MAURICIO_RODRIGO> \<http://rdaregistry.info/Elements/a/P50195> \<http://190.15.141.66:8899/ucuenca/recurso/141> 
 
