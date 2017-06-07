@@ -207,8 +207,28 @@ Una vez configurado se requiere ejecutar una vez el proceso de transformación p
 Es posible cambiar el puerto por el cual acceder al servicio,  por lo que en lugar de 3030 puede emplearse algun otro puerto seleccionado.
 
 ### Enlace ###
-El proceso de enlace permite establecer vinculos entre los recursos de modo que la información disponible entre varias fuentes pueda ser relacionada. Este proceso se lo puede dejar casi al final, debido a que previamente se requiere haberse realizado el proceso de publicación para cada una de las fuentes que requieran enlazarse. Se requiere que los datos se encuentren publicados debido a que el plugin generado utiliza los servicios de Sparql Endpoint para facilitar su configuración.  El plugin de Linking de Silk dispone de los siguientes campos:
+El proceso de enlace permite establecer vínculos entre los recursos de modo que la información disponible entre varias fuentes pueda ser relacionada. En el caso de repositorios se ha notado que la mayor probabilidad de enlace entre recursos ocurre entre autores, puesto que pueden trabajar realizando obras en varias instituciones. Debido a esta razón se ha creado el plugin de linking Silk workbench que emplea los nombres de los autores junto con las obras asociadas a los mismos para tratar de determinar si dos autores representan la misma persona. Este proceso se lo puede dejar casi al final, debido a que previamente se requiere haberse realizado el proceso de publicación para cada una de las fuentes que requieran enlazarse. Los  datos deben encontrarse publicados debido a que el plugin generado utiliza los servicios de Sparql Endpoint para facilitar su configuración.  Para configurar este plugin se disponen de los siguientes campos:
+- Insert first Endpoint y Graph first Endpoint: URI del primer endpoint y su grafo.
+- Insert Second Endpoint y Graph Second Endpoint: URI del segundo endpoint y su grafo.
+- Thresold for metrics: Umbral para la comparación sintactica (SILK).
+- Thresold for refine process: Umbral para la comparación semántica.
+- Linking File Output: Directorio de Salida.
 
 ![Image1Input](./Images/Silkejemplo.png?style=centerme)
 
 
+En este caso se ha buscado enlaces entre los autores del endpoint de la universidad de Cuenca y la institución de CEDIA, la cual previamente ya se habia realizado el proceso de publicación de sus datos. Una muestra  de los autores que se encontraron como equivalente  se resumen a continuación.
+
+| Universidad de Cuenca | Cedia | 
+|---------|----------|
+| Delgado Suconota, María Fernanda | Delgado, María Fernanda   |  
+| Illescas Riera, Raquel Guadalupe   | Illescas Riera, Raquel   |
+|  Ortíz Segarra, José  |   Ignacio Ortíz Segarra, José      |
+| Andrade, Gabriela        |   Andrade, Gabriela              | 
+|   Espinoza, Mauricio                |   Espinoza, Mauricio                          |
+| Saquicela, Víctor | Saquicela, Víctor |
+
+### Explotación ###
+Para mejorar la visualización de los recursos frente a los usuarios se puede emplear el plugin "ELDA Loader". Este plugin utiliza ELDA API para generar una página de descripción de los recursos a los cuales el usuario puedan acceder mediante su URI. Dentro de las configuraciones de este plugin se encuentran:
+
+![Image1Input](./Images/UCUERDFGen.png?style=centerme)
