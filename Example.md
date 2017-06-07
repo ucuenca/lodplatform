@@ -195,5 +195,5 @@ Para dar visibilidad a los datos obtenidos y permitir su acceso al publico, se p
 Algunos de los campos se cargan automáticamente mediante el boton "Load File". En la tabla posterior se puede configurar ciertas caracteristicas como permisos de modificación de los datos.
 - Fuseki:serviceReadGraphStore : Habilita permisos unicamente de  lectura. Por defecto.
 - Fuseki:ServiceUpload: Permite subir nuevos dataset al fuseki.
-- Fuseki:ServiceUpdate: Habilita el servicio de actualización de los datos a tráves  del endpoint. 
+- Fuseki:ServiceUpdate: Habilita el servicio de actualización de los datos. 
 - Fuseki:ServiceReadWriteGraphStore: Habilita permisos de lectura y escritura a traves del endpoint.
