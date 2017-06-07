@@ -1,16 +1,17 @@
 
 ## Generación de Linked Data a partir de un repositorio digital Dspace ##
 
-En este ejemplo se presentan los pasos y  configuraciones necesarias que han sido aplicadas sobre la plataforma  para la generación y publicación de datos de repositorios digitales siguiendo los principios de Linked Data. En este  caso en particular como fuente se ha tomado el servicio OAI-PMH del repositorio DSPACE de la universidad de Cuenca. 
+En este ejemplo se presentan los pasos y  configuraciones necesarias que han sido aplicadas sobre el framework  para la generación y publicación de datos enlazados a partir del repositorio digital Dspace de la universidad de Cuenca. Este caso de uso es una muestra de aplicabilidad real del framework sobre varios escenarios  y dicho procedimiento ha sido extendido sobre un gran número de universidades del país. Dentro de este tipo de  repositorios se pueden encontrar la mayoría de documentación generada por las universidades entre los que se encuentran tesis, artículos científicos,  revistas, etc.  los cuales con la finalidad de mejorar su visibilidad e interoperabilidad  han sido publicados siguiendo los principios de Linked Data.
 
 ### Especificación ###
-Para la extracción de datos, en este caso en particular que la fuente es un repositorios digital Dspace con servicio OAI-PMH,  se emplea el plugin de lectura  **"OAI-PMH Loader".** Como primer paso se coloca la URL del servicio OAI (http://dspace.ucuenca.edu.ec/oai/request) en el campo *Input URI*. Una vez hecho esto se da click en el boton *Get Formats*, esto despliega los prefijos de los formatos disponibles para extracción de los datos. En este caso se ha seleccionado XOAI. Adicionalmente, se selecciona el path de respuesta desde el cual se tomará los datos. Generalmente se debe tomar la primera opción, que se encuentra marcada en la figura 1. Finalmente, se acepta los cambios y se guarda la configuración.
+La mayoría de  repositorios digitales como el tratado en este ejemplo, disponen  de  un servicio de cosecha OAI-PMH para la extracción de información.  Dentro del framework para este tipo de fuentes se cuenta con el plugin especializado de lectura de servicios OAI-PMH conocido como **"OAI-PMH Loader".**  Como primer paso para configurar dicho plugin se coloca la URL del servicio OAI (http://dspace.ucuenca.edu.ec/oai/request) en el campo *Input URI*. Una vez hecho esto se puede seleccionar los formatos específicos para lectura  mediante el botón *Get Formats* que  despliega los prefijos de los formatos disponibles para extracción de los datos. En este caso se ha seleccionado XOAI. Adicionalmente, se selecciona el path de respuesta desde el cual se tomará los datos. Generalmente se debe tomar la primera opción, que se encuentra marcada en la figura 1. Finalmente, se acepta los cambios y se guarda la configuración.
+
 
 ![Image1Input](./Images/ImagenInput.PNG?style=centerme)
 
 
 ### Modelamiento ###
-Para esta etapa se utiliza el plugin **"Get Properties OWL"** que se encarga de cargar los vocabularios de las ontologías. En este caso se han seleccionado varias ontologias que permiten describir semánticamente los diferentes recursos que dispone lo repositorios. Entre estos se encuentran:
+Para esta etapa se utiliza el plugin **"Get Properties OWL"** que se encarga de cargar los vocabularios de las ontologías. En este caso se han seleccionado varias ontologías que permiten describir semánticamente los diferentes recursos que disponen los repositorios. Entre estos se encuentran:
 
 - bibo: Empleado para describir recursos bibliográficos. 
 - foaf: Utilizado para describir personas, objetos  y propiedades asociadas.
@@ -18,7 +19,8 @@ Para esta etapa se utiliza el plugin **"Get Properties OWL"** que se encarga de 
 - bibtex: Dispone de algunos vocabularios específicos enfocados en  describir referencias de recursos bibliográficos. 
 - rdda: Contiene vocabulario especializado para describir elementos relacionados con bibliotecas. 
 
-Para ingresar los vocabularios de las ontologías dentro del plugin, se puede optar por dos alternativas: usar un prefijo de la ontologia o cargar un archivo con el modelo.  En este caso se ha optado por la manera mas sencilla que es   ingresar el nombre o prefijo en el campo de "Input Ontology URL or the name of prefix" y cargar los datos mediante el botón "Add URI".   Una vez se ha realizado el proceso con todas las ontologias disponibles se puede precargar los datos con el boton "Pre-cath data" para ser utilizados posteriormente.
+Para ingresar los vocabularios de las ontologías dentro del plugin, se puede optar por dos alternativas: usar un prefijo de la ontología o cargar un archivo con el modelo.  En este caso se ha optado por la manera más sencilla que es   ingresar el nombre o prefijo en el campo de *"Input Ontology URL or the name of prefix"* y cargar los datos mediante el botón *"Add URI"*.   Una vez se ha realizado el proceso con todas las ontologías disponibles se puede precargar los datos con el botón *"Pre-cath data"* para ser utilizados posteriormente.
+
 
 ![Image1Input](./Images/ucuencaonto.png?style=centerme)
 
@@ -46,22 +48,24 @@ Para idiomas se han encontrado dos representaciones diferentes para el idioma es
 - esp
 
 
-Para solucionar este y otros problemas se requieren flujos de transformación que acondicionen y corrigan los problemas encontrados en los datos, para esto fueron utilizados la gran variedad de plugins nativos de Kettle. Para mayor información acerca de estos procesos  revisar la  documentacion de Pentaho Data Integration. Para este ejemplo en particular revisar transformación de ejemplo.
+Para solucionar este y otros problemas se requieren flujos de transformación que acondicionen y corrijan los problemas encontrados en los datos, para esto fueron utilizados la gran variedad de plugins nativos de Kettle. Para mayor información acerca de estos procesos  revisar la  documentación de Pentaho Data Integration. Para este ejemplo en particular revisar transformación de ejemplo.
 
 ![Image1Input](./Images/TrasnfLimpieza.PNG?style=centerme)
 
 
 Los datos una vez se han pasado por los flujos de limpieza, deben ser almacenados temporalmente en una base de datos para evitar sobrecargar la memoria. Para realizar este proceso se dispone del plugin "Data Pre-Catching" , al cual debe enviarse los datos de forma normalizada con los siguientes campos:
+
 - Id Record: Identificador del recurso. Ejemplo "oai:localhost:123456789/333" para documento.
 - Field: Indica el tipo de dato  que contiene el campo Data. Ejemplo "Título" 
 - Data: Valor de interes. Ejemplo. "Enriquecimiento Semántico..."
 
-El plugin al ser insertado en la transformación automáticamente se cargara con los datos por defecto, por lo que no es necesario realizar algun cambio sobre la configuración para su funcionamiento. La base de datos con los datos y otras configuraciones  se crearan en la carpeta del usuario.
+El plugin al ser insertado en la transformación automáticamente se cargara con los datos por defecto, por lo que no es necesario realizar ningún cambio en la configuración para su funcionamiento. La base de datos con los datos y otras configuraciones  se crearan en la carpeta del usuario tal como se presenta a continuación.
 
 ![Image1Input](./Images/UCUEdatapre.png?style=centerme)
 
 #### Conversión ####
-Una vez se dispone de los datos y el vocabulario cargado, se procede a generar las reglas de asociación que permitiran generar  la descripción en RDF. Para realizar esta actividad se utiliza el plugin "Ontology & Data Mapping".  Dentro del plugin existen configuraciones generales tales, como:
+
+Una vez se dispone de los datos y el vocabulario cargado, se procede a generar las reglas de asociación que permitirán generar  la descripción en RDF. Para realizar esta actividad se utiliza el plugin "Ontology & Data Mapping".  Dentro del plugin existen configuraciones generales tales, como:
 
 
 ![Image1Input](./Images/UCUEMAP1.png?style=centerme)
@@ -78,6 +82,7 @@ La definición de las reglas entre los vocabularios y los datos constan de 3 apa
  **Clasificación**
  
 En este apartado se declaran los recursos existentes en los datos. Por ejemplo Documentos, Personas, Colecciones, etc. Para generar las reglas de asociaciación este apartado dispone de varios campos. 
+
 - ID: Identificador de la regla de clasificación. Puede ser empleado  para identificar a los recursos en los siguientes apartados.
 - Ontology y  Entity: Ontologia y vocabulario con el cual se identificara al recurso.
 - Relative URI: URI relativa que identifica al tipo de recurso y se sumara a la URI base.
