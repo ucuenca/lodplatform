@@ -74,7 +74,9 @@ Una vez se dispone de los datos y el vocabulario cargado, se procede a generar l
 
 
 La definición de las reglas entre los vocabularios y los datos constan de 3 apartados:
+
  **Clasificación**
+ 
 En este apartado se declaran los recursos existentes en los datos. Por ejemplo Documentos, Personas, Colecciones, etc. Para generar las reglas de asociaciación este apartado dispone de varios campos. 
 - ID: Identificador de la regla de clasificación. Puede ser empleado  para identificar a los recursos en los siguientes apartados.
 - Ontology y  Entity: Ontologia y vocabulario con el cual se identificara al recurso.
@@ -139,7 +141,6 @@ En la regla de asociación (A011) se define la asignación de una propiedad de n
 Se obtiene la siguiente tripleta para las propiedades de Personas:
 
 \<http://190.15.141.66:8899/ucuenca/contribuyente/BRITO_RIVAS__MAURICIO_RODRIGO> \<http://xmlns.com/foaf/0.1/name> "Brito Rivas, Mauricio Rodrigo" .
-
 
 
 **Relation**
