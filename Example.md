@@ -192,8 +192,23 @@ Para dar visibilidad a los datos obtenidos y permitir su acceso al publico, se p
 - Graph URI: URI del grafo que contendra el conjunto de datos.
 - Choose a Directory: Directorio de salida de los archivos y dependencias.
 
-Algunos de los campos se cargan automáticamente mediante el boton "Load File". En la tabla posterior se puede configurar ciertas caracteristicas como permisos de modificación de los datos.
+Algunos de los campos se cargan automáticamente mediante el boton "Precath". En la tabla posterior se puede configurar ciertas caracteristicas como permisos de modificación de los datos.
 - Fuseki:serviceReadGraphStore : Habilita permisos unicamente de  lectura. Por defecto.
 - Fuseki:ServiceUpload: Permite subir nuevos dataset al fuseki.
 - Fuseki:ServiceUpdate: Habilita el servicio de actualización de los datos. 
 - Fuseki:ServiceReadWriteGraphStore: Habilita permisos de lectura y escritura a traves del endpoint.
+
+Una vez configurado se requiere ejecutar una vez el proceso de transformación para que se generen los archivos necesarios para poder inciar el servicio. Posteriormente a este proceso se puede inicializar el servicio en consola mediante los siguientes pasos:
+1. Trasladarse a la carpeta en la que se creo una instancia de fuseki. 
+2. Ejecutar ./fuseki-server -port 3030 -config=config.ttl
+3. Acceder al servicio http://localhost:3030
+4. Abrir el puerto y asignar al computador una IP publica  para que pueda ser accesible a través de la web.
+
+Es posible cambiar el puerto por el cual acceder al servicio,  por lo que en lugar de 3030 puede emplearse algun otro puerto seleccionado.
+
+### Enlace ###
+El proceso de enlace permite establecer vinculos entre los recursos de modo que la información disponible entre varias fuentes pueda ser relacionada. Este proceso se lo puede dejar casi al final, debido a que previamente se requiere haberse realizado el proceso de publicación para cada una de las fuentes que requieran enlazarse. Se requiere que los datos se encuentren publicados debido a que el plugin generado utiliza los servicios de Sparql Endpoint para facilitar su configuración.  El plugin de Linking de Silk dispone de los siguientes campos:
+
+![Image1Input](./Images/Silkejemplo.png?style=centerme)
+
+
