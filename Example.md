@@ -229,6 +229,21 @@ En este caso se ha buscado enlaces entre los autores del endpoint de la universi
 | Saquicela, Víctor | Saquicela, Víctor |
 
 ### Explotación ###
-Para mejorar la visualización de los recursos frente a los usuarios se puede emplear el plugin "ELDA Loader". Este plugin utiliza ELDA API para generar una página de descripción de los recursos a los cuales el usuario puedan acceder mediante su URI. Dentro de las configuraciones de este plugin se encuentran:
+Para mejorar la visualización de los recursos frente a los usuarios se puede emplear el plugin "ELDA Loader". Este plugin utiliza ELDA API para generar una página de descripción de los recursos a los cuales el usuario puedan acceder mediante su URI. Para configurar este plugin el servicio del SPARQL Endpoint debe encontrarse funcionando. Dentro de las configuraciones de este plugin se encuentran:
+- SPARQL Service: URI del servicio de endpoint SPARQL
+- BASE URI: URI del grafo en el que se almacenan los datos
+- Entities: Presenta las clases disponibles en el endpoint.
+- Properties: Presenta las propiedades de cada una de las clases disponibles.
+- Output Directory: Directorio de salida en la que se creara una estancia de ELDA.
 
-![Image1Input](./Images/UCUERDFGen.png?style=centerme)
+![Image1Input](./Images/UCUEElda.png?style=centerme)
+
+Una vez se ha configurado el plugin es necesario correr la transformación para generar una instancia de ELDA. Posteriormente, se debe seguir los siguiente pasos:
+1. Trasladarse al directorio de salida
+2. Ejecutar el comando java -jar start.java 
+3. Una vez inicializado abrir el navegador a la dirección http://localhost:8080/ + fuente + Tipo de Recurso. Ejemplo http://localhost:8080/ucuenca/Document
+
+
+![Image1Input](./Images/InterfazELDA.png?style=centerme)
+
+
