@@ -139,14 +139,16 @@ Esta etapa contempla el uso o desarrollo de herramientas, en función de  mejora
 
  ![ImageDatap](./Images/ELDAPlugin.PNG?style=centerme)
 
-Mas detalles acerca  del plugin de explotación  en la sección del manual [Explotación](./Especificación.md#elda-loader).
+Mas detalles acerca  del plugin de explotación  en la sección del manual [Explotación](./Especificación.md#elda-loader). [Ejemplo](./Example.md)
 
 ### DEMO ###
 Una demostración del funcionamiento del framework para repositorios digitales, se puede ver en el  siguiente  enlace:
 
 [![LOD-GF](http://img.youtube.com/vi/orMefphD1yg/0.jpg)](https://www.youtube.com/watch?v=orMefphD1yg)
 
-Ejemplos de la aplicación del framework sobre distintos escenarios  se pueden encontrar en el reporte técnico en el siguiente [enlace](./technicalReport/frameworktech.pdf) (Disponible unicamente en español).
+
+Un ejemplo completo  de aplicación de repositorios digitales se puede encontrar en la sección de [ejemplo](./Example.md). Mas detalles acerca  del plugin de explotación  con otros casos de uso se pueden encontrar en el reporte técnico en el siguiente [enlace](./technicalReport/frameworktech.pdf) (Disponible unicamente en español).
+
 
 [ ![Codeship Status for lod/LODPlatform](https://codeship.com/projects/f70d1860-b628-0132-afb1-32912015c090/status?branch=master)](https://codeship.com/projects/70968)
 
