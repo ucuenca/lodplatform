@@ -65,7 +65,7 @@ El plugin al ser insertado en la transformación automáticamente se cargara con
 
 #### Conversión ####
 
-Una vez se dispone de los datos y el vocabulario cargado, se procede a generar las reglas de asociación que permitirán generar  la descripción en RDF. Para realizar esta actividad se utiliza el plugin "Ontology & Data Mapping".  Dentro del plugin existen configuraciones generales tales, como:
+Una vez se dispone de los datos y el vocabulario cargado, se procede a generar las reglas de asociación que permitirán generar  la descripción en RDF. Para realizar esta actividad se utiliza el plugin **"Ontology & Data Mapping"**.  Dentro de este plugin existen configuraciones generales tales, como:
 
 
 ![Image1Input](./Images/UCUEMAP1.png?style=centerme)
@@ -73,7 +73,7 @@ Una vez se dispone de los datos y el vocabulario cargado, se procede a generar l
 
 - Ontologies Step:  Nombre asignado al plugin de carga de vocabulario. Por defecto "Get Properties OWL".
 - Data Step: Nombre asignado al plugin de cache. Por defecto "Data Precatching".
-- Data Base URI: URI base para todos los recursos. Es recomendable que esta dirección apunte a un servidor accesible y en el cual se puede levantar un servicio para visualizar los recursos. Para este caso se ha incluido la fuente de origen del recurso para facilitar su identificación.
+- Data Base URI: URI base para todos los recursos. Es recomendable que esta dirección apunte a un servidor accesible y en el cual se puede levantar un servicio (ver sección Explotación) para visualizar los recursos. Para este caso se ha incluido la fuente de origen del recurso para facilitar su identificación.
 - Output Directory: Salida del archivo de reglas.
 
 
@@ -81,13 +81,13 @@ La definición de las reglas entre los vocabularios y los datos constan de 3 apa
 
  **Clasificación**
  
-En este apartado se declaran los recursos existentes en los datos. Por ejemplo Documentos, Personas, Colecciones, etc. Para generar las reglas de asociaciación este apartado dispone de varios campos. 
+En este apartado se declaran los recursos existentes en los datos. Por ejemplo Documentos, Personas, Colecciones, etc. Para generar las reglas de asociación este apartado dispone de varios campos. 
 
 - ID: Identificador de la regla de clasificación. Puede ser empleado  para identificar a los recursos en los siguientes apartados.
-- Ontology y  Entity: Ontologia y vocabulario con el cual se identificara al recurso.
+- Ontology y  Entity: Ontologia y vocabulario con el cual se identificará al recurso.
 - Relative URI: URI relativa que identifica al tipo de recurso y se sumara a la URI base.
-- URI Field ID: Campo del cual se extraera el identificador  unico del recurso. Dentro de este campo se pueden realizar operaciones tales como substring() para tomar unicamente parte de un campo como clave o upper() para pasar el campo clave a mayúsculas. Con este identificador se completara la URI del recurso.
-- Data Field y  Data Value: Campo y valor que se buscara en cada una de las filas de los datos y por la cual se aplicara dicha regla. Dentro del campo data value se puede usar operadores como "%" que indican que pudede ir  cualquier valor despues del patron previamente definido.
+- URI Field ID: Campo del cual se extraerá  el identificador  único  del recurso. Dentro de este campo se pueden realizar operaciones tales como substring() para tomar únicamente  parte de un campo como clave o upper() para pasar el campo clave a mayúsculas. Con este identificador se completara la URI del recurso.
+- Data Field y  Data Value: Campo y valor que se buscara en cada una de las filas de los datos y por la cual se aplicara dicha regla. Dentro del campo data value se puede usar operadores como "%" que indican que puede ir  cualquier valor después  del patrón previamente definido.
 
 ![Image1Input](./Images/UCUEClassification.png?style=centerme)
 
@@ -99,7 +99,10 @@ En el primer caso (C001) por ejemplo cuando se encuentre los siguientes datos:
 
 Mediante la configuración generada se crea la siguiente tripleta:
 
-\<http://190.15.141.66:8899/ucuenca/recurso/141> a \<http://purl.org/ontology/bibo/Thesis> 
+| Subject | Predicado | Objeto  |
+|---------|----------|--------|
+|\<http://190.15.141.66:8899/ucuenca/recurso/141>   | a   |  \<http://purl.org/ontology/bibo/Thesis>      |
+
 
 Para el caso de personas (C012), dada la siguiente entrada:
 
@@ -109,18 +112,21 @@ Para el caso de personas (C012), dada la siguiente entrada:
 
 Se genera la siguiente tripleta:
 
-\<http://190.15.141.66:8899/ucuenca/contribuyente/BRITO_RIVAS__MAURICIO_RODRIGO> a \<http://xmlns.com/foaf/0.1/Person>
+| Subject | Predicado | Objeto  |
+|---------|----------|--------|
+|\<http://190.15.141.66:8899/ucuenca/contribuyente/BRITO_RIVAS__MAURICIO_RODRIGO>   | a   |  \<http://xmlns.com/foaf/0.1/Person>  |
 
+  
 **Anotación**
 
 Este apartado permite asociar propiedades de tipo literal a los recursos y dispone de algunos campos similares a los presentados anteriormente:
 
 - ID: Identificador de la regla de anotación. 
-- Entity Class ID: Permite referenciar al identificador de  una regla de clasificación. En otras palabras permite referenciar al recursos declarado.
-- Ontology y  Property: Ontologia y vocabulario con el cual se identificara la relación de propiedad.
+- Entity Class ID: Permite referenciar al identificador de  una regla de clasificación. En otras palabras permite referenciar al recurso declarado.
+- Ontology y  Property: Ontología y vocabulario con el cual se identificará la relación de propiedad.
 - Extraction Field: Campo del cual se extraera el valor de la propiedad generalmente Data.
 - Data Field y  Data Value: Campo y valor que se buscara en cada una de las filas de los datos y por la cual se aplicara dicha regla en la generación de una relación de propiedad.
-- Data Type: Permite seleccionar el tipo de campo con el cual se identificara a la propiedad generada.
+- Data Type: Permite seleccionar el tipo de campo con el cual se identificara a la propiedad generada. Ejemplo String.
 
 ![Image1Input](./Images/UCUEAnotation.png?style=centerme)
 
@@ -132,7 +138,10 @@ En  la regla de asociación (A001) se define la asignación de una propiedad de 
 
 Se obtendra la siguiente tripleta:
 
-\<http://190.15.141.66:8899/ucuenca/recurso/141> \<http://purl.org/dc/terms/title> "Diseño e implementación de servicios especializados para el portal del Centro de Documentación Juan Bautista Vázquez"^^\<http://www.w3.org/2001/XMLSchema#string>
+| Subject | Predicado | Objeto  |
+|---------|----------|--------|
+|\<http://190.15.141.66:8899/ucuenca/recurso/141>  |   \<http://purl.org/dc/terms/title>    |  "Diseño e implementación de servicios especializados para el portal del Centro de Documentación Juan Bautista Vázquez"^^\<http://www.w3.org/2001/XMLSchema#string>  |
+
 
 En la regla de asociación (A011) se define la asignación de una propiedad de nombre a la persona declarada en la regla (C012), por lo tanto dado una entrada:
 
@@ -145,7 +154,9 @@ En la regla de asociación (A011) se define la asignación de una propiedad de n
 
 Se obtiene la siguiente tripleta para las propiedades de Personas:
 
-\<http://190.15.141.66:8899/ucuenca/contribuyente/BRITO_RIVAS__MAURICIO_RODRIGO> \<http://xmlns.com/foaf/0.1/name> "Brito Rivas, Mauricio Rodrigo" .
+| Subject | Predicado | Objeto  |
+|---------|----------|--------|
+|\<http://190.15.141.66:8899/ucuenca/contribuyente/BRITO_RIVAS__MAURICIO_RODRIGO>  |   \<http://xmlns.com/foaf/0.1/name>    |  "Brito Rivas, Mauricio Rodrigo"  |
 
 
 **Relation**
