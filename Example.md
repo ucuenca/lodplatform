@@ -31,8 +31,8 @@ Dentro de la fase de generación se dispone de varias actividades, que pueden se
 #### Limpieza ####
 El proceso de limpieza busca mejorar la estandarización y calidad de los datos previo a la generación RDF. Para realizar este proceso los datos deben pasar previamente por un proceso de análisis que permita distinguir algunos problemas de estandarización asi como  errores. En el repositorio mencionado se ha logrado distinguir por ejemplo errores en los autores tal como se detalla a continuación:
 
-Datos adicionales no correspondientes a los nombre propios de autores, por ejemplo:
-- Recalde Moreno, Dr. Celso
+Datos adicionales no correspondientes a los nombres propios de autores, por ejemplo:
+- Recalde Moreno,Dr. Celso
 - Torres Arroba, Fernando Javier Ph.D
 
 Dos nombres pertenecientes a diferentes autores en un solo campo:
@@ -53,15 +53,15 @@ Para solucionar este y otros problemas se requieren flujos de transformación qu
 ![Image1Input](./Images/TrasnfLimpieza.PNG?style=centerme)
 
 
-Los datos una vez se han pasado por los flujos de limpieza, deben ser almacenados temporalmente en una base de datos para evitar sobrecargar la memoria. Para realizar este proceso se dispone del plugin "Data Pre-Catching" , al cual debe enviarse los datos de forma normalizada con los siguientes campos:
+Los datos una vez se han pasado por los flujos de limpieza, deben ser almacenados temporalmente en una base de datos para evitar sobrecargar la memoria. Para realizar este proceso se dispone del plugin **"Data Pre-Catching"** , al cual debe enviarse los datos de forma normalizada con los siguientes campos:
 
 - Id Record: Identificador del recurso. Ejemplo "oai:localhost:123456789/333" para documento.
 - Field: Indica el tipo de dato  que contiene el campo Data. Ejemplo "Título" 
-- Data: Valor de interes. Ejemplo. "Enriquecimiento Semántico..."
+- Data: Valor del dato de interés. Ejemplo. "Enriquecimiento Semántico..."
 
 El plugin al ser insertado en la transformación automáticamente se cargara con los datos por defecto, por lo que no es necesario realizar ningún cambio en la configuración para su funcionamiento. La base de datos con los datos y otras configuraciones  se crearan en la carpeta del usuario tal como se presenta a continuación.
 
-![Image1Input](./Images/UCUEdatapre.png?style=centerme)
+![Image2Input](./Images/UCUEdatapre.png?style=centerme)
 
 #### Conversión ####
 
