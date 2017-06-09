@@ -165,7 +165,7 @@ En este apartado se definen relaciones entre los recursos definidos previamente.
 
 - ID: Identificador de la regla de relación entre recursos.
 - Entity ClassID 1: Identificador del primer recurso. Desde el cual parte la relación.
-- Ontology y Property: Ontologia y vocabulario que representa  a la propiedad que relaciona los recursos.
+- Ontology y Property: Ontología y vocabulario que representa  a la propiedad que relaciona los recursos.
 - Entity ClassID 2: Identificar del segundo recurso. Al cual llega la relación.
 
 ![Image1Input](./Images/UCUEREL.png?style=centerme)
@@ -178,13 +178,21 @@ En la regla de relación (R001) se especifica la relación de los recursos tipo 
 
 Se genera la tripleta:
 
-\<http://190.15.141.66:8899/ucuenca/recurso/141> \<http://purl.org/dc/terms/creator> \<http://190.15.141.66:8899/ucuenca/contribuyente/BRITO_RIVAS__MAURICIO_RODRIGO>
+| Subject | Predicado | Objeto  |
+|---------|----------|--------|
+|\<http://190.15.141.66:8899/ucuenca/recurso/141>  |  \<http://purl.org/dc/terms/creator>    |   \<http://190.15.141.66:8899/ucuenca/contribuyente/BRITO_RIVAS__MAURICIO_RODRIGO>  |
+
+
 
 Existe otro tipo de relaciones que ocurren de forma inversa a las declaradas, es decir van desde el recurso 2 al recurso 1. Para declarar estas relaciones basta con  definir una relación como IR. Adicionalmente hay que invertir el orden del recurso 1 y el 2 tal como se puede apreciar en la relación (IR004).
 
 Dada la misma relación anterior da como resultado la siguiente  tripleta.
 
-\<http://190.15.141.66:8899/ucuenca/contribuyente/BRITO_RIVAS__MAURICIO_RODRIGO> \<http://rdaregistry.info/Elements/a/P50195> \<http://190.15.141.66:8899/ucuenca/recurso/141> 
+| Subject | Predicado | Objeto  |
+|---------|----------|--------|
+|\<http://190.15.141.66:8899/ucuenca/contribuyente/BRITO_RIVAS__MAURICIO_RODRIGO>  |   \<http://rdaregistry.info/Elements/a/P50195>    |  \<http://190.15.141.66:8899/ucuenca/recurso/141>   |
+
+
 
 Para obtener finalmente el archivo en formato RDF se debe utilizar el plugin "R2MLtoRDF2" que mapea las reglas definidas con los datos. Algunos de los  datos previamente definidos  pueden cargarse en este plugin  automáticamente mediante el botón "Retrieve DBConnection From Input Step". Algunos campos que puede requerir definirse son:
 
@@ -199,42 +207,44 @@ Para obtener el archivo como RDF, se debe ejecutar el proceso de transformación
 
 ### Publicación ###
 
-Para dar visibilidad a los datos obtenidos y permitir su acceso al publico, se pueden almacenar los datos en un triplestore como FUSEKI. Para desplegar este servicio el framework dispone del plugin  "FUSEKI LOADER"  el cual debe configurarse con los siguientes parametros.
+Para dar visibilidad a los datos obtenidos y permitir su acceso al público, se pueden almacenar los datos en un triplestore como FUSEKI. Para desplegar este servicio el framework dispone del plugin  **"FUSEKI LOADER"**  el cual debe configurarse con los siguientes parámetros.
 
 ![Image1Input](./Images/UCUEFUSEKI.png?style=centerme)
 
 - Input Data Set: Archivo RDF obtenido del paso anterior.
 - Service Name: Nombre del servicio que formara parte de la URL de acceso al endpoint SPARQL. Por defecto "myservice"
 - Service Port: Puerto por el cual se levantara el servicio de SPARQL Endpoint. Por defecto 3030.
-- Graph URI: URI del grafo que contendra el conjunto de datos.
+- Graph URI: URI del grafo que contendrá el conjunto de datos.
 - Choose a Directory: Directorio de salida de los archivos y dependencias.
 
-Algunos de los campos se cargan automáticamente mediante el boton "Precath". En la tabla posterior se puede configurar ciertas caracteristicas como permisos de modificación de los datos.
-- Fuseki:serviceReadGraphStore : Habilita permisos unicamente de  lectura. Por defecto.
+Algunos de los campos se cargan automáticamente mediante el boton "Precath". En la tabla posterior se puede configurar ciertas características como permisos de modificación de los datos.
+
+- Fuseki:serviceReadGraphStore : Habilita permisos únicamente de  lectura. Por defecto.
 - Fuseki:ServiceUpload: Permite subir nuevos dataset al fuseki.
 - Fuseki:ServiceUpdate: Habilita el servicio de actualización de los datos. 
-- Fuseki:ServiceReadWriteGraphStore: Habilita permisos de lectura y escritura a traves del endpoint.
+- Fuseki:ServiceReadWriteGraphStore: Habilita permisos de lectura y escritura a través del endpoint.
 
-Una vez configurado se requiere ejecutar una vez el proceso de transformación para que se generen los archivos necesarios para poder inciar el servicio. Posteriormente a este proceso se puede inicializar el servicio en consola mediante los siguientes pasos:
+Una vez configurado se requiere ejecutar una vez el proceso de transformación para que se generen los archivos necesarios para poder iniciar el servicio. Posteriormente a este proceso se puede inicializar el servicio en consola mediante los siguientes pasos:
+
 1. Trasladarse a la carpeta en la que se creo una instancia de fuseki. 
 2. Ejecutar ./fuseki-server -port 3030 -config=config.ttl
 3. Acceder al servicio http://localhost:3030
 4. Abrir el puerto y asignar al computador una IP publica  para que pueda ser accesible a través de la web.
 
-Es posible cambiar el puerto por el cual acceder al servicio,  por lo que en lugar de 3030 puede emplearse algun otro puerto seleccionado.
+Es posible cambiar el puerto por el cual acceder al servicio,  por lo que en lugar de 3030 puede emplearse algún otro puerto seleccionado.
 
 ### Enlace ###
 El proceso de enlace permite establecer vínculos entre los recursos de modo que la información disponible entre varias fuentes pueda ser relacionada. En el caso de repositorios se ha notado que la mayor probabilidad de enlace entre recursos ocurre entre autores, puesto que pueden trabajar realizando obras en varias instituciones. Debido a esta razón se ha creado el plugin de linking Silk workbench que emplea los nombres de los autores junto con las obras asociadas a los mismos para tratar de determinar si dos autores representan la misma persona. Este proceso se lo puede dejar casi al final, debido a que previamente se requiere haberse realizado el proceso de publicación para cada una de las fuentes que requieran enlazarse. Los  datos deben encontrarse publicados debido a que el plugin generado utiliza los servicios de Sparql Endpoint para facilitar su configuración.  Para configurar este plugin se disponen de los siguientes campos:
 - Insert first Endpoint y Graph first Endpoint: URI del primer endpoint y su grafo.
 - Insert Second Endpoint y Graph Second Endpoint: URI del segundo endpoint y su grafo.
-- Thresold for metrics: Umbral para la comparación sintactica (SILK).
+- Thresold for metrics: Umbral para la comparación sintáctica (SILK).
 - Thresold for refine process: Umbral para la comparación semántica.
 - Linking File Output: Directorio de Salida.
 
 ![Image1Input](./Images/Silkejemplo.png?style=centerme)
 
 
-En este caso se ha buscado enlaces entre los autores del endpoint de la universidad de Cuenca y la institución de CEDIA, la cual previamente ya se habia realizado el proceso de publicación de sus datos. Una muestra  de los autores que se encontraron como equivalente  se resumen a continuación.
+En este caso se ha buscado enlaces entre los autores del endpoint de la universidad de Cuenca y la institución de CEDIA, la cual previamente ya se había realizado el proceso de publicación de sus datos. Una muestra  de los autores que se encontraron como equivalente  se resumen a continuación.
 
 | Universidad de Cuenca | Cedia | 
 |---------|----------|
@@ -247,6 +257,7 @@ En este caso se ha buscado enlaces entre los autores del endpoint de la universi
 
 ### Explotación ###
 Para mejorar la visualización de los recursos frente a los usuarios se puede emplear el plugin "ELDA Loader". Este plugin utiliza ELDA API para generar una página de descripción de los recursos a los cuales el usuario puedan acceder mediante su URI. Para configurar este plugin el servicio del SPARQL Endpoint debe encontrarse funcionando. Dentro de las configuraciones de este plugin se encuentran:
+
 - SPARQL Service: URI del servicio de endpoint SPARQL
 - BASE URI: URI del grafo en el que se almacenan los datos
 - Entities: Presenta las clases disponibles en el endpoint.
