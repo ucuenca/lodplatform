@@ -32,3 +32,8 @@ La plataforma fue desarrollada usando el utilitario de desarrollo Maven, el cual
     
     sudo apt-get install maven
     
+### Descarga e instalación del Framework ###
+
+La plataforma de Linked Data esta publicada en un repositorio de software libre (Github) y puede descargase como ZIP  desde la siguiente [enlace](https://github.com/santteegt/lodplatform). Una vez descargada se debe descomprimir en un directorio conocido dentro de la plataforma como, por ejemplo: /home/cedia/LOD
+
+    
