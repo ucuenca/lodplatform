@@ -8,12 +8,8 @@ En caso de no tener instalada la plataforma Java en el sistema, se debe proceder
 Esta plataforma puede instalarse utilizando los siguientes comandos.
 
 :::bash
-sudo add-apt-repository ppa:webupd8team/java 
-sudo apt-get update 
-sudo apt-get install oracle-java7-installer
 
-:::python
-    import lifetime
-    
-    for each_day in lifetime.days():
-        carpe_diem()
+    sudo add-apt-repository ppa:webupd8team/java 
+    sudo apt-get update 
+    sudo apt-get install oracle-java7-installer
+        
