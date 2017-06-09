@@ -156,8 +156,7 @@ Se obtiene la siguiente tripleta para las propiedades de Personas:
 
 | Subject | Predicado | Objeto  |
 |---------|----------|--------|
-|\<http://190.15.141.66:8899/ucuenca/contribuyente/
-BRITO_RIVAS__MAURICIO_RODRIGO>  |   \<http://xmlns.com/foaf/0.1/name>    |  "Brito Rivas, Mauricio Rodrigo"  |
+|\<http://190.15.141.66:8899/ucuenca/contribuyente/BRITO_RIVAS__MAURICIO_RODRIGO>  |   \<http://xmlns.com/foaf/0.1/name>    |  "Brito Rivas, Mauricio Rodrigo"  |
 
 
 **Relation**
@@ -192,8 +191,7 @@ Dada la misma relación anterior da como resultado la siguiente  tripleta.
 
 | Subject | Predicado | Objeto  |
 |---------|----------|--------|
-|\<http://190.15.141.66:8899/ucuenca/contribuyente/
-BRITO_RIVAS__MAURICIO_RODRIGO>  |   \<http://rdaregistry.info/Elements/a/P50195>    |  \<http://190.15.141.66:8899/ucuenca/recurso/141>   |
+|\<http://190.15.141.66:8899/ucuenca/contribuyente/BRITO_RIVAS__MAURICIO_RODRIGO>  |   \<http://rdaregistry.info/Elements/a/P50195>    |  \<http://190.15.141.66:8899/ucuenca/recurso/141>   |
 
 
 
@@ -238,6 +236,7 @@ Es posible cambiar el puerto por el cual acceder al servicio,  por lo que en lug
 
 ### Enlace ###
 El proceso de enlace permite establecer vínculos entre los recursos de modo que la información disponible entre varias fuentes pueda ser relacionada. En el caso de repositorios se ha notado que la mayor probabilidad de enlace entre recursos ocurre entre autores, puesto que pueden trabajar realizando obras en varias instituciones. Debido a esta razón se ha creado el plugin de linking Silk workbench que emplea los nombres de los autores junto con las obras asociadas a los mismos para tratar de determinar si dos autores representan la misma persona. Este proceso se lo puede dejar casi al final, debido a que previamente se requiere haberse realizado el proceso de publicación para cada una de las fuentes que requieran enlazarse. Los  datos deben encontrarse publicados debido a que el plugin generado utiliza los servicios de Sparql Endpoint para facilitar su configuración.  Para configurar este plugin se disponen de los siguientes campos:
+
 - Insert first Endpoint y Graph first Endpoint: URI del primer endpoint y su grafo.
 - Insert Second Endpoint y Graph Second Endpoint: URI del segundo endpoint y su grafo.
 - Thresold for metrics: Umbral para la comparación sintáctica (SILK).
