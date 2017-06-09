@@ -156,7 +156,8 @@ Se obtiene la siguiente tripleta para las propiedades de Personas:
 
 | Subject | Predicado | Objeto  |
 |---------|----------|--------|
-|\<http://190.15.141.66:8899/ucuenca/contribuyente/BRITO_RIVAS__MAURICIO_RODRIGO>  |   \<http://xmlns.com/foaf/0.1/name>    |  "Brito Rivas, Mauricio Rodrigo"  |
+|\<http://190.15.141.66:8899/ucuenca/contribuyente/
+BRITO_RIVAS__MAURICIO_RODRIGO>  |   \<http://xmlns.com/foaf/0.1/name>    |  "Brito Rivas, Mauricio Rodrigo"  |
 
 
 **Relation**
@@ -180,7 +181,8 @@ Se genera la tripleta:
 
 | Subject | Predicado | Objeto  |
 |---------|----------|--------|
-|\<http://190.15.141.66:8899/ucuenca/recurso/141>  |  \<http://purl.org/dc/terms/creator>    |   \<http://190.15.141.66:8899/ucuenca/contribuyente/BRITO_RIVAS__MAURICIO_RODRIGO>  |
+|\<http://190.15.141.66:8899/ucuenca/recurso/141>  |  \<http://purl.org/dc/terms/creator>    |   \<http://190.15.141.66:8899/ucuenca/contribuyente/
+BRITO_RIVAS__MAURICIO_RODRIGO>  |
 
 
 
@@ -190,7 +192,8 @@ Dada la misma relación anterior da como resultado la siguiente  tripleta.
 
 | Subject | Predicado | Objeto  |
 |---------|----------|--------|
-|\<http://190.15.141.66:8899/ucuenca/contribuyente/BRITO_RIVAS__MAURICIO_RODRIGO>  |   \<http://rdaregistry.info/Elements/a/P50195>    |  \<http://190.15.141.66:8899/ucuenca/recurso/141>   |
+|\<http://190.15.141.66:8899/ucuenca/contribuyente/
+BRITO_RIVAS__MAURICIO_RODRIGO>  |   \<http://rdaregistry.info/Elements/a/P50195>    |  \<http://190.15.141.66:8899/ucuenca/recurso/141>   |
 
 
 
