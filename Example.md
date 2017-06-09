@@ -194,7 +194,7 @@ Dada la misma relación anterior da como resultado la siguiente  tripleta.
 
 
 
-Para obtener finalmente el archivo en formato RDF se debe utilizar el plugin "R2MLtoRDF2" que mapea las reglas definidas con los datos. Algunos de los  datos previamente definidos  pueden cargarse en este plugin  automáticamente mediante el botón "Retrieve DBConnection From Input Step". Algunos campos que puede requerir definirse son:
+Para obtener finalmente el archivo en formato RDF se debe utilizar el plugin **"R2MLtoRDF2"** que mapea las reglas definidas con los datos. Algunos de los  datos previamente definidos  pueden cargarse en este plugin  automáticamente mediante el botón *"Retrieve DBConnection From Input Step"*. Algunos campos que puede requerir definirse son:
 
 - RDF Output File: Ruta del archivo RDF de salida.
 - RDF Output Format: Formato del archivo RDF. Ejemplo Turtle o RDF/XML.
@@ -217,7 +217,7 @@ Para dar visibilidad a los datos obtenidos y permitir su acceso al público, se 
 - Graph URI: URI del grafo que contendrá el conjunto de datos.
 - Choose a Directory: Directorio de salida de los archivos y dependencias.
 
-Algunos de los campos se cargan automáticamente mediante el boton "Precath". En la tabla posterior se puede configurar ciertas características como permisos de modificación de los datos.
+Algunos de los campos se cargan automáticamente mediante el boton *"Precath"*. En la tabla posterior se puede configurar ciertas características como permisos de modificación de los datos.
 
 - Fuseki:serviceReadGraphStore : Habilita permisos únicamente de  lectura. Por defecto.
 - Fuseki:ServiceUpload: Permite subir nuevos dataset al fuseki.
@@ -256,7 +256,7 @@ En este caso se ha buscado enlaces entre los autores del endpoint de la universi
 | Saquicela, Víctor | Saquicela, Víctor |
 
 ### Explotación ###
-Para mejorar la visualización de los recursos frente a los usuarios se puede emplear el plugin "ELDA Loader". Este plugin utiliza ELDA API para generar una página de descripción de los recursos a los cuales el usuario puedan acceder mediante su URI. Para configurar este plugin el servicio del SPARQL Endpoint debe encontrarse funcionando. Dentro de las configuraciones de este plugin se encuentran:
+Para mejorar la visualización de los recursos frente a los usuarios se puede emplear el plugin **"ELDA Loader"**. Este plugin utiliza ELDA API para generar una página de descripción de los recursos a los cuales el usuario puedan acceder mediante su URI. Para configurar este plugin el servicio del SPARQL Endpoint debe encontrarse funcionando. Dentro de las configuraciones de este plugin se encuentran:
 
 - SPARQL Service: URI del servicio de endpoint SPARQL
 - BASE URI: URI del grafo en el que se almacenan los datos
@@ -267,6 +267,7 @@ Para mejorar la visualización de los recursos frente a los usuarios se puede em
 ![Image1Input](./Images/UCUEElda.png?style=centerme)
 
 Una vez se ha configurado el plugin es necesario correr la transformación para generar una instancia de ELDA. Posteriormente, se debe seguir los siguiente pasos:
+
 1. Trasladarse al directorio de salida
 2. Ejecutar el comando java -jar start.java 
 3. Una vez inicializado abrir el navegador a la dirección http://localhost:8080/ + fuente + Tipo de Recurso. Ejemplo http://localhost:8080/ucuenca/Document
