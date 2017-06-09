@@ -180,8 +180,7 @@ Se genera la tripleta:
 
 | Subject | Predicado | Objeto  |
 |---------|----------|--------|
-|\<http://190.15.141.66:8899/ucuenca/recurso/141>  |  \<http://purl.org/dc/terms/creator>    |   \<http://190.15.141.66:8899/ucuenca/contribuyente/
-BRITO_RIVAS__MAURICIO_RODRIGO>  |
+|\<http://190.15.141.66:8899/ucuenca/recurso/141>  |  \<http://purl.org/dc/terms/creator>    |   \<http://190.15.141.66:8899/ucuenca/contribuyente/BRITO_RIVAS__MAURICIO_RODRIGO>  |
 
 
 
