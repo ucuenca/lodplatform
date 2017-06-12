@@ -17,7 +17,7 @@ Con el avanzar del tiempo un número  mayor de empresas e instituciones se han i
 
 
 
-Para soportar cada una de estas fases el framework emplea plugins (modulos de procesamiento especializados) tanto nativos de este entorno  como desarrollados para brindar  un marco de trabajo gráfico y flexible, con el cual los usuarios puedan convertir sus datos originarios de  un amplio dominio de fuentes o  formatos a datos enlazados de calidad.
+Para soportar cada una de estas fases el framework emplea plugins (módulos de procesamiento especializados) tanto nativos de este entorno  como desarrollados para brindar  un marco de trabajo gráfico y flexible, con el cual los usuarios puedan convertir sus datos originarios de  un amplio dominio de fuentes o  formatos a datos enlazados de calidad.
 
 
 ![ImageARQLOD](./Images/MPLUG.png?style=centerme)
@@ -34,10 +34,10 @@ Para que el framework  pueda soportar el proceso de generación y publicación d
 
 ## Fases del proceso de publicación de datos enlazados ##
 
-A continuación se detalla cada una de las fases del proceso de publicación de datos enlazados y asi como los componentes del framework que se emplea para soportarlas.
+A continuación se detalla cada una de las fases del proceso de publicación de datos enlazados y así como los componentes del framework que se emplea para soportarlas.
 
 ### 1. Especificación ###
-Esta etapa principalmente se centrar en definir las fuentes de los datos que seran  procesados y convertidos siguiendo los principios de Linked Open Data. Para este proceso el framework ofrece varios  plugins para la lectura de datos sobre distintas fuentes (base de datos, servicio web, etc), asi como el procesamiento de  distintos formatos  de datos (csv, excel, json, xml, etc). 
+Esta etapa principalmente se centrar en definir las fuentes de los datos que seran  procesados y convertidos siguiendo los principios de Linked Open Data. Para este proceso el framework ofrece varios  plugins para la lectura de datos sobre distintas fuentes (base de datos, servicio web, etc), así como el procesamiento de  distintos formatos  de datos (csv, excel, json, xml, etc). 
 
 | Plugin  | Soporte |
 |---------|----------|
@@ -53,11 +53,11 @@ Esta etapa principalmente se centrar en definir las fuentes de los datos que ser
 
 
 
-La mayoria de los plugins que pueden ser empleados en esta fase son propios de Pentaho, sin embargo para casos particulares es posible desarrollar plugins personalizados. En este caso se han desarrollado dos plugins especiales orientados a la lectura de  recursos bibliográficos.
+La mayoría de los plugins que pueden ser empleados en esta fase son propios de Pentaho, sin embargo para casos particulares es posible desarrollar plugins personalizados. En este caso se han desarrollado dos plugins especiales orientados a la lectura de  recursos bibliográficos.
 
 | Plugin  | Soporte |
 |---------|----------|
-|  ![OAI](./Images/OAI.PNG?style=centermetab3)   | El protocolo  [OAI-PMH](https://www.openarchives.org/pmh/) es un mecanismo adoptado ampliamente por repositorios digitales para la comunicación y cosecha de metadatos. Mediante el plugin OAI-LOADER es posible acceder a los servicios de los repositoriso digitales como *DSPACE* para la extracción de metadatos.   |
+|  ![OAI](./Images/OAI.PNG?style=centermetab3)   | El protocolo  [OAI-PMH](https://www.openarchives.org/pmh/) es un mecanismo adoptado ampliamente por repositorios digitales para la comunicación y cosecha de metadatos. Mediante el plugin OAI-LOADER es posible acceder a los servicios de los repositorios digitales como *DSPACE* para la extracción de metadatos.   |
 |  ![MARC](./Images/Marc21.PNG?style=centermetab4)     | Este plugin permite la lectura de metadatos de recursos bibliográficos que se encuentren en  formato [MARC 21](https://www.loc.gov/marc/bibliographic/ecbdspa.html). Este formato es ampliamente empleado para el almacenamiento y transferencia de recursos bibliográficos tanto físicos como digitales debido a la gran cantidad de campos especializados que dispone.    |
 
 
@@ -66,22 +66,22 @@ Para obtener más información acerca del funcionamiento y configuraciones de lo
 
 ### 2. Modelamiento ###
 
-En esta etapa se debe identificar, seleccionar o generar vocabularios que permitan describir semánticamente los datos de las fuentes disponibles de acuerdo a su dominio. En este caso el framework provee el plugin llamado **Get Properties OWL** con el cual se puede cargar los vocabularios de ontologias tanto de las que se encuentran disponibles en la web, como las creadas localmente. Para esto brinda dos tipos de carga: 
- - Archivo:  Carga los vocaburios desde un archivo con formato compatible con la definición de esquemas ontologicos por ejemplo OWL.
- - Web : Es posible cargar vocabulario ontologio  definiendo unicamente su prefijo. Ejemplo foaf, dcterms, etc.
+En esta etapa se debe identificar, seleccionar o generar vocabularios que permitan describir semánticamente los datos de las fuentes disponibles de acuerdo a su dominio. En este caso el framework provee el plugin llamado **Get Properties OWL** con el cual se puede cargar los vocabularios de ontologías tanto de las que se encuentran disponibles en la web, como las creadas localmente. Para esto brinda dos tipos de carga: 
+ - Archivo:  Carga los vocabularios desde un archivo con formato compatible con la definición de esquemas ontológicos por ejemplo OWL.
+ - Web : Es posible cargar vocabulario ontológico  definiendo unicamente su prefijo. Ejemplo foaf, dcterms, etc.
  
 ![ImageGetProp](./Images/GetProp.PNG?style=centerme)
  
 Este plugin sirve como paso previo al proceso  asignación de vocabularios  (*Mapping*) en la fase de generación.
 
-Informacón acerca de  la interfaz y configuración de este plugin en la sección del  [Modelamiento](./Especificación.md#fase-de-modelamiento) del manual.
+Información acerca de  la interfaz y configuración de este plugin en la sección del  [Modelamiento](./Especificación.md#fase-de-modelamiento) del manual.
 
 ### 3. Generación  ###
 
 El objetivo central de esta etapa es la conversión de datos a formato RDF, para lo cual se  consideran aspectos como la fiabilidad de los datos y la detección de recursos similares entre fuentes. Para llevar a cabo este objetivo por lo tanto, se realizan varias actividades tales  como limpieza de datos, conversión de datos a formato RDF y generación de enlaces.
 
 ####  3.1 Limpieza de datos ####
-Una actividad importante en el proceso de generación de datos enlazados es la limpieza de datos. Dentro de esta actividad se adecuan, estandarizan y aseguran la calidad minima de los datos para poder generar datos enlazados de calidad. Para realizar esta actividad el framework posee un desempeño destacable al estar basado en una herramienta ETL que dispone de varias componentes nativos para la trasnformación, estandarización y en general procesamiento de datos. Dentro de los plugins mas empleados en esta etapa son:
+Una actividad importante en el proceso de generación de datos enlazados es la limpieza de datos. Dentro de esta actividad se adecuan, estandarizan y aseguran la calidad mínima de los datos para poder generar datos enlazados de calidad. Para realizar esta actividad el framework posee un desempeño destacable al estar basado en una herramienta ETL que dispone de varias componentes nativos para la transformación, estandarización y en general procesamiento de datos. Dentro de los plugins más empleados en esta etapa están:
 
 
 | Plugin  | Soporte |
@@ -91,12 +91,12 @@ Una actividad importante en el proceso de generación de datos enlazados es la l
 |  ![VALUE](./Images/ValueM.png?style=centermetab5)     | Con este plugin se pueden mapear valores de los campos con otros, lo cual es útil cuando se quiere realizar estandarizaciones.    |
 |  ![STRING](./Images/StringOP.png?style=centermetab5)   | Permite realizar operaciones con cadenas de caracteres, como remover números, eliminar caracteres especiales, quitar espacios en blanco entre otros.   |
 
-Una vez los datos han sido procesados se dispone de un plugin de almacenamiento temporal **Data Pre catching**, que permite que los datos ya procesados liberen la memoria y puedan ser manipulados en  los pasos posteriores.
+Una vez los datos han sido procesados, se dispone de un plugin de almacenamiento temporal **Data Pre catching** que permite que los datos ya procesados liberen la memoria y puedan ser manipulados en  los pasos posteriores.
 
 ![ImageDatap](./Images/DataP.PNG?style=centerme)
   
 ####  3.2 Conversión de datos ####
-Una vez los datos han sido acondicionados y se encuentran libres de errores se procede a describirlos semánticamente empleando los vocabularios de las ontologias previamente cargados. Para realizar este proceso se dispone de un plugin  llamado **Ontology & Data Mapping** ,el cual permite vincular cada uno de los campos de los recursos y los propios recursos  con determinado vocabulario semántico. Dicha vinculación (Mapping) funcionan como reglas con lo cual los datos seran descritos automaticamente siguiendo el estandar RDF. 
+Una vez los datos han sido acondicionados y se encuentran libres de errores se procede a describirlos semánticamente empleando los vocabularios de las ontologías previamente cargadas. Para realizar este proceso se dispone de un plugin  llamado **Ontology & Data Mapping** ,el cual permite vincular a los recursos  con determinado vocabulario semántico. Dicha vinculación (Mapping) funcionan como reglas con lo cual los datos serán descritos automáticamente siguiendo el estándar RDF. 
 
   ![ImageDatap](./Images/OntoMap.PNG?style=centerme)
 
@@ -119,14 +119,15 @@ Dentro de este proceso se distinguen 3 diferentes procesos de mapeo:
   
 
   
-Una vez se han generado los archivos de mapping, estos deben ser ingresados en otro plugin (**R2RMLtoRDF**) que permite que las reglas definidas se apliquen sobre los datos para finalmente obtener estos datos en un archivo RDF.  Mediante el plugin  se puede representar los datos con la sintaxis RDF-XML, N3, Turtle, etc.
+Una vez se han generado los archivos de mapeo, estos deben ser ingresados en otro plugin (**R2RMLtoRDF**) que permite que las reglas definidas se apliquen sobre los datos para finalmente obtener estos datos en un archivo RDF.  Mediante el plugin  se puede representar los datos con la sintaxis RDF-XML, N3, Turtle, etc.
   
  ![ImageDatap](./Images/R2RML.PNG?style=centerme)
  
 
-  Mas detalles  acerca de la  interfaz y configuración de los plugins de generación en la sección del manual [Generación](./Especificación.md#fase-de-generaciÓn).
+  Más detalles  acerca de la  interfaz y configuración de los plugins de generación en la sección del manual [Generación](./Especificación.md#fase-de-generaciÓn).
+  
 ####  3.3 Enlace (Linking)  ####
-Para aprovechar de todas las caracteristicas y ventajas que ofrece las tecnologias de Linked Data, es necesario generar enlaces entre recursos de distintas fuentes. Esto permite que la información se enriquezca con cada fuente  disponible y aumenten la cantidad de información que se puede extraer. Para el enlace de datos se ha desarrollado un plugin específico (Silk Plugin) que permite utilizar la potencialidad de [SILK Workbench](http://silkframework.org/) de forma integrada y sencilla para encontrar los recursos similares entre dos fuentes. Por ahora este plugin funciona únicamente para realizar proceso de enlace entre autores y se destaca por contar con un proceso de validación mediante desambiguación semántica. En el proceso de desambiguación los autores son caracterizados por sus  obras para posteriormente generar una  métrica semántica de similaridad, que determinara si dos autores hacen referencia o no a una misma persona.
+Para aprovechar de todas las características y ventajas que ofrece las tecnologías de Linked Data, es necesario generar enlaces entre recursos de distintas fuentes. Esto permite que la información se enriquezca con cada fuente  disponible y aumenten la cantidad de información que se puede extraer. Para el enlace de datos se ha desarrollado un plugin específico (Silk Plugin) que permite utilizar la potencialidad de [SILK Workbench](http://silkframework.org/) de forma integrada y sencilla para encontrar los recursos similares entre dos fuentes. Por ahora este plugin funciona únicamente para realizar proceso de enlace entre autores y se destaca por contar con un proceso de validación mediante desambiguación semántica. En el proceso de desambiguación los autores son caracterizados por sus  obras para posteriormente generar una  métrica semántica de similaridad, que determinara si dos autores hacen referencia o no a una misma persona.
 
  ![ImageDatap](./Images/SILK.PNG?style=centerme)
  
