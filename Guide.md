@@ -39,7 +39,6 @@ La plataforma de Linked Data esta publicada en un repositorio de software libre 
 #### Configuración e instalación ####
 
 Una vez descargado el código fuente se debe especificar el directorio donde deben ser instalados los plugins, esto se hacen en el archivo pom.xml del directorio descargado. El archivo pom.xml  es un archivo XML que contiene configuraciones de compilación para el proyecto, por lo que aquí se debe definir  la ruta de salida para los archivos compilados. Esta configuración se lo realiza en la siguiente ruta XML  (/project/properties/pdiDirectory) como se muestra en el ejemplo. 
-
 :::xml
 
     <properties>
