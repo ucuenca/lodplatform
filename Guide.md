@@ -67,5 +67,5 @@ Al abrir esta aplicación se presentará la interfaz gráfica de Pentaho Data In
 
 
 ![Imagen](./Images/guidelod.PNG?style=centerme)
-![ImageLOD](./Images/MLOD.png?style=centerme)
+
     
