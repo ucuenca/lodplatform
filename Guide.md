@@ -66,6 +66,6 @@ Una vez instalados los plugins para ejecutar la plataforma se tendrá que abrir 
 Al abrir esta aplicación se presentará la interfaz gráfica de Pentaho Data Integration con los plugings de la plataforma de Linked Data como se muestra en la siguiente captura.
 
 
-![Imagen](./images/guidelod.PNG)
-
+![Imagen](./Images/guidelod.PNG?style=centerme)
+![ImageLOD](./Images/MLOD.png?style=centerme)
     
