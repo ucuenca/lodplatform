@@ -38,7 +38,6 @@ La plataforma de Linked Data esta publicada en un repositorio de software libre 
 
 Una vez descargado el código fuente se debe especificar el directorio donde deben ser instalados los plugins, esto se hacen en el archivo pom.xml del directorio descargado. El archivo pom.xml  es un archivo XML que contiene configuraciones de compilación para el proyecto, por lo que aquí se debe definir  la ruta de salida para los archivos compilados. Esta configuración se lo realiza en la siguiente ruta XML  (/project/properties/pdiDirectory) como se muestra en el ejemplo. 
 :::xml
-
     <properties>
     <pdiDirectory>/home/cedia/PDI/data-integration</pdiDirectory>
     <ucuenca.lod.version> ${project.version}</ucuenca.lod.version>
@@ -47,7 +46,6 @@ Una vez descargado el código fuente se debe especificar el directorio donde deb
 
 La ruta de salida debe apuntar a la raiz del directorio de Pentaho data integration para que los plugins una vez compilados se encuentren disponibles para su uso por el framework. Una vez configurada la ruta de salida se puede proceder a compilar e instalar los plugins, esto se realiza usando Maven con los siguientes comandos en consola dentro de la carpeta raiz de los plugins framework descargado  (/lodplatform-master).
 :::bash
-       
        mvn clean install
 
 Este comando compila el código fuente y agrega los ejecutables a la carpeta de Pentaho. Es necesario ejecutarlo solamente una vez, para posteriores ejecuciones de la plataforma solamente se requiere iniciar Pentaho normalmente.
