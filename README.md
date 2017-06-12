@@ -5,9 +5,9 @@ Linked Open Data Platform: Solution to accomplish the life cycle management for 
 
 # Contenido #
 
-- Descripción de LOD-GF
+- [Descripción de LOD-GF] (./README.md#introducción)
 - [Guia de instalación](./Guide.md)  
-- Ejemplos de aplicación
+- [Ejemplos de aplicación](./Example.md) 
 
 ## Introducción ##
 
