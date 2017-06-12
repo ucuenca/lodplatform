@@ -63,7 +63,7 @@ Una vez instalados los plugins para ejecutar la plataforma se tendrá que abrir 
     
      ./spoon.sh
 
-Al abrir esta aplicación se presentará la interfaz gráfica de Pentaho Data Integration con los plugings de la plataforma de Linked Data como se muestra en la siguiente captura.
+Al abrir esta aplicación se presentará la interfaz gráfica de Pentaho Data Integration con los plugings del framework de Linked Data como se muestra en la siguiente imagen.
 
 
 ![Imagen](./Images/guidelod.PNG?style=centerme)
