@@ -127,14 +127,14 @@ Una vez se han generado los archivos de mapeo, estos deben ser ingresados en otr
   Más detalles  acerca de la  interfaz y configuración de los plugins de generación en la sección del manual [Generación](./Especificación.md#fase-de-generaciÓn).
   
 ####  3.3 Enlace (Linking)  ####
-Para aprovechar de todas las características y ventajas que ofrece las tecnologías de Linked Data, es necesario generar enlaces entre recursos de distintas fuentes. Esto permite que la información se enriquezca con cada fuente  disponible y aumenten la cantidad de información que se puede extraer. Para el enlace de datos se ha desarrollado un plugin específico (Silk Plugin) que permite utilizar la potencialidad de [SILK Workbench](http://silkframework.org/) de forma integrada y sencilla para encontrar los recursos similares entre dos fuentes. Por ahora este plugin funciona únicamente para realizar proceso de enlace entre autores y se destaca por contar con un proceso de validación mediante desambiguación semántica. En el proceso de desambiguación los autores son caracterizados por sus  obras para posteriormente generar una  métrica semántica de similaridad, que determinara si dos autores hacen referencia o no a una misma persona.
+Para aprovechar de todas las características y ventajas que ofrece las tecnologías de Linked Data, es necesario generar enlaces entre recursos de distintas fuentes. Esto permite que la información se enriquezca con cada fuente  disponible y aumenten la cantidad de información que se puede extraer. Para el enlace de datos se ha desarrollado un plugin específico (Silk Plugin) que permite utilizar la potencialidad de [SILK Workbench](http://silkframework.org/) de forma integrada y sencilla para encontrar los recursos similares entre dos fuentes. Por ahora este plugin funciona únicamente para realizar proceso de enlace entre autores y se destaca por contar con un proceso de validación mediante desambiguación semántica. En el proceso de desambiguación los autores son caracterizados por sus  obras para posteriormente generar una  métrica semántica de similitud, que determinara si dos autores hacen referencia o no a una misma persona.
 
  ![ImageDatap](./Images/SILK.PNG?style=centerme)
  
-Mas detalles acerca  del plugin de enlace y desambiguación  en la sección del manual [Enlace](./Especificación.md#linking-silk-plugin).
+Más detalles acerca  del plugin de enlace y desambiguación  en la sección del manual [Enlace](./Especificación.md#linking-silk-plugin).
  
 ###  4. Publicación  ###
-En esta etapa se centran los esfuerzos en mejorar la visibilidad de los datos obtenidos de las etapa de generación, para que puedan ser consumidos por las  entidades interesadas. Para llevar a cabo esta  tarea se almacenan regularmente los datos en un triplestore que generalmente disponde de un medio de acceso a los datos (Sparql Endpoint). Para solventar esta fase, el framework dispone de un plugin especializado conocido como **Fuseki Loader**, el cual permite configurar los parametros básicos para el despligue del triplestore [Fuseki](https://jena.apache.org/documentation/fuseki2/) con los datos generados del proceso anterior. Asi mismo, es posible configurar un punto de acceso a los datos para que puedan ser consumidos dessde  la web.
+En esta etapa se centran los esfuerzos en mejorar la visibilidad de los datos obtenidos de la etapa de generación, para que puedan ser consumidos por las  entidades interesadas. Para llevar a cabo esta  tarea se almacenan regularmente los datos en un triplestore que generalmente dispone de un medio de acceso a los datos (Sparql Endpoint). Para solventar esta fase, el framework dispone de un plugin especializado conocido como **Fuseki Loader**, el cual permite configurar los parámetros básicos para el despligue del triplestore [Fuseki](https://jena.apache.org/documentation/fuseki2/) con los datos generados del proceso anterior. Así mismo, es posible configurar un punto de acceso a los datos para que puedan ser consumidos desde  la web.
 
  ![ImageDatap](./Images/FUSEKIplugin.PNG?style=centerme)
  
@@ -154,7 +154,7 @@ Una demostración del funcionamiento del framework para repositorios digitales, 
 [![LOD-GF](http://img.youtube.com/vi/orMefphD1yg/0.jpg)](https://www.youtube.com/watch?v=orMefphD1yg)
 
 
-Un ejemplo completo  de aplicación de repositorios digitales se puede encontrar en la sección de [ejemplo](./Example.md). Mas detalles acerca  del plugin de explotación  con otros casos de uso se pueden encontrar en el reporte técnico en el siguiente [enlace](./technicalReport/frameworktech.pdf) (Disponible unicamente en español).
+Un ejemplo completo  de aplicación de repositorios digitales se puede encontrar en la sección de [ejemplo](./Example.md). Mas detalles acerca  del plugin de explotación  con otros casos de uso se pueden encontrar en el reporte técnico en el siguiente [enlace](./technicalReport/frameworktech.pdf) (Disponible únicamente en español).
 
 
 [ ![Codeship Status for lod/LODPlatform](https://codeship.com/projects/f70d1860-b628-0132-afb1-32912015c090/status?branch=master)](https://codeship.com/projects/70968)
