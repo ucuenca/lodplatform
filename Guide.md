@@ -14,7 +14,6 @@ La siguiente descripción de la  instalación tiene en consideración que se dis
 En caso de no tener instalada la plataforma Java en el sistema, se debe proceder a su instalación ya que todos los componentes de la plataforma utilizan esta plataforma. La versión recomendada es el JDK 7 (oracle).  Esta plataforma puede instalarse utilizando los siguientes comandos.
 
 :::bash
-
     sudo add-apt-repository ppa:webupd8team/java 
     sudo apt-get update 
     sudo apt-get install oracle-java7-installer
@@ -29,7 +28,6 @@ Opcionalmente, se puede agregar un enlace (acceso directo) al archivo spoon.sh y
 La plataforma fue desarrollada usando el utilitario de desarrollo Maven, el cual facilita el manejo de dependencias e instalación de los Plugins. La versión recomendada a ser usada es la 3.0, la cual puede ser descargada e instalada usando los siguientes comandos.
 
 :::bash
-    
     sudo apt-get install maven
     
 ### Descarga e instalación del Framework ###
