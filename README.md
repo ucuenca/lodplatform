@@ -159,8 +159,8 @@ Un ejemplo completo  de aplicación de repositorios digitales se puede encontrar
 ### AGRADECIMIENTOS ###
 Se agradece al departamento de Ciencias de la Computación de la universidad de Cuenca, así como a RED-CEDIA por el apoyo brindado al presente proyecto.
 
- ![ImageUCUENCA](./Images/ELDAPlugin.PNG?style=centerme)
- ![ImageCEDIA](./Images/ELDAPlugin.PNG?style=centerme)
+ ![ImageUCUENCA](./Images/logoucuenca.PNG?style=centerme)
+ ![ImageCEDIA](./Images/logocedia.PNG?style=centerme)
 
 [ ![Codeship Status for lod/LODPlatform](https://codeship.com/projects/f70d1860-b628-0132-afb1-32912015c090/status?branch=master)](https://codeship.com/projects/70968)
 
