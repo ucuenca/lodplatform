@@ -114,7 +114,7 @@ Se genera la siguiente tripleta:
 
 | Subject | Predicado | Objeto  |
 |---------|----------|--------|
-|\<http://190.15.141.66:8899/ucuenca/contribuyente/BRITO_RIVAS__MAURICIO_RODRIGO>   | a   |  \<http://xmlns.com/foaf/0.1/Person>  |
+|\<http://190.15.141.66:8899/ucuenca/contribuyente/<br>BRITO_RIVAS__MAURICIO_RODRIGO>   | a   |  \<http://xmlns.com/foaf/0.1/Person>  |
 
   
 **Anotación**
@@ -140,7 +140,7 @@ Se obtendra la siguiente tripleta:
 
 | Subject | Predicado | Objeto  |
 |---------|----------|--------|
-|\<http://190.15.141.66:8899/ucuenca/recurso/141>  |   \<http://purl.org/dc/terms/title>    |  "Diseño e implementación de servicios especializados para el portal del Centro de Documentación Juan Bautista Vázquez"^^\<http://www.w3.org/2001/XMLSchema#string>  |
+|\<http://190.15.141.66:8899/ucuenca/<br>recurso/141>  |   \<http://purl.org/dc/terms/title>    |  "Diseño e implementación de servicios especializados para el portal del Centro de Documentación Juan Bautista Vázquez"^^\<http://www.w3.org/2001/XMLSchema#string>  |
 
 
 En la regla de asociación (A011) se define la asignación de una propiedad de nombre a la persona declarada en la regla (C012), por lo tanto dado una entrada:
@@ -156,7 +156,7 @@ Se obtiene la siguiente tripleta para las propiedades de Personas:
 
 | Subject | Predicado | Objeto  |
 |---------|----------|--------|
-|\<http://190.15.141.66:8899/ucuenca/contribuyente/BRITO_RIVAS__MAURICIO_RODRIGO>  |   \<http://xmlns.com/foaf/0.1/name>    |  "Brito Rivas, Mauricio Rodrigo"  |
+|\<http://190.15.141.66:8899/ucuenca/contribuyente/<br>BRITO_RIVAS__MAURICIO_RODRIGO>  |   \<http://xmlns.com/foaf/0.1/name>    |  "Brito Rivas, Mauricio Rodrigo"  |
 
 
 **Relation**
