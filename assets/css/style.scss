@@ -49,6 +49,9 @@ img[src$="Image2Input"] {
   width: 300px; 
 }
 
-img[alt=imageucuenca] { width: 500px; }
-img[alt=imagecedia] { width: 100px; right: 0px; }
+//img[alt=imageucuenca] { width: 500px; }
+img[alt=imagecedia] {
+  width: 500px;
+  display:block;
+  margin: 0 auto; }
 
