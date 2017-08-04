@@ -126,16 +126,16 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
                 data.resumptionToken = data.initialResumptionToken;
                 dataLoader.logBasic("Resuming harvesting from "
                         + data.resumptionToken); // Some basic logging
-                data.listRecords = new ListRecords(meta.getInputURI(),
+                data.listRecords = new ListRecords(meta.getEnvironmentSubstituteInputURI(),
                         data.resumptionToken, data.schema);
-                data.listSet = new ListSets(meta.getInputURI(),
+                data.listSet = new ListSets(meta.getEnvironmentSubstituteInputURI(),
                         data.resumptionToken);
             } else {
                 data.resumptionToken = "";
-                data.listRecords = new ListRecords(meta.getInputURI(),
+                data.listRecords = new ListRecords(meta.getEnvironmentSubstituteInputURI(),
                         data.fromDate, data.untilDate, data.set,
                         meta.getPrefix(), data.schema);
-                data.listSet = new ListSets(meta.getInputURI());
+                data.listSet = new ListSets(meta.getEnvironmentSubstituteInputURI());
             }
             this.loadListSets(meta, data);
             this.databaseLoad = databaseLoad;
@@ -204,7 +204,7 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
                     try {
                         // listRecords = new ListRecords(url_str,
                         // resumptionToken);
-                        listSet = new ListSets(meta.getInputURI(),
+                        listSet = new ListSets(meta.getEnvironmentSubstituteInputURI(),
                                 data.resumptionToken);
                     } catch (IOException e) {
                         dataLoader
@@ -212,7 +212,7 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
                                         + resumptionToken + ", trying again.");
                         // listRecords = new ListRecords(url_str,
                         // resumptionToken);
-                        listSet = new ListSets(meta.getInputURI(),
+                        listSet = new ListSets(meta.getEnvironmentSubstituteInputURI(),
                                 data.resumptionToken);
                     } catch (SAXException e) {
                         dataLoader
@@ -220,7 +220,7 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
                                         + resumptionToken + ", trying again.");
                         // listRecords = new ListRecords(url_str,
                         // resumptionToken);
-                        listSet = new ListSets(meta.getInputURI(),
+                        listSet = new ListSets(meta.getEnvironmentSubstituteInputURI(),
                                 data.resumptionToken);
                     }
                 }
@@ -380,7 +380,7 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
                     dataLoader.logBasic("Resuming harvesting from "
                             + data.resumptionToken);
                     try {
-                        data.listRecords = new ListRecords(meta.getInputURI(),
+                        data.listRecords = new ListRecords(meta.getEnvironmentSubstituteInputURI(),
                                 data.resumptionToken);
                         this.header = null;
                     } catch (IOException e) {
@@ -401,7 +401,7 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
                                             + data.resumptionToken
                                             + ", trying again.");
 
-                            data.listRecords = new ListRecords(meta.getInputURI(),
+                            data.listRecords = new ListRecords(meta.getEnvironmentSubstituteInputURI(),
                                     data.resumptionToken);
                             this.header = null;
                         }
@@ -411,7 +411,7 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
                                         + data.resumptionToken
                                         + ", trying again.");
 
-                        data.listRecords = new ListRecords(meta.getInputURI(),
+                        data.listRecords = new ListRecords(meta.getEnvironmentSubstituteInputURI(),
                                 data.resumptionToken);
 
                     }

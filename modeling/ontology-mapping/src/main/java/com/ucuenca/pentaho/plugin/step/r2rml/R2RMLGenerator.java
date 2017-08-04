@@ -58,7 +58,7 @@ public class R2RMLGenerator {
         try {
             meta = (OntoMapMeta) smi;
             data = (OntoMapData) sdi;
-            baseURI = meta.getMapBaseURI();
+            baseURI = meta.getEnvMapBaseURI();
             sqlClassificationRows += data.CLASSIFICATIONTABLE + " WHERE TRANSID = ? AND STEPID = ?";
             sqlAnnotationRows += data.ANNOTATIONTABLE + " WHERE TRANSID = ? AND STEPID = ? AND ENTITY_CLASSID = ?";
             sqlRelationRows += data.RELATIONTABLE + " WHERE TRANSID = ? AND STEPID = ?";

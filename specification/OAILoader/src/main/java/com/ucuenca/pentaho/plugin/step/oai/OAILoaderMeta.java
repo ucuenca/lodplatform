@@ -75,6 +75,8 @@ public class OAILoaderMeta extends BaseStepMeta implements StepMetaInterface {
     private String stepName;
 
     private String ResponseDateField;
+    
+    private OAILoader TransEnvironment;
 
     /**
      * Constructor should call super() to make sure the base class has a chance
@@ -328,6 +330,24 @@ public class OAILoaderMeta extends BaseStepMeta implements StepMetaInterface {
     }
 
 //get and set
+
+    public OAILoader getTransEnvironment() {
+        return TransEnvironment;
+    }
+
+    public void setTransEnvironment(OAILoader TransEnviroment) {
+        this.TransEnvironment = TransEnviroment;
+    }
+    
+    
+    
+    public String getEnvironmentSubstituteInputURI() {
+        return TransEnvironment.environmentSubstitute(inputURI);
+    }
+    
+    
+    
+    
     public String getInputURI() {
         return inputURI;
     }

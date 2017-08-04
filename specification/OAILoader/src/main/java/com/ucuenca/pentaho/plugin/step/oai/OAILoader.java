@@ -57,6 +57,7 @@ public class OAILoader extends BaseStep implements StepInterface {
     public boolean init(StepMetaInterface smi, StepDataInterface sdi) {
         // Casting to step-specific implementation classes is safe
         OAILoaderMeta meta = (OAILoaderMeta) smi;
+        meta.setTransEnvironment(this);
         OAILoaderData data = (OAILoaderData) sdi;
         data.getDataLoader().setBaseStep(this);
         //

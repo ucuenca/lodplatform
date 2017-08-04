@@ -48,6 +48,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.pentaho.di.ui.core.widget.TextVar;
 import org.pentaho.di.core.Const;
 import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.i18n.BaseMessages;
@@ -91,7 +92,7 @@ public class OAILoaderDialog extends BaseStepDialog implements
 
     // componentes de la interface
     private Label lbURI;
-    private Text txtURI;
+    private TextVar txtURI;
 
     private Label lbResponseDateField;
     private Text txtResponseDateField;
@@ -294,7 +295,7 @@ public class OAILoaderDialog extends BaseStepDialog implements
         fdlbURI.top = new FormAttachment(txtResponseDateField, margin);
         lbURI.setLayoutData(fdlbURI);
 
-        txtURI = new Text(shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
+        txtURI = new TextVar(transMeta,shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
         txtURI.setText(meta.getInputURI());
         props.setLook(txtURI);
         txtURI.addModifyListener(lsMod);
@@ -571,7 +572,6 @@ public class OAILoaderDialog extends BaseStepDialog implements
      */
     private void populateDialog() {
         wStepname.selectAll();
-
         if (!meta.getInputURI().equals("Input URI")) {
             prefix = meta.getPrefix();
             listPrefix(meta.getInputURI());

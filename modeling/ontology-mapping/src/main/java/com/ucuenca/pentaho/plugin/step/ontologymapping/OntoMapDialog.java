@@ -85,6 +85,7 @@ import org.pentaho.di.trans.step.errorhandling.StreamInterface;
 
 import com.ucuenca.misctools.DatabaseLoader;
 import com.ucuenca.pentaho.plugin.step.r2rml.DataTypeProcessor;
+import org.pentaho.di.ui.core.widget.TextVar;
 
 /**
  * This class is part of the demo step plug-in implementation.
@@ -128,7 +129,7 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	  private FormData fdlStep2, fdStep2;
 	  
 	  private Label wlBaseURI;
-	  private Text wBaseURI;
+	  private TextVar wBaseURI;
 	  private FormData fdlBaseURI, fdBaseURI;
 	  
 	  private Label wlOutputDir;
@@ -350,7 +351,7 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	    fdlBaseURI.right = new FormAttachment( middle, -margin );
 	    fdlBaseURI.top = new FormAttachment( wStep2, margin );
 	    wlBaseURI.setLayoutData( fdlBaseURI );
-	    wBaseURI = new Text( shell, SWT.SINGLE | SWT.LEFT | SWT.MEDIUM | SWT.BORDER );
+	    wBaseURI = new TextVar(transMeta, shell, SWT.SINGLE | SWT.LEFT | SWT.MEDIUM | SWT.BORDER );
 	    wBaseURI.setText( "http://" );
 	    props.setLook( wBaseURI );
 	    wBaseURI.addModifyListener( lsMod );
@@ -359,7 +360,7 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	    fdBaseURI.top = new FormAttachment( wStep2, margin );
 	    fdBaseURI.right = new FormAttachment( 80, 0 );
 	    wBaseURI.setLayoutData( fdBaseURI );
-	    wBaseURI.addSelectionListener(inputStepLs);
+	    //wBaseURI.addSelectionListener(inputStepLs);
 	    
 		wlOutputDir=new Label(shell, SWT.RIGHT | SWT.MEDIUM);
 		wlOutputDir.setText( BaseMessages.getString( PKG, "OntologyMapping.OutputDir.Label" ) );

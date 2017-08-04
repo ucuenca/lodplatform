@@ -96,6 +96,16 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 	  private String outputDir;
 	  private List<String> sqlStack = new ArrayList<String>();
 	  private String outFileName;
+          
+          private OntoMap Environment;
+
+    public OntoMap getEnvironment() {
+        return Environment;
+    }
+
+    public void setEnvironment(OntoMap Environment) {
+        this.Environment = Environment;
+    }
 
 	  
 	public String getOutFileName() {
@@ -125,7 +135,11 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 	public String getMapBaseURI() {
 		return mapBaseURI;
 	}
+        public String getEnvMapBaseURI() {
+		return Environment.environmentSubstitute(mapBaseURI);
+	}
 
+        
 	public void setMapBaseURI(String mapBaseURI) {
 		this.mapBaseURI = mapBaseURI;
 	}
