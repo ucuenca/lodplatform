@@ -137,7 +137,7 @@ public class OntoMap extends BaseStep implements StepInterface {
 			getRow();
 			data.outputRowMeta = getInputRowMeta().clone();
 			meta.getFields(data.outputRowMeta, getStepname(), null, null, this);
-
+                        meta.setEnvironment(this);
 			R2RMLGenerator r2rmlParser = new R2RMLGenerator(smi, sdi);
 			r2rmlParser.process();
 			List<String[]> rowSet = r2rmlParser.getModelSentences();
