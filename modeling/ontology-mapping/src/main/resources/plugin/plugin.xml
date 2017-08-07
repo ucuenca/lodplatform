@@ -27,6 +27,7 @@
     		 <library name="lib/json-20070829.jar"/>
     		 <library name="lib/misctools-0.0.1-SNAPSHOT.jar"/>
     		 <library name="lib/slf4j-api-1.7.6.jar"/>
+                 <library name="lib/slf4j-simple-1.7.6.jar"/>
     		 <library name="lib/jena-core-2.12.0.jar"/>
 		</libraries>
 		

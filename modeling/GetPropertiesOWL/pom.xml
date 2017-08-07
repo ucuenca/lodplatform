@@ -100,7 +100,17 @@
 									<overWrite>false</overWrite>
 									<outputDirectory>${project.build.directory}/lib</outputDirectory>
 								</artifactItem>
-								<artifactItem>
+								
+                                                                <artifactItem>
+									<groupId>org.slf4j</groupId>
+									<artifactId>slf4j-simple</artifactId>
+									<type>jar</type>
+									<version>1.7.6</version>
+									<overWrite>false</overWrite>
+									<outputDirectory>${project.build.directory}/lib</outputDirectory>
+								</artifactItem>
+                                                                
+                                                                <artifactItem>
 									<groupId>org.slf4j</groupId>
 									<artifactId>slf4j-api</artifactId>
 									<type>jar</type>

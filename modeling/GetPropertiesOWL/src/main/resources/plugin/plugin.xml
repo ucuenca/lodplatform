@@ -22,6 +22,7 @@
     		<!-- specify additional jars to be included when loading the step plug-in -->
     			<library name="lib/jena-core-2.12.0.jar"/>
     		 	<library name="lib/slf4j-api-1.7.6.jar"/>
+                        <library name="lib/slf4j-simple-1.7.6.jar"/>
     		 	<library name="lib/jena-arq-2.12.0.jar"/>
     		 	<library name="lib/jena-iri-1.1.0.jar"/>
     		 	<library name="lib/httpclient-4.2.6.jar"/>
