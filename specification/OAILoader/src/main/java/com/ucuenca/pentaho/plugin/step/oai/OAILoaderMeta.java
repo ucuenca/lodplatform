@@ -342,7 +342,7 @@ public class OAILoaderMeta extends BaseStepMeta implements StepMetaInterface {
     
     
     public String getEnvironmentSubstituteInputURI() {
-        return TransEnvironment.environmentSubstitute(inputURI);
+        return TransEnvironment.getParentVariableSpace().environmentSubstitute(inputURI);
     }
     
     

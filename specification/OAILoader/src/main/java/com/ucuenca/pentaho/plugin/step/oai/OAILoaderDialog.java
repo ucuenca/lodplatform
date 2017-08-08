@@ -360,7 +360,7 @@ public class OAILoaderDialog extends BaseStepDialog implements
 
                 Pattern pat = Pattern.compile("^http://.*");
                 Matcher mat = pat.matcher(txtURI.getText());
-                if (mat.matches()) { // entonces es una uri
+                if (true || mat.matches()) { // entonces es una uri
                     //meta.setInputURI(txtURI.getText());	
                     valueUri = txtURI.getText();
                     cbmPrefix.setText("");

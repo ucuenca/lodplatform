@@ -136,7 +136,7 @@ public class OntoMapMeta extends BaseStepMeta implements StepMetaInterface {
 		return mapBaseURI;
 	}
         public String getEnvMapBaseURI() {
-		return Environment.environmentSubstitute(mapBaseURI);
+		return Environment.getParentVariableSpace().environmentSubstitute(mapBaseURI);
 	}
 
         
