@@ -77,6 +77,8 @@ public class RDFGenerationMeta extends BaseStepMeta implements
 	private String fileoutput;
 
 	private String stepName;
+        
+        private RDFGeneration Environment;
 
 	/**
 	 * Constructor should call super() to make sure the base class has a chance
@@ -434,6 +436,11 @@ public class RDFGenerationMeta extends BaseStepMeta implements
 	public String getInputFieldr2rml() {
 		return inputFieldr2rml;
 	}
+        
+        public String getEnvInputFieldr2rml() {
+		return Environment.getParentVariableSpace().environmentSubstitute(inputFieldr2rml);
+	}
+        
 
 	public void setInputFieldr2rml(String inputFieldr2rml) {
 		this.inputFieldr2rml = inputFieldr2rml;
@@ -490,6 +497,11 @@ public class RDFGenerationMeta extends BaseStepMeta implements
 	public String getDirectorioOutputRDF() {
 		return directorioOutputRDF;
 	}
+        
+        public String getEnvDirectorioOutputRDF() {
+		return Environment.getParentVariableSpace().environmentSubstitute(directorioOutputRDF);
+	}
+        
 
 	public void setDirectorioOutputRDF(String directorioOutputRDF) {
 		this.directorioOutputRDF = directorioOutputRDF;
@@ -514,9 +526,19 @@ public class RDFGenerationMeta extends BaseStepMeta implements
 	public String getFileoutput() {
 		return fileoutput;
 	}
-
+        
 	public void setFileoutput(String fileoutput) {
 		this.fileoutput = fileoutput;
 	}
+
+    public RDFGeneration getEnvironment() {
+        return Environment;
+    }
+
+    public void setEnvironment(RDFGeneration Environment) {
+        this.Environment = Environment;
+    }
+        
+        
 
 }

@@ -516,7 +516,7 @@ public class R2RMLGenerator {
      * @throws Exception
      */
     private void finishProcess() throws Exception {
-        String url = meta.getOutputDir() + System.getProperty("file.separator") + meta.getOutFileName();
+        String url = meta.getEnvOutputDir() + System.getProperty("file.separator") + meta.getOutFileName();
         FileOutputStream out = new FileOutputStream(url);
         r2rmlModel.write(out, "TURTLE");
         DatabaseLoader.closeConnection();

@@ -211,6 +211,7 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 				first = false;
 
 				super.init(meta, data);
+                                meta.setEnvironment(this);
 				data.outputRowMeta = getInputRowMeta() != null ? getInputRowMeta().clone(): new RowMeta();
 				//data.outputRowMeta = (RowMetaInterface) getInputRowMeta().clone();
 				try {
@@ -255,22 +256,22 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 					 */
 
 					// create destination
-					File dir = new File(meta.getDirectory() + "/fuseki");
+					File dir = new File(meta.getEnvDirectory() + "/fuseki");
 					dir.mkdir();
 					//
 					File source = new File("plugins/steps/FusekiLoader/fuseki");
-					File destination = new File(meta.getDirectory() + "/fuseki");
+					File destination = new File(meta.getEnvDirectory() + "/fuseki");
 
 					recursiveCopy(source, destination);
 					// copyFile(source,destination);
 
 					logBasic("The file was build succesfully in "
-							+ meta.getDirectory() + "/" + "fuseki");
+							+ meta.getEnvDirectory() + "/" + "fuseki");
 
 				} catch (Exception e1) {
 
 					logBasic(" ERROR " + e1 + "The File was not created. in "
-							+ meta.getDirectory() + "/" + "fuseki");
+							+ meta.getEnvDirectory() + "/" + "fuseki");
 				}
 
 			}
@@ -289,7 +290,7 @@ public class FusekiLoader extends BaseStep implements StepInterface {
 			
 			Object[] outputRow = new Object[2];
 
-			outputRow[0] = meta.getDirectory() + "/fuseki";
+			outputRow[0] = meta.getEnvDirectory() + "/fuseki";
 			outputRow[1] = status;
 			putRow(data.outputRowMeta, outputRow);
 

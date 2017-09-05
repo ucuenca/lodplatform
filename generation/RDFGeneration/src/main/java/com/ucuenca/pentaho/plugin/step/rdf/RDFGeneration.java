@@ -127,17 +127,18 @@ public class RDFGeneration extends BaseStep implements StepInterface {
 		if (first) {
 			first = false;
 			super.init(meta, data);
+                        meta.setEnvironment(this);
 			data.outputRowMeta = getInputRowMeta() != null ? getInputRowMeta().clone(): new RowMeta();
 			meta.getFields(data.outputRowMeta, getStepname(), null, null, this);
 		}
 		
 		Object [] outputRow = RowDataUtil.allocateRowData(data.outputRowMeta.size());
-		outputRow[0] = meta.getInputFieldr2rml(); 
-		if (meta.getInputFieldr2rml() == null || meta.getSqlvendor() == null
+		outputRow[0] = meta.getEnvInputFieldr2rml(); 
+		if (meta.getEnvInputFieldr2rml() == null || meta.getSqlvendor() == null
 				|| meta.getDatabaseURL() == null
 				|| meta.getDatabaseSchema() == null
 				|| meta.getUserName() == null || meta.getPassword() == null
-				|| meta.getDirectorioOutputRDF() == null
+				|| meta.getEnvDirectorioOutputRDF() == null
 				|| meta.getFormat() == null) {
 			logError(BaseMessages.getString(PKG,
 					"RDFGeneration.ERROR.MissingField"));
@@ -176,12 +177,12 @@ public class RDFGeneration extends BaseStep implements StepInterface {
 				SesameDataSet g = null;
 
 				g = R2RMLProcessor.convertDatabase(data.conn,
-						meta.getInputFieldr2rml(), meta.getBaseUri(),
+						meta.getEnvInputFieldr2rml(), meta.getBaseUri(),
 						data.sqlDriver);
-				outputRow[0] = meta.getDirectorioOutputRDF() + "/"
+				outputRow[0] = meta.getEnvDirectorioOutputRDF() + "/"
 						+ meta.getFileoutput();
 				g.dumpRDF(
-						meta.getDirectorioOutputRDF() + "/"
+						meta.getEnvDirectorioOutputRDF() + "/"
 								+ meta.getFileoutput(), data.rdfFormat);
 
 			} catch (Exception e) {
@@ -200,7 +201,7 @@ public class RDFGeneration extends BaseStep implements StepInterface {
 		putRow(data.outputRowMeta, outputRow);
 
 		if (checkFeedback(getLinesRead())) {
-			logBasic(meta.getDirectorioOutputRDF()); // Some basic logging
+			logBasic(meta.getEnvDirectorioOutputRDF()); // Some basic logging
 		}
 
 		// indicate that processRow() should be called again
