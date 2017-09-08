@@ -133,7 +133,7 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	  private FormData fdlBaseURI, fdBaseURI;
 	  
 	  private Label wlOutputDir;
-	  private Text wOutputDir;
+	  private TextVar wOutputDir;
 	  private FormData fdlOutputDir, fdOutputDir;
 	
 	  private CTabFolder wTabFolder;
@@ -370,7 +370,7 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 		fdlOutputDir.right= new FormAttachment(middle, -margin);
 		fdlOutputDir.top  = new FormAttachment(wBaseURI, margin);
 		wlOutputDir.setLayoutData(fdlOutputDir);		
-		wOutputDir = new Text(shell, SWT.SINGLE | SWT.LEFT | SWT.MEDIUM | SWT.BORDER);
+		wOutputDir = new TextVar(transMeta,shell, SWT.SINGLE | SWT.LEFT | SWT.MEDIUM | SWT.BORDER);
  		props.setLook(wOutputDir);
  		wOutputDir.addModifyListener(lsMod);
  		wOutputDir.setEditable(Boolean.FALSE);

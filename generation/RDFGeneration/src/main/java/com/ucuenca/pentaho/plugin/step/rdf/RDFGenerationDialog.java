@@ -65,6 +65,7 @@ import org.pentaho.di.trans.step.StepMetaInterface;
 
 import com.ucuenca.misctools.DatabaseLoader;
 import com.ucuenca.misctools.StepDataLoader;
+import org.pentaho.di.ui.core.widget.TextVar;
 
 /**
  * This class is part of the demo step plug-in implementation. It demonstrates
@@ -101,7 +102,7 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 	private Text txtdatabaseSchema;
 	private Text txtuserName;
 	private Text txtbaseUri;
-	private Text txtoutputFileRDF;
+	private TextVar txtoutputFileRDF;
 	private Text txtpassword;
 
 	private Button btnloadFile;
@@ -135,7 +136,7 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 	private FormData fbcbmoutputFormat;
 
 	// text field holding the name of the field to add to the row stream
-	private Text txtR2rmlfile;
+	private TextVar txtR2rmlfile;
 
 	private Listener lsTest;
 
@@ -244,7 +245,7 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 		fdlbR2rmlFile.top = new FormAttachment(wStepname, margin);
 		lbR2rmlFile.setLayoutData(fdlbR2rmlFile);
 
-		txtR2rmlfile = new Text(shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
+		txtR2rmlfile = new TextVar(transMeta,shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
 		// txtR2rmlfile.setText(meta.getInputFieldr2rml());
 		props.setLook(txtR2rmlfile);
 		txtR2rmlfile.addModifyListener(lsMod);
@@ -434,7 +435,7 @@ public class RDFGenerationDialog extends BaseStepDialog implements
 		fdloutputrdf.top = new FormAttachment(txtbaseUri, margin);
 		lboutputFileRDF.setLayoutData(fdloutputrdf);
 
-		txtoutputFileRDF = new Text(shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
+		txtoutputFileRDF = new TextVar(transMeta,shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
 		// txtoutputFileRDF.setText(meta.getDirectorioOutputRDF());
 		props.setLook(txtoutputFileRDF);
 		txtoutputFileRDF.addModifyListener(lsMod);
