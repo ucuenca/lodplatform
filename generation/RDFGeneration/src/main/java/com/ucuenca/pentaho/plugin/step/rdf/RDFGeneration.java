@@ -152,7 +152,8 @@ public class RDFGeneration extends BaseStep implements StepInterface {
 			try {
 
 				if (meta.getFormat().equals("TURTLE")) {
-					data.rdfFormat = RDFFormat.TURTLE;
+                                       
+					data.rdfFormat =  RDFFormat.TURTLE;
 				} else if (meta.getFormat().equals("RDFXML")) {
 					data.rdfFormat = RDFFormat.RDFXML;
 				} else if (meta.getFormat().equals("NTRIPLES")) {
@@ -190,6 +191,8 @@ public class RDFGeneration extends BaseStep implements StepInterface {
 			} finally {
 				try {
 					// Close db connection
+                                    
+                                    RDFFormat a = RDFFormat.TURTLE;
 					data.conn.close();
 				} catch (SQLException e) {
 					logBasic("expection" + e.getMessage());

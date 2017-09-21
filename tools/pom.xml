@@ -15,6 +15,5 @@
   <name>LOD Tools</name>
   <modules>
 	<module>misctools</module>
-	<module>data-precatching</module>
   </modules>
 </project>

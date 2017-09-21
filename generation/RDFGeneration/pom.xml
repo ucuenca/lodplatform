@@ -1,920 +1,928 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-
-	<parent>
-		<groupId>com.ucuenca</groupId>
-		<artifactId>generation</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
-	</parent>
-
-	<groupId>com.ucuenca</groupId>
-	<artifactId>RDFGeneration</artifactId>
-	<packaging>jar</packaging>
-
-	<name>RDFGeneration</name>
-	<!-- <url>http://maven.apache.org</url> -->
-
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
-
-	<repositories>
-		<repository>
-			<id>default</id>
-			<url>http://repo1.maven.org/maven2/</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-			<id>central</id>
-			<name>repo</name>
-			<url>http://nexus.pentaho.org/content/groups/omni</url>
-		</repository>
-
-
-	</repositories>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.7</version>
-				<executions>
-					<execution>
-						<id>deploy-plugin</id>
-						<phase>package</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<target>
-								<property name="runtime-classpath" refid="maven.runtime.classpath" />
-								<property name="kettle-local-dir" value="${pdiDirectory}" />
-								<ant antfile="build.xml" target="install" output="${basedir}/target/ant.log"
-									inheritRefs="true" />
-							</target>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<!-- Dependencias a ser copiadas en la distribución -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.8</version>
-				<executions>
-					<execution>
-						<id>copy</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>copy</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<!-- Ejemplo de dependencia a ser copiada -->
-								<!-- *************************WARNING************************* -->
-								<!-- ********************************************************* -->
-								<!-- RECORDAR INCLUIR REFERENCIAS A ESTAS LIBRERIAS EN ARCHIVO -->
-								<!-- src/main/resources/plugin.xml CON UBICACIÓN EN LA CARPETA lib/ -->
-								<!-- ********************************************************* -->
-								<!-- ********************************************************* -->
-								<artifactItem>
-									<groupId>junit</groupId>
-									<artifactId>junit</artifactId>
-									<version>3.8.1</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>net.antidot</groupId>
-									<artifactId>db2triples</artifactId>
-									<version>${antidot.db2triples.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-runtime</artifactId>
-									<version>2.6.10</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-http-client</artifactId>
-									<version>2.6.10</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>commons-codec</groupId>
-									<artifactId>commons-codec</artifactId>
-									<version>1.4</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>commons-httpclient</groupId>
-									<artifactId>commons-httpclient</artifactId>
-									<version>3.1</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>commons-logging</groupId>
-									<artifactId>commons-logging</artifactId>
-									<version>1.1.2</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-http-protocol</artifactId>
-									<version>2.6.10</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-model</artifactId>
-									<version>2.6.10</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-util</artifactId>
-									<version>2.6.10</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.slf4j</groupId>
-									<artifactId>slf4j-api</artifactId>
-									<version>1.6.1</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-query</artifactId>
-									<version>${openrdf.sesame.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-queryalgebra-model</artifactId>
-									<version>${openrdf.sesame.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-queryparser-api</artifactId>
-									<version>${openrdf.sesame.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-queryparser-serql</artifactId>
-									<version>${openrdf.sesame.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-queryparser-sparql</artifactId>
-									<version>${openrdf.sesame.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-queryresultio-api</artifactId>
-									<version>${openrdf.sesame.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-queryresultio-binary</artifactId>
-									<version>${openrdf.sesame.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-queryresultio-sparqljson</artifactId>
-									<version>${openrdf.sesame.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-queryresultio-sparqlxml</artifactId>
-									<version>${openrdf.sesame.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-queryresultio-text</artifactId>
-									<version>${openrdf.sesame.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-repository-api</artifactId>
-									<version>${openrdf.sesame.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-repository-contextaware</artifactId>
-									<version>${openrdf.sesame.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-repository-dataset</artifactId>
-									<version>${openrdf.sesame.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-repository-http</artifactId>
-									<version>${openrdf.sesame.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-repository-manager</artifactId>
-									<version>${openrdf.sesame.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-repository-sail</artifactId>
-									<version>${openrdf.sesame.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-rio-api</artifactId>
-									<version>${openrdf.sesame.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-rio-binary</artifactId>
-									<version>${openrdf.sesame.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-rio-n3</artifactId>
-									<version>${openrdf.sesame.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-rio-ntriples</artifactId>
-									<version>${openrdf.sesame.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-rio-rdfxml</artifactId>
-									<version>${openrdf.sesame.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-rio-trig</artifactId>
-									<version>${openrdf.sesame.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-rio-trix</artifactId>
-									<version>${openrdf.sesame.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-rio-turtle</artifactId>
-									<version>${openrdf.sesame.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-sail-api</artifactId>
-									<version>${openrdf.sesame.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-sail-inferencer</artifactId>
-									<version>${openrdf.sesame.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-sail-nativerdf</artifactId>
-									<version>${openrdf.sesame.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-sail-rdbms</artifactId>
-									<version>${openrdf.sesame.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-sail-memory</artifactId>
-									<version>${openrdf.sesame.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-queryalgebra-evaluation</artifactId>
-									<version>${openrdf.sesame.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>net.sf.opencsv</groupId>
-									<artifactId>opencsv</artifactId>
-									<version>2.0</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>commons-cli</groupId>
-									<artifactId>commons-cli</artifactId>
-									<version>1.2</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-repository-sparql</artifactId>
-									<version>${openrdf.sesame.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.openrdf.sesame</groupId>
-									<artifactId>sesame-repository-event</artifactId>
-									<version>${openrdf.sesame.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>commons-dbcp</groupId>
-									<artifactId>commons-dbcp</artifactId>
-									<version>1.3</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>commons-pool</groupId>
-									<artifactId>commons-pool</artifactId>
-									<version>1.5.4</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.slf4j</groupId>
-									<artifactId>slf4j-simple</artifactId>
-									<version>1.6.1</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>mysql</groupId>
-									<artifactId>mysql-connector-java</artifactId>
-									<version>5.1.25</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>postgresql</groupId>
-									<artifactId>postgresql</artifactId>
-									<version>9.1-901.jdbc4</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-
-								<artifactItem>
-									<groupId>com.ucuenca</groupId>
-									<artifactId>misctools</artifactId>
-									<version>${project.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-
-
-								<artifactItem>
-									<groupId>com.h2database</groupId>
-									<artifactId>h2</artifactId>
-									<version>${h2.database.version}</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/lib</outputDirectory>
-								</artifactItem>
-							</artifactItems>
-						</configuration>
-
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<excludes>
-					<exclude>plugin/*.*</exclude>
-				</excludes>
-			</resource>
-			<resource>
-				<directory>src/main/java</directory>
-				<includes>
-					<include>**/*.properties</include>
-				</includes>
-			</resource>
-		</resources>
-	</build>
-
-	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>pentaho-kettle</groupId>
-			<artifactId>kettle-core</artifactId>
-			<version>${pentaho.kettle.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>pentaho-kettle</groupId>
-			<artifactId>kettle-dbdialog</artifactId>
-			<version>${pentaho.kettle.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>pentaho-kettle</groupId>
-			<artifactId>kettle-engine</artifactId>
-			<version>${pentaho.kettle.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>pentaho-kettle</groupId>
-			<artifactId>kettle-ui-swt</artifactId>
-			<version>${pentaho.kettle.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>net.antidot</groupId>
-			<artifactId>db2triples</artifactId>
-			<version>${antidot.db2triples.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-runtime</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-http-client</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-			<version>1.4</version>
-		</dependency>
-
-		<dependency>
-			<groupId>commons-httpclient</groupId>
-			<artifactId>commons-httpclient</artifactId>
-			<version>3.1</version>
-		</dependency>
-
-		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-			<version>1.1.2</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-http-protocol</artifactId>
-			<version>2.6.10</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-model</artifactId>
-			<version>2.6.10</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-util</artifactId>
-			<version>2.6.10</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.6.1</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-query</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-queryalgebra-model</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-queryparser-api</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-queryparser-serql</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-queryparser-sparql</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-queryresultio-api</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-queryresultio-binary</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-queryresultio-sparqljson</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-queryresultio-sparqlxml</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-queryresultio-text</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-repository-api</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-repository-contextaware</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-repository-dataset</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-repository-http</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-repository-manager</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-repository-sail</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-rio-api</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-rio-binary</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-rio-n3</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-rio-ntriples</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-rio-rdfxml</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-rio-trig</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-rio-trix</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-rio-turtle</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-sail-api</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-sail-inferencer</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-sail-memory</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-sail-nativerdf</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-sail-rdbms</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-queryalgebra-evaluation</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>net.sf.opencsv</groupId>
-			<artifactId>opencsv</artifactId>
-			<version>2.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>commons-cli</groupId>
-			<artifactId>commons-cli</artifactId>
-			<version>1.2</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-repository-sparql</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-repository-event</artifactId>
-			<version>${openrdf.sesame.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>commons-dbcp</groupId>
-			<artifactId>commons-dbcp</artifactId>
-			<version>1.3</version>
-		</dependency>
-
-		<dependency>
-			<groupId>commons-pool</groupId>
-			<artifactId>commons-pool</artifactId>
-			<version>1.5.4</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>1.6.1</version>
-		</dependency>
-
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.25</version>
-		</dependency>
-
-		<dependency>
-			<groupId>postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>9.1-901.jdbc4</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.ucuenca</groupId>
-			<artifactId>misctools</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<version>${h2.database.version}</version>
-		</dependency>
-	</dependencies>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.ucuenca</groupId>
+        <artifactId>generation</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <groupId>com.ucuenca</groupId>
+    <artifactId>RDFGeneration</artifactId>
+    <packaging>jar</packaging>
+
+    <name>RDFGeneration</name>
+    <!-- <url>http://maven.apache.org</url> -->
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>default</id>
+            <url>http://repo1.maven.org/maven2/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>central</id>
+            <name>repo</name>
+            <url>http://nexus.pentaho.org/content/groups/omni</url>
+        </repository>
+
+
+    </repositories>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <id>deploy-plugin</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <property name="runtime-classpath" refid="maven.runtime.classpath" />
+                                <property name="kettle-local-dir" value="${pdiDirectory}" />
+                                <ant antfile="build.xml" target="install" output="${basedir}/target/ant.log"
+                                                                     inheritRefs="true" />
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Dependencias a ser copiadas en la distribución -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.8</version>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <!-- Ejemplo de dependencia a ser copiada -->
+                                <!-- *************************WARNING************************* -->
+                                <!-- ********************************************************* -->
+                                <!-- RECORDAR INCLUIR REFERENCIAS A ESTAS LIBRERIAS EN ARCHIVO -->
+                                <!-- src/main/resources/plugin.xml CON UBICACIÓN EN LA CARPETA lib/ -->
+                                <!-- ********************************************************* -->
+                                <!-- ********************************************************* -->
+                                <artifactItem>
+                                    <groupId>junit</groupId>
+                                    <artifactId>junit</artifactId>
+                                    <version>3.8.1</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>net.antidot</groupId>
+                                    <artifactId>db2triples</artifactId>
+                                    <version>${antidot.db2triples.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-runtime</artifactId>
+                                    <!--									<version>2.6.10</version>-->
+                                    <version>2.7.13</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-http-client</artifactId>
+                                    <!--									<version>2.6.10</version>-->
+                                    <version>2.7.13</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>commons-codec</groupId>
+                                    <artifactId>commons-codec</artifactId>
+                                    <version>1.4</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>commons-httpclient</groupId>
+                                    <artifactId>commons-httpclient</artifactId>
+                                    <version>3.1</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>commons-logging</groupId>
+                                    <artifactId>commons-logging</artifactId>
+                                    <version>1.1.2</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-http-protocol</artifactId>
+                                    <!--									<version>2.6.10</version>-->
+                                    <version>2.7.13</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-model</artifactId>
+                                    <!--									<version>2.6.10</version>-->
+                                    <version>2.7.13</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-util</artifactId>
+                                    <!--									<version>2.6.10</version>-->
+                                    <version>2.7.3</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.slf4j</groupId>
+                                    <artifactId>slf4j-api</artifactId>
+                                    <version>1.6.1</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-query</artifactId>
+                                    <version>${openrdf.sesame.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-queryalgebra-model</artifactId>
+                                    <version>${openrdf.sesame.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-queryparser-api</artifactId>
+                                    <version>${openrdf.sesame.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-queryparser-serql</artifactId>
+                                    <version>${openrdf.sesame.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-queryparser-sparql</artifactId>
+                                    <version>${openrdf.sesame.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-queryresultio-api</artifactId>
+                                    <version>${openrdf.sesame.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-queryresultio-binary</artifactId>
+                                    <version>${openrdf.sesame.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-queryresultio-sparqljson</artifactId>
+                                    <version>${openrdf.sesame.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-queryresultio-sparqlxml</artifactId>
+                                    <version>${openrdf.sesame.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-queryresultio-text</artifactId>
+                                    <version>${openrdf.sesame.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-repository-api</artifactId>
+                                    <version>${openrdf.sesame.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-repository-contextaware</artifactId>
+                                    <version>${openrdf.sesame.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-repository-dataset</artifactId>
+                                    <version>${openrdf.sesame.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-repository-http</artifactId>
+                                    <version>${openrdf.sesame.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-repository-manager</artifactId>
+                                    <version>${openrdf.sesame.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-repository-sail</artifactId>
+                                    <version>${openrdf.sesame.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-rio-api</artifactId>
+                                    <version>${openrdf.sesame.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-rio-binary</artifactId>
+                                    <version>${openrdf.sesame.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-rio-n3</artifactId>
+                                    <version>${openrdf.sesame.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-rio-ntriples</artifactId>
+                                    <version>${openrdf.sesame.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-rio-rdfxml</artifactId>
+                                    <version>${openrdf.sesame.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-rio-trig</artifactId>
+                                    <version>${openrdf.sesame.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-rio-trix</artifactId>
+                                    <version>${openrdf.sesame.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-rio-turtle</artifactId>
+                                    <version>${openrdf.sesame.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-sail-api</artifactId>
+                                    <version>${openrdf.sesame.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-sail-inferencer</artifactId>
+                                    <version>${openrdf.sesame.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-sail-nativerdf</artifactId>
+                                    <version>${openrdf.sesame.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-sail-rdbms</artifactId>
+                                    <version>${openrdf.sesame.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-sail-memory</artifactId>
+                                    <version>${openrdf.sesame.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-queryalgebra-evaluation</artifactId>
+                                    <version>${openrdf.sesame.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>net.sf.opencsv</groupId>
+                                    <artifactId>opencsv</artifactId>
+                                    <version>2.0</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>commons-cli</groupId>
+                                    <artifactId>commons-cli</artifactId>
+                                    <version>1.2</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-repository-sparql</artifactId>
+                                    <version>${openrdf.sesame.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.openrdf.sesame</groupId>
+                                    <artifactId>sesame-repository-event</artifactId>
+                                    <version>${openrdf.sesame.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>commons-dbcp</groupId>
+                                    <artifactId>commons-dbcp</artifactId>
+                                    <version>1.3</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>commons-pool</groupId>
+                                    <artifactId>commons-pool</artifactId>
+                                    <version>1.5.4</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.slf4j</groupId>
+                                    <artifactId>slf4j-simple</artifactId>
+                                    <version>1.6.1</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>mysql</groupId>
+                                    <artifactId>mysql-connector-java</artifactId>
+                                    <version>5.1.25</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>postgresql</groupId>
+                                    <artifactId>postgresql</artifactId>
+                                    <version>9.1-901.jdbc4</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+
+                                <artifactItem>
+                                    <groupId>com.ucuenca</groupId>
+                                    <artifactId>misctools</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+
+
+                                <artifactItem>
+                                    <groupId>com.h2database</groupId>
+                                    <artifactId>h2</artifactId>
+                                    <version>${h2.database.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>plugin/*.*</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
+            </resource>
+        </resources>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>pentaho-kettle</groupId>
+            <artifactId>kettle-core</artifactId>
+            <version>${pentaho.kettle.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>pentaho-kettle</groupId>
+            <artifactId>kettle-dbdialog</artifactId>
+            <version>${pentaho.kettle.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>pentaho-kettle</groupId>
+            <artifactId>kettle-engine</artifactId>
+            <version>${pentaho.kettle.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>pentaho-kettle</groupId>
+            <artifactId>kettle-ui-swt</artifactId>
+            <version>${pentaho.kettle.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>net.antidot</groupId>
+            <artifactId>db2triples</artifactId>
+            <version>${antidot.db2triples.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-runtime</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-http-client</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <version>3.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.1.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-http-protocol</artifactId>
+            <version>2.7.13</version>
+            <!--			<version>2.6.10</version>-->
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-model</artifactId>
+            <version>2.7.13</version>
+            <!--			<version>2.6.10</version>-->
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-util</artifactId>
+            <version>2.7.3</version>
+            <!--			<version>2.6.10</version>-->
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.6.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-query</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-queryalgebra-model</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-queryparser-api</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-queryparser-serql</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-queryparser-sparql</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-queryresultio-api</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-queryresultio-binary</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-queryresultio-sparqljson</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-queryresultio-sparqlxml</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-queryresultio-text</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-repository-api</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-repository-contextaware</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-repository-dataset</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-repository-http</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-repository-manager</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-repository-sail</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-rio-api</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-rio-binary</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-rio-n3</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-rio-ntriples</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-rio-rdfxml</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-rio-trig</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-rio-trix</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-rio-turtle</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-sail-api</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-sail-inferencer</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-sail-memory</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-sail-nativerdf</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-sail-rdbms</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-queryalgebra-evaluation</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>net.sf.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>2.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-cli</groupId>
+            <artifactId>commons-cli</artifactId>
+            <version>1.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-repository-sparql</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-repository-event</artifactId>
+            <version>${openrdf.sesame.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-dbcp</groupId>
+            <artifactId>commons-dbcp</artifactId>
+            <version>1.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-pool</groupId>
+            <artifactId>commons-pool</artifactId>
+            <version>1.5.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.6.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.25</version>
+        </dependency>
+
+        <dependency>
+            <groupId>postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>9.1-901.jdbc4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.ucuenca</groupId>
+            <artifactId>misctools</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${h2.database.version}</version>
+        </dependency>
+    </dependencies>
 </project>
