@@ -100,6 +100,8 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 	private String listaValores;
 	private String listaPropiedades;
 	
+        private FusekiLoader Environment;
+        
 	public String getValidate() {
 		return Validate;
 	}
@@ -193,6 +195,10 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 	
 	public String getDirectory() {
 		return directory;
+	}
+        
+        public String getEnvDirectory() {
+		return Environment.getParentVariableSpace().environmentSubstitute(directory);
 	}
 
 	public void setDirectory(String directory) {
@@ -544,6 +550,14 @@ public class FusekiLoaderMeta extends BaseStepMeta implements StepMetaInterface 
 		}
     	
 	}
+
+    public FusekiLoader getEnvironment() {
+        return Environment;
+    }
+
+    public void setEnvironment(FusekiLoader Environment) {
+        this.Environment = Environment;
+    }
 
 
 }

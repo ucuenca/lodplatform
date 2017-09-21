@@ -23,10 +23,9 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.XSD;
 import com.ucuenca.misctools.DatabaseLoader;
-import com.ucuenca.misctools.LOVApiV2;
-import com.ucuenca.misctools.PrefixCCLookUp;
 import com.ucuenca.pentaho.plugin.step.ontologymapping.OntoMapData;
 import com.ucuenca.pentaho.plugin.step.ontologymapping.OntoMapMeta;
+import com.ucuenca.misctools.PrefixCCLookUp;
 
 /**
  * R2RML mapping file processor
@@ -495,18 +494,18 @@ public class R2RMLGenerator {
      * @throws Exception
      */
     private String getLOVOntologyURI(String prefix) throws Exception {
-        prefix = prefix.trim();
+//        prefix = prefix.trim();
         String URI = "";
-        if (prefixes.containsKey(prefix)) {
-            URI = prefixes.get(prefix)[0];
-        } else {
-            List<String> URIList = LOVApiV2.vocabularySearch(prefix);
-            if (URIList.size()>0){
-                prefixes.put(prefix, URIList.toArray(new String[URIList.size()]));
-                URI = URIList.get(0);
-                r2rmlModel.setNsPrefix(prefix, URI);
-            }
-        }
+//        if (prefixes.containsKey(prefix)) {
+//            URI = prefixes.get(prefix)[0];
+//        } else {
+//            List<String> URIList = LOVApiV2.vocabularySearch(prefix);
+//            if (URIList.size()>0){
+//                prefixes.put(prefix, URIList.toArray(new String[URIList.size()]));
+//                URI = URIList.get(0);
+//                r2rmlModel.setNsPrefix(prefix, URI);
+//            }
+//        }
         return URI;
     }
 
@@ -516,7 +515,7 @@ public class R2RMLGenerator {
      * @throws Exception
      */
     private void finishProcess() throws Exception {
-        String url = meta.getOutputDir() + System.getProperty("file.separator") + meta.getOutFileName();
+        String url = meta.getEnvOutputDir() + System.getProperty("file.separator") + meta.getOutFileName();
         FileOutputStream out = new FileOutputStream(url);
         r2rmlModel.write(out, "TURTLE");
         DatabaseLoader.closeConnection();
