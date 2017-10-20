@@ -274,6 +274,11 @@ public class DataPrecatchingStepDialog extends BaseStepDialog implements StepDia
 		String[] dbResult = new String[2]; 
 		try {
 			dbResult =  this.getDBTableNameFromPreviousSteps(stepMeta);
+                        if (dbResult.length==2 && dbResult[0]==null && dbResult[1]==null){
+                            dbResult[0]="DEFAULTDATA";
+                            dbResult[1]="DEFAULTSTEP";
+                            changed=true;
+                        }
 		}catch(KettleException e) {
 			
 		}
