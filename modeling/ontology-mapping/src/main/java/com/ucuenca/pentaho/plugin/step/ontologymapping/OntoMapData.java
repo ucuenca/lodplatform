@@ -100,6 +100,17 @@ public class OntoMapData extends BaseStepData implements StepDataInterface {
 		this.stepName = stepName;
 	}
 
+        public void ReloadDB(List<String>sqls,List<String>tableNames) throws Exception{
+            for (String tbN: tableNames){
+                Object[] pk = new Object[]{this.getTransName().toUpperCase(), this.getStepName().toUpperCase()};
+                DatabaseLoader.executeUpdate("DELETE FROM " + tbN + " WHERE TRANSID = ? AND STEPID = ?", pk);
+            }
+            for (String sql: sqls){
+                DatabaseLoader.executeQuery(sql);
+            }
+        }
+        
+        
 	/**
 	 * Saves table data on DB Schema
 	 * @param table Dialog TableView
@@ -172,7 +183,7 @@ public class OntoMapData extends BaseStepData implements StepDataInterface {
 		tableFields.put("STEPID", "VARCHAR(50)");
     	for(ColumnInfo column:columns) tableFields.put(column.getName().toUpperCase().replaceAll(" ", "_"), "VARCHAR(100)");
     	tableFields.put("PRIMARY KEY", "(TRANSID, STEPID, "+ columns[0].getName().toUpperCase().replaceAll(" ", "_") + ")");
-    	DatabaseLoader.createTable(tableName, tableFields);
+    	DatabaseLoader.createTable(tableName, tableFields, true);
 	}
 
 	/**

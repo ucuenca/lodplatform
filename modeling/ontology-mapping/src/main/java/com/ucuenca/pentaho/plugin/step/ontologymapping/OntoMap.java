@@ -141,7 +141,7 @@ public class OntoMap extends BaseStep implements StepInterface {
 			R2RMLGenerator r2rmlParser = new R2RMLGenerator(smi, sdi);
 			r2rmlParser.process();
 			List<String[]> rowSet = r2rmlParser.getModelSentences();
-			this.rowIter = rowSet.iterator();	
+			this.rowIter = rowSet.iterator();
 		}
 		
 		if(rowIter.hasNext()) {

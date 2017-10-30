@@ -118,10 +118,12 @@ public class DatabaseLoader {
 	 * @param fields List of field names with its associated constraints
 	 * @throws Exception
 	 */
-	public static void createTable(String tableName, Map<String, String> fields)throws Exception {
+	public static void createTable(String tableName, Map<String, String> fields, boolean force)throws Exception {
 		if(conn == null) throw new SQLException("SQL CONNECTION NOT FOUND");
 		String sql = tableName != null && tableName.length() > 0 ? 
 				"CREATE TABLE IF NOT EXISTS " + tableName + " (":null;
+                String sql2 = tableName != null && tableName.length() > 0 ? 
+				"DROP TABLE IF EXISTS " + tableName :null;
 		if(sql != null) {
 			for(String fieldID: fields.keySet()){
 				String constraint = fields.get(fieldID);
@@ -129,7 +131,10 @@ public class DatabaseLoader {
 			}
 			sql = sql.substring(0, sql.length() -1) + ")";
 		}
-		conn.createStatement().execute(sql);
+                if (force){
+                    conn.createStatement().execute(sql2);
+                }
+                conn.createStatement().execute(sql);
 	}
 	
 	/**
