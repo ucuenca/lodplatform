@@ -33,7 +33,7 @@ La plataforma fue desarrollada usando el utilitario de desarrollo Maven, el cual
 
 ### Descarga e instalación del Framework ###
 
-La plataforma de Linked Data esta publicada en un repositorio de software libre (Github) y puede descargase como ZIP  desde la siguiente [enlace](https://github.com/santteegt/lodplatform). Una vez descargada se debe descomprimir en un directorio de fácil acceso como el home.
+La plataforma de Linked Data esta publicada en un repositorio de software libre (Github) y puede descargase como ZIP  desde la siguiente [enlace](https://github.com/ucuenca/lodplatform). Una vez descargada se debe descomprimir en un directorio de fácil acceso como el home.
 
 #### Configuración e instalación ####
 
