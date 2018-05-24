@@ -138,7 +138,7 @@ public class StepDataLoader {
                         if (length < 0 ){
                             length=0;
                         }
-                        definition = "VARCHAR(" + length + ")";
+                        definition = "VARCHAR(" + "0" + ")";
                     }
                 }
                 tableFields.put(fieldName, definition);
@@ -150,7 +150,7 @@ public class StepDataLoader {
 
     public void init_(StepMetaInterface smi, Object[] values) throws Exception {
         if (!createdTable) {
-            DatabaseLoader.createTable(tableName, this.getFields(smi));
+            DatabaseLoader.createTable(tableName, this.getFields(smi), false);
             createdTable = Boolean.TRUE;
             this.cleanTableStepData(new Object[]{values[0], values[1]});
         }
@@ -166,7 +166,7 @@ public class StepDataLoader {
      */
     public void insertTableRow(StepMetaInterface smi, Object[] values) throws Exception {
         if (!createdTable) {
-            DatabaseLoader.createTable(tableName, this.getFields(smi));
+            DatabaseLoader.createTable(tableName, this.getFields(smi), false);
             createdTable = Boolean.TRUE;
             this.cleanTableStepData(new Object[]{values[0], values[1]});
         }

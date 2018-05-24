@@ -245,11 +245,11 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	    SelectionListener inputStepLs = new SelectionListener() {
 			
 			public void widgetSelected(SelectionEvent arg0) {
-				try {
-					getPrevStepsMeta();
-				}catch(KettleException e) {
-					showErrorMessage(e.getMessage());
-				}
+//				try {
+//					getPrevStepsMeta();
+//				}catch(KettleException e) {
+//					showErrorMessage(e.getMessage());
+//				}
 			}
 
 			public void widgetDefaultSelected(SelectionEvent arg0) {
@@ -326,7 +326,7 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 	    fdStep2.top = new FormAttachment( wStep1, margin );
 	    fdStep2.left = new FormAttachment( middle, 0 );
 	    fdStep2.right = new FormAttachment( 80, 0 );
-	    wStep2.setLayoutData( fdStep2 );
+	    wStep2.setLayoutData( fdStep2 );	    
 	    wStep2.addSelectionListener(inputStepLs);
 	    
 	    wPreview = new Button( shell, SWT.PUSH );
@@ -891,6 +891,8 @@ public class OntoMapDialog extends BaseStepDialog implements StepDialogInterface
 		wTabFolder.setSelection(2);
 		wTabFolder.setSelection(0);
 	    shell.open();
+            wStep1.addSelectionListener(inputStepLs);
+            wStep2.addSelectionListener(inputStepLs);
 	    while ( !shell.isDisposed() ) {
 	      if ( !display.readAndDispatch() ) {
 	        display.sleep();
