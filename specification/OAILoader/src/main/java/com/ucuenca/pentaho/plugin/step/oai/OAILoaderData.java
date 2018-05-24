@@ -269,7 +269,7 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
                 data.total += batch;
                 dataLoader.logBasic("Harvested Records: batch "
                         + records.getLength() + ", total " + data.total);
-            }
+            } 
 
             if (datos.size() == 0) {
                 Node nNode1 = records.item(recordIndex);
@@ -282,6 +282,7 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
                 }
                 Node nNodeHeader = null;
                 Node nNode2 = null;
+                
 
                 // nuevo codigo
                 if (records.getLength() > header.getLength()) {
@@ -301,8 +302,22 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
                         }
                     }
                     nNodeHeader = header.item(headerIndex);
+                } else if (records.getLength() < header.getLength()){
+                      Boolean valid = false;      
+                      int auxindex = this.headerIndex == 0 ?  recordIndex : headerIndex  ;
+                      while (!valid){
+                      Element comprationStatus =  (Element) header.item(auxindex);
+                      if (comprationStatus.hasAttribute("status")){
+                         auxindex++;
+                        String deletedRes = comprationStatus.getChildNodes().item(0).getTextContent();
+                      }else { comprationStatus.getChildNodes().item(0).getTextContent();
+                         valid = true;
+                         nNodeHeader = header.item(auxindex);
+                         headerIndex = auxindex+1;
+                      }
+                      }
                 } else {
-                    nNodeHeader = header.item(recordIndex);
+                   nNodeHeader = header.item(recordIndex);
                 }
 
                 if (nNode1.getNodeType() == Node.ELEMENT_NODE) {
@@ -310,6 +325,7 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
                     Element eElement1 = (Element) nNode1;
                     Element eElementHeader = (Element) nNodeHeader;
 
+                    
                     getHeader(eElementHeader);
 
                     StringTokenizer strobj = new StringTokenizer(
@@ -629,19 +645,25 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
             }
 
         } else {
-            Element eElement = (Element) prueba;
+            Element eElement = (Element) prueba; 
             NodeList datosnodo = eElement.getChildNodes();
-
+           /*if (eElement.hasAttribute("status")){ 
+               String status =  eElement.getAttribute("status"); return false;}*/
             for (int temp = 0; temp < datosnodo.getLength(); temp++) {
                 Node nNode = datosnodo.item(temp);
 
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
                     Element eElement1 = (Element) nNode;
                     getHeader(eElement1);
+                    //if (!getHeader(eElement1)){
+                    //return false; }
+                    //}
 
                 }
             }
+       // return true;
         }
+       // return true;
     }
 
 }
