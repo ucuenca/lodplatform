@@ -25,7 +25,7 @@ public class GetXPath {
 		meta = new OAILoaderMeta();
 	}
 
-	public void getPath(Node record) {
+	public boolean getPath(Node record) {
 		// meta.getListpath().add("/oai20:OAI-PMH");
 		// meta.getListpath().add("/oai20:OAI-PMH/oai20:ListRecords");
 		// meta.getListpath().add("/oai20:OAI-PMH/oai20:ListRecords/oai20:record");
@@ -60,11 +60,13 @@ public class GetXPath {
 					}
 					
 					
-					
+				 return true;	
 				}
+                               
 			}// end two for
 
 		}
+                return false;
 	}
 
 	String develto = "/oai20:OAI-PMH/oai20:ListRecords/oai20:record/oai20:metadata";

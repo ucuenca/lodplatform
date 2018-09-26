@@ -331,6 +331,8 @@ public class OAILoaderDialog extends BaseStepDialog implements
             public void widgetSelected(SelectionEvent arg0) {
                 prefix = cbmPrefix.getText();
                 electedItem = cbmPrefix.getSelectionIndex();
+              // schema =  getSchemaSelected (schemas , cbmPrefix.getText());
+             //   schema = (Schema) schemas.get(schemas.indexOf(cbmPrefix.getText()));
                 schema = (Schema) schemas.get(cbmPrefix.getSelectionIndex());
                 txtXpath.setText("");
                 Xpath.setEnabled(true);
@@ -629,7 +631,8 @@ public class OAILoaderDialog extends BaseStepDialog implements
         meta.setStepName(stepname);
         meta.setInputURI(txtURI.getText());
         meta.setResponseDateField(txtResponseDateField.getText());
-        meta.setPrefix(cbmPrefix.getText());
+        meta.setPrefix(cbmPrefix.getText());   
+       //  schema = getSchemaSelected (schemas , cbmPrefix.getText());
         schema = (Schema) schemas.get(cbmPrefix.getSelectionIndex());
         meta.setSchema(schema.schema);
         meta.setNamespace(schema.namespace);
@@ -637,6 +640,15 @@ public class OAILoaderDialog extends BaseStepDialog implements
         meta.setChanged(true);
     }
 
+   /* private Schema getSchemaSelected (List<Schema> schemas , String schemaPrefix) {
+       for (Schema s :  schemas )
+       {
+           if (s.prefix.equals(schemaPrefix)){
+           return s;
+           }
+       }
+       return null;
+    }*/
     // my proccess
     private void getLoopPathList() throws IOException,
             ParserConfigurationException, SAXException, TransformerException {
@@ -654,10 +666,16 @@ public class OAILoaderDialog extends BaseStepDialog implements
 
         Document doc = listRecords.getDocument();
         NodeList nList = doc.getElementsByTagName("record");
-
+        // nList.item(10);
         // para llamar el metodo para cargar las rutas
-        getPathOai.getPath(nList.item(0));
-
+        boolean delete = false ;
+        int aux = 0;
+        while  (!delete && aux < nList.getLength()){
+            
+        delete = getPathOai.getPath(nList.item(aux));
+        aux++;
+        }
+    
         list_xpath = new String[getPathOai.getMeta().getListpath().size()];
 
         for (int k = 0; k < getPathOai.getMeta().getListpath().size(); k++) {
@@ -714,24 +732,28 @@ public class OAILoaderDialog extends BaseStepDialog implements
                         "OAI-PMH/ListMetadataFormats/metadataFormat", "add");
 
                 schemas = (List) digester.parse(new StringReader(metadata.toString()));
-
                 Iterator<Schema> i = schemas.iterator();
                 cbmPrefix.removeAll();
+                List <Schema> NewSchema = new ArrayList();
 
                 while (i.hasNext()) {
                     Schema schema = i.next();
 
                     for (Format f : Format.values()) {
                         if (f.isState() && f.getName().equals(schema.prefix)) {
+                            NewSchema.add(schema);
                             cbmPrefix.add(schema.prefix);
                             break;
                         } else if (!f.isState() && f.getName().equals(schema.prefix)) {
 
                             cbmPrefix.add(schema.prefix + " (" + BaseMessages.getString(PKG, "OAILoader.Manager.FORMAT") + ")");
+                            NewSchema.add(schema);
                             break;
                         }
                     }
+                   
                 }
+                 schemas = NewSchema;
                 cbmPrefix.setEnabled(true);
                 Uri = ruta;
 
