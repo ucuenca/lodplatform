@@ -271,14 +271,26 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
                         + records.getLength() + ", total " + data.total);
             } 
 
-            if (datos.size() == 0) {
+            if (datos.size() == 0  ) {
                 Node nNode1 = records.item(recordIndex);
-                if (nNode1 == null) {
+                if (nNode1 == null && records.getLength() > 0 ) {
                     //No data
                     if (databaseLoad) {
                         DatabaseLoader.closeConnection();
+                         
                     }
                     return false;
+                   //  return true;
+                  
+               }else if (records.getLength() == 0){
+                data.resumptionToken = data.listRecords.getResumptionToken();
+                dataLoader.logBasic("Resuming harvesting from "
+                            + data.resumptionToken);
+                
+                        data.listRecords = new ListRecords(meta.getEnvironmentSubstituteInputURI(),
+                                data.resumptionToken);
+                        this.header = null;
+                return true;
                 }
                 Node nNodeHeader = null;
                 Node nNode2 = null;
@@ -305,9 +317,9 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
                 } else if (records.getLength() < header.getLength()){
                       Boolean valid = false;      
                       int auxindex = this.headerIndex == 0 ?  recordIndex : headerIndex  ;
-                      while (!valid){
+                      while (!valid && header.getLength() > auxindex  ){
                       Element comprationStatus =  (Element) header.item(auxindex);
-                      if (comprationStatus.hasAttribute("status")){
+                      if ( comprationStatus.hasAttribute("status")){
                          auxindex++;
                         String deletedRes = comprationStatus.getChildNodes().item(0).getTextContent();
                       }else { comprationStatus.getChildNodes().item(0).getTextContent();
