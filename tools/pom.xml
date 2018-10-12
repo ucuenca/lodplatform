@@ -16,5 +16,6 @@
   <modules>
 	<module>misctools</module>
 	<module>data-precatching</module>
+	<module>oai_xslt</module>
   </modules>
 </project>
