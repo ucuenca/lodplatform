@@ -774,6 +774,7 @@ public class OAILoaderDialog extends BaseStepDialog implements
         QDC("qdc", true),
         UKETD_DC("uketd_dc", true),
         OAI_DC("oai_dc", true),
+        MARCXML("marcxml", true),
         DIM("dim", false),
         MARC("marc", false),
         ETDMS("etdms", false),

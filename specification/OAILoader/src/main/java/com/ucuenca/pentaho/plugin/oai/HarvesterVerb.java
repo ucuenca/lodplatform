@@ -15,6 +15,7 @@
 
 package com.ucuenca.pentaho.plugin.oai;
 
+import com.ucuenca.pentaho.plugin.auxiliary.XSLTUtils;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,6 +25,7 @@ import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 import java.util.zip.ZipInputStream;
@@ -39,8 +41,8 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPathExpressionException;
 
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.apache.xpath.XPathAPI;
 import org.w3c.dom.DOMImplementation;
@@ -75,6 +77,7 @@ public abstract class HarvesterVerb {
     private static HashMap builderMap = new HashMap();
     private static Element namespaceElement = null;
     private static DocumentBuilderFactory factory = null;
+    private boolean transform = false;
     
     private static Transformer idTransformer = null;
     static {
@@ -235,15 +238,35 @@ public abstract class HarvesterVerb {
      * @throws SAXException
      * @throws TransformerException
      */
-    public HarvesterVerb(String requestURL, Schema... schemas) throws IOException,
+    public HarvesterVerb(String requestURL,boolean transform, Schema... schemas) throws IOException,
     ParserConfigurationException, SAXException, TransformerException {
-    	//sgonzalez for
+    	this.transform=transform;
     	for(Schema schema:schemas) {
     		namespaceElement.setAttributeNS("http://www.w3.org/2000/xmlns/", 
         			"xmlns:"+schema.prefix, schema.namespace);
     	}
         harvest(requestURL);
     }
+    
+    /**
+     * Performs the OAI request
+     * 
+     * @param requestURL
+     * @throws IOException
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws TransformerException
+     */
+    public HarvesterVerb(String requestURL, Schema... schemas) throws IOException,
+    ParserConfigurationException, SAXException, TransformerException {
+    	this.transform=false;
+    	for(Schema schema:schemas) {
+    		namespaceElement.setAttributeNS("http://www.w3.org/2000/xmlns/", 
+        			"xmlns:"+schema.prefix, schema.namespace);
+    	}
+        harvest(requestURL);
+    }
+    
     
     /**
      * Preforms the OAI request
@@ -313,6 +336,15 @@ public abstract class HarvesterVerb {
             in = new InflaterInputStream(con.getInputStream());
         } else {
             in = con.getInputStream();
+        }
+        
+        if (transform){
+            XSLTUtils xsltUtils = new XSLTUtils();
+            try {
+                in = xsltUtils.Transform(in);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
         
         InputSource data = new InputSource(in);

@@ -127,7 +127,7 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
                 dataLoader.logBasic("Resuming harvesting from "
                         + data.resumptionToken); // Some basic logging
                 data.listRecords = new ListRecords(meta.getEnvironmentSubstituteInputURI(),
-                        data.resumptionToken, data.schema);
+                        data.resumptionToken,data.schema.prefix, data.schema);
                 data.listSet = new ListSets(meta.getEnvironmentSubstituteInputURI(),
                         data.resumptionToken);
             } else {
@@ -288,7 +288,7 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
                             + data.resumptionToken);
                 
                         data.listRecords = new ListRecords(meta.getEnvironmentSubstituteInputURI(),
-                                data.resumptionToken);
+                                data.resumptionToken,data.schema.prefix);
                         this.header = null;
                 return true;
                 }
@@ -352,7 +352,7 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
                         getDataQDC(eElement1);
                     } else if (data.schema.prefix.equals("ore")) {
                         getDataUKETDDC(eElement1);
-                    } else if (data.schema.prefix.equals("oai_dc")) {
+                    } else if (data.schema.prefix.equals("oai_dc") || data.schema.prefix.equals("marcxml")) {
                         getDataUKETDDC(eElement1);
                     } else if (data.schema.prefix.equals("didl")) {
                         getDataUKETDDC(eElement1);
@@ -409,7 +409,7 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
                             + data.resumptionToken);
                     try {
                         data.listRecords = new ListRecords(meta.getEnvironmentSubstituteInputURI(),
-                                data.resumptionToken);
+                                data.resumptionToken,data.schema.prefix);
                         this.header = null;
                     } catch (IOException e) {
 
@@ -430,7 +430,7 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
                                             + ", trying again.");
 
                             data.listRecords = new ListRecords(meta.getEnvironmentSubstituteInputURI(),
-                                    data.resumptionToken);
+                                    data.resumptionToken,data.schema.prefix);
                             this.header = null;
                         }
                     } catch (SAXException e) {
@@ -440,7 +440,7 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
                                         + ", trying again.");
 
                         data.listRecords = new ListRecords(meta.getEnvironmentSubstituteInputURI(),
-                                data.resumptionToken);
+                                data.resumptionToken,data.schema.prefix);
 
                     }
                 }

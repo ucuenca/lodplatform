@@ -14,7 +14,9 @@
  */
 package com.ucuenca.pentaho.plugin.oai;
 
+import com.ucuenca.pentaho.plugin.step.oai.OAILoaderDialog;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URLEncoder;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -51,7 +53,7 @@ public class ListRecords extends HarvesterVerb {
             String set, String metadataPrefix, Schema... schemas)
             throws IOException, ParserConfigurationException, SAXException,
             TransformerException {
-        super(getRequestURL(baseURL, from, until, set, metadataPrefix), schemas);
+        super(getRequestURL(baseURL, from, until, set, metadataPrefix),metadataPrefix.compareTo(OAILoaderDialog.Format.MARCXML.getName()) == 0, schemas);
     }
 
     /**
@@ -65,10 +67,10 @@ public class ListRecords extends HarvesterVerb {
      * @throws TransformerException
      */
     //sgonzalez parametro schemas
-    public ListRecords(String baseURL, String resumptionToken/*, String from*/, Schema... schemas)
+    public ListRecords(String baseURL, String resumptionToken/*, String from*/, String metadataPrefix, Schema... schemas)
             throws IOException, ParserConfigurationException, SAXException,
             TransformerException {
-        super(getRequestURL(baseURL, resumptionToken/*, from*/), schemas);
+        super(getRequestURL(baseURL, resumptionToken/*, from*/),metadataPrefix.compareTo(OAILoaderDialog.Format.MARCXML.getName()) == 0, schemas);
     }
 
     /**
