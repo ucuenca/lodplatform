@@ -266,12 +266,7 @@
 		<xsl:for-each select="marc:datafield[@tag=856]/marc:subfield[@code='q']">
 			<dc:format>
 				<xsl:value-of select="."/>
-
 			</dc:format>
-		    <dc:type>
-			    <xsl:text>Article </xsl:text>
-			</dc:type>
-	
 		</xsl:for-each>
 		<xsl:for-each select="marc:datafield[@tag=520]">
 			<dc:description>
@@ -356,13 +351,15 @@
 				<xsl:value-of select="marc:subfield[@code='u']"/>
 			</dc:identifier>
 		</xsl:for-each>
-			<xsl:for-each select="marc:datafield[@tag=020]">
+		<xsl:for-each select="marc:datafield[@tag=020]">
 			<dc:identifierISBN>
+				<xsl:text>URN:ISBN:</xsl:text>
 				<xsl:value-of select="marc:subfield[@code='$a']"/>
 			</dc:identifierISBN>
 		</xsl:for-each>
-		<xsl:for-each select="marc:datafield[@tag=022]">
+		<xsl:for-each select="marc:datafield[@tag=022">
 			<dc:identifierISSN>
+				<xsl:text>ISSN:</xsl:text>
 				<xsl:value-of select="marc:subfield[@code='$a']"/>
 			</dc:identifierISSN>
 		</xsl:for-each>
