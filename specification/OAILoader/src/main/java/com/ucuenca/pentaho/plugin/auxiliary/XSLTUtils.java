@@ -51,7 +51,7 @@ public class XSLTUtils {
     private static final String TMP = "/tmp/";
 
     public InputStream Transform(InputStream in) throws SAXException, ParserConfigurationException, IOException, XPathExpressionException, TransformerException, Exception {
-        InputStream resourceAsStream = this.getClass().getResourceAsStream("/exe.jar");
+        InputStream resourceAsStream = this.getClass().getResourceAsStream("/exe.jar_");
         String theString = IOUtils.toString(in);
         String toString = IOUtils.toString(this.getClass().getResourceAsStream("/MARCXML2OAI_DC.xslt"));
         Files.copy(resourceAsStream, Paths.get(TMP + "exe.jar"), StandardCopyOption.REPLACE_EXISTING);
