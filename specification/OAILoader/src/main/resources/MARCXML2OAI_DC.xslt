@@ -228,7 +228,7 @@
 			</xsl:if>
 			<xsl:if test="$leader6='d' or $leader6='f' or $leader6='p' or $leader6='t'">
 				<!--Remove attribute 6/04 jer-->
-				<!--<xsl:attribute name="manuscript">yes</xsl:attribute>-->
+		
 				<xsl:text>manuscript</xsl:text>
 			</xsl:if>
 			<xsl:choose>
@@ -255,11 +255,34 @@
 				</xsl:call-template>
 			</dc:publisher>
 		</xsl:for-each>
+		<xsl:for-each select="marc:dataField[@tag=260]/marc:subfield[@code='c']">
+			    <dc:date>
+			    	<xsl:value-of select="."/>
+				 <!-- <xsl:value-of select="marc:subfield[@code='c']"/> 	-->
+			</dc:date>
+			 <!-- <dc:publisher>
+				<xsl:call-template name="subfieldSelect">
+					<xsl:with-param name="codes">ab</xsl:with-param>
+				</xsl:call-template>
+			</dc:publisher>-->
+		</xsl:for-each>
+
 		<xsl:for-each select="marc:datafield[@tag=260]/marc:subfield[@code='c']">
+			    <dc:date>
+			    	<xsl:value-of select="."/>
+			</dc:date>
+			 <!-- <dc:publisher>
+				<xsl:call-template name="subfieldSelect">
+					<xsl:with-param name="codes">ab</xsl:with-param>
+				</xsl:call-template>
+			</dc:publisher>-->
+		</xsl:for-each>
+				<!--/marc:subfield[@code='c'] -->
+		<!--<xsl:for-each select="marc:datafield[@tag=260]">
 			<dc:date>
 				<xsl:value-of select="."/>
 			</dc:date>
-		</xsl:for-each>
+		</xsl:for-each>-->
 		<dc:language>
 			<xsl:value-of select="substring($controlField008,36,3)"/>
 		</dc:language>
@@ -345,11 +368,11 @@
 			</dc:relation>
 		</xsl:for-each>
 		<xsl:for-each select="marc:datafield[@tag=760]|marc:datafield[@tag=762]|marc:datafield[@tag=765]|marc:datafield[@tag=767]|marc:datafield[@tag=770]|marc:datafield[@tag=772]|marc:datafield[@tag=773]|marc:datafield[@tag=774]|marc:datafield[@tag=775]|marc:datafield[@tag=776]|marc:datafield[@tag=777]|marc:datafield[@tag=780]|marc:datafield[@tag=785]|marc:datafield[@tag=786]|marc:datafield[@tag=787]">
-			<dc:relation>
+			<dc:source>
 				<xsl:call-template name="subfieldSelect">
-					<xsl:with-param name="codes">ot</xsl:with-param>
+					<xsl:with-param name="codes">not</xsl:with-param>
 				</xsl:call-template>
-			</dc:relation>
+			</dc:source>
 		</xsl:for-each>
 		<xsl:for-each select="marc:datafield[@tag=856]">
 			<dc:identifier>
