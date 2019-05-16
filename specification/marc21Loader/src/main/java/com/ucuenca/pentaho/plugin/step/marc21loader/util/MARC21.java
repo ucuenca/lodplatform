@@ -2,7 +2,7 @@ package com.ucuenca.pentaho.plugin.step.marc21loader.util;
 
 public class MARC21 {
 
-    private int recordNumber;
+    private String recordNumber;
     private String secuence;
     private String field;
     private String indicators;
@@ -14,7 +14,7 @@ public class MARC21 {
 
     }
 
-    public MARC21(int recordNumber, String secuence, String field, String indicators, char subfield, String leaderSubfields, String value) {
+    public MARC21(String recordNumber, String secuence, String field, String indicators, char subfield, String leaderSubfields, String value) {
         this.recordNumber = recordNumber;
         this.secuence = secuence;
         this.field = field;
@@ -24,11 +24,11 @@ public class MARC21 {
         this.value = value;
     }
 
-    public int getRecordNumber() {
+    public String getRecordNumber() {
         return recordNumber;
     }
 
-    public void setRecordNumber(int recordNumber) {
+    public void setRecordNumber(String recordNumber) {
         this.recordNumber = recordNumber;
     }
 
