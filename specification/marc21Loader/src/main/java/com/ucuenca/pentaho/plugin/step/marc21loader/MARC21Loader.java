@@ -28,6 +28,8 @@ import org.pentaho.di.trans.step.StepInterface;
 import org.pentaho.di.trans.step.StepMeta;
 import org.pentaho.di.trans.step.StepMetaInterface;
 import com.ucuenca.pentaho.plugin.step.marc21loader.util.MARC21;
+import java.util.Random;
+import java.util.UUID;
 import org.marc4j.marc.VariableField;
 
 /**
@@ -266,6 +268,15 @@ public class MARC21Loader extends BaseStep implements StepInterface {
         return retval;
     }
 
+    public static String createRandomString(int length) {
+        Random random = new Random();
+        StringBuilder sb = new StringBuilder();
+        while (sb.length() < length) {
+            sb.append(Integer.toHexString(random.nextInt()));
+        }
+        return sb.toString();
+    }
+
     /**
      * Lectura de campos básicos del leader del registro MARC
      *
@@ -279,8 +290,9 @@ public class MARC21Loader extends BaseStep implements StepInterface {
         //Muestra el lenguaje de cada registro 
         // get control field with tag 001/005/008
         field = (ControlField) record.getVariableField("001");
-        mfn = field != null ? field.getData() : "";
-
+        //mfn = field != null ? field.getData() : createRandomString(12);
+        mfn = UUID.randomUUID().toString();
+        
         //Atributos del ControlField 005
         //Date and Time of Latest Transaction
         field = (ControlField) record.getVariableField("005");

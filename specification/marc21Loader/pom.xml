@@ -1,162 +1,161 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>com.ucuenca</groupId>
-    <artifactId>specification</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-  </parent>
+    <parent>
+        <groupId>com.ucuenca</groupId>
+        <artifactId>specification</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
 
-  <groupId>com.ucuenca.specification</groupId>
-  <artifactId>marc21-loader</artifactId>
-  <packaging>jar</packaging>
+    <groupId>com.ucuenca.specification</groupId>
+    <artifactId>marc21-loader</artifactId>
+    <packaging>jar</packaging>
 
-  <name>MARC21 Loader</name>
-  <!-- <url>http://maven.apache.org</url> -->
+    <name>MARC21 Loader</name>
+    <!-- <url>http://maven.apache.org</url> -->
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
   
-  <repositories>
-  	<repository>
-		<id>default</id>
-		<url>http://repo1.maven.org/maven2/</url>
-		<snapshots>
-			<enabled>false</enabled>
-		</snapshots>
-	</repository>
-	<repository>
-          <snapshots>
-            <enabled>false</enabled>
-          </snapshots>
-          <id>central</id>
-          <name>repo</name>
-          <url>http://nexus.pentaho.org/content/groups/omni</url>
+    <repositories>
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>central</id>
+            <name>repo</name>
+            <url>http://nexus.pentaho.org/content/groups/omni</url>
         </repository>
-
+        <repository>
+            <id>default</id>
+            <url>http://repo1.maven.org/maven2/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
   
-  </repositories>
+    </repositories>
   
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <version>1.7</version>
-        <executions>
-          <execution>
-            <id>deploy-plugin</id>
-            <phase>package</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-            <configuration>
-              <target>
-                <property name="runtime-classpath" refid="maven.runtime.classpath"/>
-                <property name="kettle-local-dir" value="${pdiDirectory}" />
-                <ant antfile="build.xml" target="install" output="${basedir}/target/ant.log" inheritRefs="true"/>
-              </target>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <id>deploy-plugin</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <property name="runtime-classpath" refid="maven.runtime.classpath"/>
+                                <property name="kettle-local-dir" value="${pdiDirectory}" />
+                                <ant antfile="build.xml" target="install" output="${basedir}/target/ant.log" inheritRefs="true"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
       
-      <!-- Dependencias a ser copiadas en la distribución -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.8</version>
-        <executions>
-          <execution>
-            <id>copy</id>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                	<groupId>info.freelibrary</groupId>
-					<artifactId>freelib-marc4j</artifactId>
-					<!-- <version>2.6.3</version> -->
-					<version>2.6.4-SNAPSHOT</version>
-                  	<type>jar</type>
-                  	<overWrite>false</overWrite>
-                  	<outputDirectory>${project.build.directory}/lib</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
+            <!-- Dependencias a ser copiadas en la distribución -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.8</version>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>info.freelibrary</groupId>
+                                    <artifactId>freelib-marc4j</artifactId>
+                                    <!-- <version>2.6.3</version> -->
+                                    <version>2.6.4-SNAPSHOT</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
             
-          </execution>
-        </executions>
-      </plugin>
+                    </execution>
+                </executions>
+            </plugin>
       
       
-    </plugins>
+        </plugins>
     
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <excludes>
-        	<exclude>plugin/*.*</exclude>
-        </excludes>
-      </resource>
-      <resource>
-        <directory>src/main/java</directory>
-        <includes>
-        	<include>**/*.properties</include>
-        </includes>
-      </resource>
-    </resources>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>plugin/*.*</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
+            </resource>
+        </resources>
     
-  </build>
+    </build>
 
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
     
-    <dependency>
-  		<groupId>pentaho-kettle</groupId>
-  		<artifactId>kettle-core</artifactId>
-  		<version>${pentaho.kettle.version}</version>
-	</dependency>
+        <dependency>
+            <groupId>pentaho-kettle</groupId>
+            <artifactId>kettle-core</artifactId>
+            <version>${pentaho.kettle.version}</version>
+        </dependency>
 	
-	<dependency>
-  		<groupId>pentaho-kettle</groupId>
-  		<artifactId>kettle-engine</artifactId>
-  		<version>${pentaho.kettle.version}</version>
-	</dependency>
+        <dependency>
+            <groupId>pentaho-kettle</groupId>
+            <artifactId>kettle-engine</artifactId>
+            <version>${pentaho.kettle.version}</version>
+        </dependency>
 	
-	<dependency>
-  		<groupId>pentaho-kettle</groupId>
-  		<artifactId>kettle-ui-swt</artifactId>
-  		<version>${pentaho.kettle.version}</version>
-	</dependency>
+        <dependency>
+            <groupId>pentaho-kettle</groupId>
+            <artifactId>kettle-ui-swt</artifactId>
+            <version>${pentaho.kettle.version}</version>
+        </dependency>
 
-  <dependency>
-      <groupId>xml-apis</groupId>
-      <artifactId>xml-apis</artifactId>
-      <version>${xml.apis.version}</version>
-  </dependency>
+        <dependency>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+            <version>${xml.apis.version}</version>
+        </dependency>
 
-  <dependency>
-    <groupId>org.eclipse.swt</groupId>
-    <artifactId>swt-linux-x86_64</artifactId>
-    <version>${org.eclipse.swt.version}</version>
-  </dependency>
+        <dependency>
+            <groupId>org.eclipse.swt</groupId>
+            <artifactId>swt-linux-x86_64</artifactId>
+            <version>${org.eclipse.swt.version}</version>
+        </dependency>
 	
-	<dependency>
-		<groupId>info.freelibrary</groupId>
-		<artifactId>freelib-marc4j</artifactId>
-		<!-- <version>2.6.3</version> -->
-		<version>2.6.4-SNAPSHOT</version>
-	</dependency>
+        <dependency>
+            <groupId>info.freelibrary</groupId>
+            <artifactId>freelib-marc4j</artifactId>
+            <!-- <version>2.6.3</version> -->
+            <version>2.6.4-SNAPSHOT</version>
+        </dependency>
 	
-  </dependencies>
+    </dependencies>
 </project>
