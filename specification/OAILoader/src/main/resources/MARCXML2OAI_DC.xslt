@@ -296,7 +296,14 @@
     <xsl:for-each select="marc:datafield[@tag=999]">
       <dc:id>
         <xsl:call-template name="subfieldSelect">
-          <xsl:with-param name="codes">abcdq</xsl:with-param>
+          <xsl:with-param name="codes">c</xsl:with-param>
+        </xsl:call-template>
+      </dc:id>
+    </xsl:for-each>
+    <xsl:for-each select="marc:datafield[@tag=999]">
+      <dc:id>
+        <xsl:call-template name="subfieldSelect">
+          <xsl:with-param name="codes">d</xsl:with-param>
         </xsl:call-template>
       </dc:id>
     </xsl:for-each>
