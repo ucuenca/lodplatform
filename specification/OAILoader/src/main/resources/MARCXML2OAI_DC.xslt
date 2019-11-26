@@ -218,6 +218,8 @@
 				    <xsl:value-of select="marc:subfield[@code='a']"/> 	
 					<xsl:text>;</xsl:text>
 					<xsl:value-of select="marc:subfield[@code='u']"/> 	
+					<xsl:text>|</xsl:text>
+					<xsl:value-of select="marc:subfield[@code='0']"/> 	
 			</dc:creator>
 		</xsl:for-each>
 		<dc:type>
@@ -306,7 +308,12 @@
 				<xsl:value-of select="marc:subfield[@code='a']"/>
 			</dc:description>
 		</xsl:for-each>
-		<xsl:for-each select="marc:datafield[500&lt;= @tag and @tag&lt;= 599 ][not(@tag=506 or @tag=530 or @tag=540 or @tag=546)]">
+				<xsl:for-each select="marc:datafield[@tag=500]">
+			<dc:subject>
+				<xsl:value-of select="marc:subfield[@code='a']"/>
+			</dc:subject>
+		</xsl:for-each>
+		<xsl:for-each select="marc:datafield[501&lt;= @tag and @tag&lt;= 599 ][not(@tag=506 or @tag=530 or @tag=540 or @tag=546)]">
 			<dc:description>
 				<xsl:value-of select="marc:subfield[@code='a']"/>
 			</dc:description>
