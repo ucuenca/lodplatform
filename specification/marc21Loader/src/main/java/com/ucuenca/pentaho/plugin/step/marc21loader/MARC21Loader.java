@@ -28,6 +28,8 @@ import org.pentaho.di.trans.step.StepInterface;
 import org.pentaho.di.trans.step.StepMeta;
 import org.pentaho.di.trans.step.StepMetaInterface;
 import com.ucuenca.pentaho.plugin.step.marc21loader.util.MARC21;
+import java.util.Random;
+import java.util.UUID;
 import org.marc4j.marc.VariableField;
 
 /**
@@ -124,7 +126,7 @@ public class MARC21Loader extends BaseStep implements StepInterface {
 
                     data.marcXmlOutfile = new MarcXmlWriter(new FileOutputStream(out + meta.getMarcxmlFilename()), true);
                     result = new StreamResult(new FileOutputStream(out + meta.getMarcxmlFilename()));
-					//data.marcXmlOutfile = new MarcXmlWriter(result, stylesheet);
+                    //data.marcXmlOutfile = new MarcXmlWriter(result, stylesheet);
                     //source = new DOMResult();
                     //data.marcXmlOutfile = new MarcXmlWriter(source);
                     //AnselToUnicode converter = new AnselToUnicode();
@@ -187,7 +189,7 @@ public class MARC21Loader extends BaseStep implements StepInterface {
 
         data.processingMarcfile = !data.processingMarcfile.hasNext()
                 && data.marcfilesIterator.hasNext()
-                        ? data.marcfilesIterator.next() : data.processingMarcfile;
+                ? data.marcfilesIterator.next() : data.processingMarcfile;
 
         if (!data.processingMarcfile.hasNext() && !data.marcfilesIterator.hasNext()) {
             if (meta.getGenMARCXML()) {
@@ -235,7 +237,7 @@ public class MARC21Loader extends BaseStep implements StepInterface {
         String leer_campos = meta.getmarcFields();
         String[] campos = leer_campos.split("@");
         List<MARC21> obj_marcAux = new ArrayList<MARC21>();
-        int mfnInt = Integer.parseInt(mfn);
+        String mfnInt = mfn;
         String currentField = "";
         String subfields = "";
         for (int i = 0; i < campos.length; i++) {
@@ -255,7 +257,7 @@ public class MARC21Loader extends BaseStep implements StepInterface {
                     outputRow[outputIndex++] = obj_marc.getLeadersubfields() + "";
                     outputRow[outputIndex++] = obj_marc.getValue() + "";
                     putRow(data.outputRowMeta, outputRow);
-               
+
                 }
             } else {
                 logBasic("Field {0} is not well formatted. Omitting", campos[i]);
@@ -264,6 +266,15 @@ public class MARC21Loader extends BaseStep implements StepInterface {
 
         //if ((linesInput%Const.ROWS_UPDATE)==0) logBasic("linenr "+linesInput);
         return retval;
+    }
+
+    public static String createRandomString(int length) {
+        Random random = new Random();
+        StringBuilder sb = new StringBuilder();
+        while (sb.length() < length) {
+            sb.append(Integer.toHexString(random.nextInt()));
+        }
+        return sb.toString();
     }
 
     /**
@@ -279,8 +290,9 @@ public class MARC21Loader extends BaseStep implements StepInterface {
         //Muestra el lenguaje de cada registro 
         // get control field with tag 001/005/008
         field = (ControlField) record.getVariableField("001");
-        mfn = field.getData();
-
+        //mfn = field != null ? field.getData() : createRandomString(12);
+        mfn = UUID.randomUUID().toString();
+        
         //Atributos del ControlField 005
         //Date and Time of Latest Transaction
         field = (ControlField) record.getVariableField("005");
@@ -363,7 +375,7 @@ public class MARC21Loader extends BaseStep implements StepInterface {
      * @param subfield
      * @return
      */
-    private List<MARC21> obtainField(Record record, int mfn, String field, String leaderSubfields, char subfield) {
+    private List<MARC21> obtainField(Record record, String mfn, String field, String leaderSubfields, char subfield) {
         //Tomo todos los subcampos del campo 
         List<MARC21> objMarc = new ArrayList<MARC21>();
         List<VariableField> marcFields = record.getVariableFields(field);
