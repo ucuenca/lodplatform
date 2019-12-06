@@ -134,7 +134,17 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
                 data.resumptionToken = "";
                 data.listRecords = new ListRecords(meta.getEnvironmentSubstituteInputURI(),
                         data.fromDate, data.untilDate, data.set,
-                        meta.getPrefix(), data.schema);
+                        meta.getPrefix(), data.schema); 
+                String error = data.listRecords.getError();
+                if (error.length() > 1){
+                data.listRecords = null;
+                throw new KettleException (error);
+                
+                }
+                //NodeList error = data.listRecords.getNodeList("/oai20:OAI-PMH");
+                //Node value = error.item(0); 
+                //error.toString();
+                //value.getNodeValue();
                 data.listSet = new ListSets(meta.getEnvironmentSubstituteInputURI());
             }
             this.loadListSets(meta, data);

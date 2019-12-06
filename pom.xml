@@ -20,7 +20,7 @@
     </plugins>
   </build>
   <properties>
-    <pdiDirectory>/home/cedia/PDI</pdiDirectory>
+    <pdiDirectory>/home/joe/REDI/Pentaho/data-integration</pdiDirectory>
     <ucuenca.lod.version>${project.version}</ucuenca.lod.version>
     <pentaho.kettle.version>5.1.preview.506</pentaho.kettle.version>
     <apache.jena.version>2.12.0</apache.jena.version>

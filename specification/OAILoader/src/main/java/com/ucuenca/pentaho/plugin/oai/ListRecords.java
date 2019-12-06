@@ -166,4 +166,19 @@ public class ListRecords extends HarvesterVerb {
         requestURL.append("&resumptionToken=").append(URLEncoder.encode(resumptionToken));
         return requestURL.toString();
     }
+    
+    
+    public String getError()
+            throws TransformerException, NoSuchFieldException {
+        String schemaLocation = getSchemaLocation();
+        if (schemaLocation.indexOf(SCHEMA_LOCATION_V2_0) != -1) {
+            String date = getSingleString("/oai20:OAI-PMH/oai20:responseDate");
+            String er = getSingleString("/oai20:OAI-PMH/oai20:error");
+            return getSingleString("/oai20:OAI-PMH/oai20:error");               
+        } else if (schemaLocation.indexOf(SCHEMA_LOCATION_V1_1_LIST_RECORDS) != -1) {
+            return getSingleString("/oai11_ListRecords:ListRecords/oai11_ListRecords:responseDate");
+        } else {
+            throw new NoSuchFieldException(schemaLocation);
+        }
+    }
 }

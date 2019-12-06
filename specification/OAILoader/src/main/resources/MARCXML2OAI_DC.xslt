@@ -175,9 +175,6 @@
     </xsl:if>
   </xsl:template>
 
-
-
-<<<<<<< HEAD
 	<xsl:output method="xml" indent="yes"/>
 	<!--
 	Fixed 530 Removed type="original" from dc:relation 2010-11-19 tmee
@@ -231,60 +228,6 @@
 			</xsl:if>
 			<xsl:if test="$leader6='d' or $leader6='f' or $leader6='p' or $leader6='t'">
 				<!--Remove attribute 6/04 jer-->
-=======
-  <xsl:output method="xml" indent="yes"/>
-  <!--
-  Fixed 530 Removed type="original" from dc:relation 2010-11-19 tmee
-  Fixed 500 fields. 2006-12-11 ntra
-  Added ISBN and deleted attributes 6/04 jer
-  -->
-  <xsl:template match="/">
-    <xsl:if test="marc:collection">
-      <oai_dc:dcCollection xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
-        <xsl:for-each select="marc:collection">
-          <xsl:for-each select="marc:record">
-            <oai_dc:dc>
-              <xsl:apply-templates select="."/>
-            </oai_dc:dc>
-          </xsl:for-each>
-        </xsl:for-each>
-      </oai_dc:dcCollection>
-    </xsl:if>
-    <xsl:if test="marc:record">
-      <oai_dc:dc xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
-        <xsl:apply-templates/>
-      </oai_dc:dc>
-    </xsl:if>
-  </xsl:template>
-  <xsl:template match="marc:record">
-    <xsl:variable name="leader" select="marc:leader"/>
-    <xsl:variable name="leader6" select="substring($leader,7,1)"/>
-    <xsl:variable name="leader7" select="substring($leader,8,1)"/>
-    <xsl:variable name="controlField008" select="marc:controlfield[@tag=008]"/>
-    <xsl:for-each select="marc:datafield[@tag=245]">
-      <dc:title>
-        <xsl:call-template name="subfieldSelect">
-          <xsl:with-param name="codes">abfghk</xsl:with-param>
-        </xsl:call-template>
-      </dc:title>
-    </xsl:for-each>
-    <xsl:for-each select="marc:datafield[@tag=100]|marc:datafield[@tag=110]|marc:datafield[@tag=111]|marc:datafield[@tag=700]|marc:datafield[@tag=710]|marc:datafield[@tag=711]|marc:datafield[@tag=720]">
-      <dc:creator>
-        <xsl:value-of select="marc:subfield[@code='a']"/> 	
-        <xsl:text>;</xsl:text>
-        <xsl:value-of select="marc:subfield[@code='u']"/> 	
-      </dc:creator>
-    </xsl:for-each>
-    <dc:type>
-      <xsl:if test="$leader7='c'">
-        <!--Remove attribute 6/04 jer-->
-        <!--<xsl:attribute name="collection">yes</xsl:attribute>-->
-        <xsl:text>collection</xsl:text>
-      </xsl:if>
-      <xsl:if test="$leader6='d' or $leader6='f' or $leader6='p' or $leader6='t'">
-        <!--Remove attribute 6/04 jer-->
->>>>>>> cb64f66648a2efa44af5f92198ec61ebff0ca5df
-		
         <xsl:text>manuscript</xsl:text>
       </xsl:if>
       <xsl:choose>
@@ -373,13 +316,10 @@
     <xsl:for-each select="marc:datafield[@tag=856]/marc:subfield[@code='q']">
       <dc:format>
         <xsl:value-of select="."/>
-
       </dc:format>
       <dc:type>
         <xsl:text>Article </xsl:text>
       </dc:type>
-	
-<<<<<<< HEAD
 		</xsl:for-each>
 		<xsl:for-each select="marc:datafield[@tag=520]">
 			<dc:description>
@@ -471,12 +411,12 @@
 		</xsl:for-each>
 			<xsl:for-each select="marc:datafield[@tag=020]">
 			<dc:identifierISBN>
-				<xsl:value-of select="marc:subfield[@code='$a']"/>
+				<xsl:value-of select="marc:subfield[@code='$a']|marc:subfield[@code='a']"/>
 			</dc:identifierISBN>
 		</xsl:for-each>
 		<xsl:for-each select="marc:datafield[@tag=022]">
 			<dc:identifierISSN>
-				<xsl:value-of select="marc:subfield[@code='$a']"/>
+				<xsl:value-of select="marc:subfield[@code='$a']|marc:subfield[@code='a']"/>
 			</dc:identifierISSN>
 		</xsl:for-each>
 		<xsl:for-each select="marc:datafield[@tag=506]">
@@ -491,114 +431,6 @@
 		</xsl:for-each>
 		<!--</oai_dc:dc>-->
 	</xsl:template>
-=======
-    </xsl:for-each>
-    <xsl:for-each select="marc:datafield[@tag=520]">
-      <dc:description>
-        <xsl:value-of select="marc:subfield[@code='a']"/>
-      </dc:description>
-    </xsl:for-each>
-    <xsl:for-each select="marc:datafield[@tag=521]">
-      <dc:description>
-        <xsl:value-of select="marc:subfield[@code='a']"/>
-      </dc:description>
-    </xsl:for-each>
-    <xsl:for-each select="marc:datafield[500&lt;= @tag and @tag&lt;= 599 ][not(@tag=506 or @tag=530 or @tag=540 or @tag=546)]">
-      <dc:description>
-        <xsl:value-of select="marc:subfield[@code='a']"/>
-      </dc:description>
-    </xsl:for-each>
-    <xsl:for-each select="marc:datafield[@tag=600]">
-      <dc:subject>
-        <xsl:call-template name="subfieldSelect">
-          <xsl:with-param name="codes">abcdq</xsl:with-param>
-        </xsl:call-template>
-      </dc:subject>
-    </xsl:for-each>
-    <xsl:for-each select="marc:datafield[@tag=610]">
-      <dc:subject>
-        <xsl:call-template name="subfieldSelect">
-          <xsl:with-param name="codes">abcdq</xsl:with-param>
-        </xsl:call-template>
-      </dc:subject>
-    </xsl:for-each>
-    <xsl:for-each select="marc:datafield[@tag=611]">
-      <dc:subject>
-        <xsl:call-template name="subfieldSelect">
-          <xsl:with-param name="codes">abcdq</xsl:with-param>
-        </xsl:call-template>
-      </dc:subject>
-    </xsl:for-each>
-    <xsl:for-each select="marc:datafield[@tag=630]">
-      <dc:subject>
-        <xsl:call-template name="subfieldSelect">
-          <xsl:with-param name="codes">abcdq</xsl:with-param>
-        </xsl:call-template>
-      </dc:subject>
-    </xsl:for-each>
-    <xsl:for-each select="marc:datafield[@tag=650]">
-      <dc:subject>
-        <xsl:call-template name="subfieldSelect">
-          <xsl:with-param name="codes">abcdq</xsl:with-param>
-        </xsl:call-template>
-      </dc:subject>
-    </xsl:for-each>
-    <xsl:for-each select="marc:datafield[@tag=653]">
-      <dc:subject>
-        <xsl:call-template name="subfieldSelect">
-          <xsl:with-param name="codes">abcdq</xsl:with-param>
-        </xsl:call-template>
-      </dc:subject>
-    </xsl:for-each>
-    <xsl:for-each select="marc:datafield[@tag=752]">
-      <dc:coverage>
-        <xsl:call-template name="subfieldSelect">
-          <xsl:with-param name="codes">abcd</xsl:with-param>
-        </xsl:call-template>
-      </dc:coverage>
-    </xsl:for-each>
-    <xsl:for-each select="marc:datafield[@tag=530]">
-      <dc:relation>
-        <xsl:call-template name="subfieldSelect">
-          <xsl:with-param name="codes">abcdu</xsl:with-param>
-        </xsl:call-template>
-      </dc:relation>
-    </xsl:for-each>
-    <xsl:for-each select="marc:datafield[@tag=760]|marc:datafield[@tag=762]|marc:datafield[@tag=765]|marc:datafield[@tag=767]|marc:datafield[@tag=770]|marc:datafield[@tag=772]|marc:datafield[@tag=773]|marc:datafield[@tag=774]|marc:datafield[@tag=775]|marc:datafield[@tag=776]|marc:datafield[@tag=777]|marc:datafield[@tag=780]|marc:datafield[@tag=785]|marc:datafield[@tag=786]|marc:datafield[@tag=787]">
-      <dc:source>
-        <xsl:call-template name="subfieldSelect">
-          <xsl:with-param name="codes">not</xsl:with-param>
-        </xsl:call-template>
-      </dc:source>
-    </xsl:for-each>
-    <xsl:for-each select="marc:datafield[@tag=856]">
-      <dc:identifier>
-        <xsl:value-of select="marc:subfield[@code='u']"/>
-      </dc:identifier>
-    </xsl:for-each>
-    <xsl:for-each select="marc:datafield[@tag=020]">
-      <dc:identifierISBN>
-        <xsl:value-of select="marc:subfield[@code='$a']|marc:subfield[@code='a']"/>
-      </dc:identifierISBN>
-    </xsl:for-each>
-    <xsl:for-each select="marc:datafield[@tag=022]">
-      <dc:identifierISSN>
-        <xsl:value-of select="marc:subfield[@code='$a']|marc:subfield[@code='a']"/>
-      </dc:identifierISSN>
-    </xsl:for-each>
-    <xsl:for-each select="marc:datafield[@tag=506]">
-      <dc:rights>
-        <xsl:value-of select="marc:subfield[@code='a']"/>
-      </dc:rights>
-    </xsl:for-each>
-    <xsl:for-each select="marc:datafield[@tag=540]">
-      <dc:rights>
-        <xsl:value-of select="marc:subfield[@code='a']"/>
-      </dc:rights>
-    </xsl:for-each>
-    <!--</oai_dc:dc>-->
-  </xsl:template>
->>>>>>> cb64f66648a2efa44af5f92198ec61ebff0ca5df
 </xsl:stylesheet>
 
 <!-- Stylus Studio meta-information - (c) 2004-2005. Progress Software Corporation. All rights reserved.
