@@ -364,7 +364,9 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
                         getDataUKETDDC(eElement1);
                     } else if (data.schema.prefix.equals("oai_dc") || data.schema.prefix.equals("marcxml")) {
                         getDataUKETDDC(eElement1);
-                    } else if (data.schema.prefix.equals("didl")) {
+                    } else if (data.schema.prefix.equals("oai_cerif_openaire") ) {
+                        getDataUKETDDC(eElement1);
+                    }else if (data.schema.prefix.equals("didl")) {
                         getDataUKETDDC(eElement1);
                     }
                     // oai:dspace.espoch.edu.ec:123456789

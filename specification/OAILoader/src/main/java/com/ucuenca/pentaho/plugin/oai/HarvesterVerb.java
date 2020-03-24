@@ -78,6 +78,7 @@ public abstract class HarvesterVerb {
     private static Element namespaceElement = null;
     private static DocumentBuilderFactory factory = null;
     private boolean transform = false;
+    private String metadataprefix = null;
     
     private static Transformer idTransformer = null;
     static {
@@ -175,6 +176,10 @@ public abstract class HarvesterVerb {
             namespaceElement.setAttributeNS("http://www.w3.org/2000/xmlns/",
                     "xmlns:ow",
             "http://www.ontoweb.org/ontology/1#");
+            
+            namespaceElement.setAttributeNS("http://www.w3.org/2000/xmlns/",
+                    "xmlns:oai_cerif",
+            "https://www.openaire.eu/cerif-profile/1.1/");
                       
        
             
@@ -238,14 +243,15 @@ public abstract class HarvesterVerb {
      * @throws SAXException
      * @throws TransformerException
      */
-    public HarvesterVerb(String requestURL,boolean transform, Schema... schemas) throws IOException,
+    public HarvesterVerb(String requestURL,boolean transform , String metadataprefix, Schema... schemas) throws IOException,
     ParserConfigurationException, SAXException, TransformerException {
     	this.transform=transform;
+        this.metadataprefix = metadataprefix;
     	for(Schema schema:schemas) {
     		namespaceElement.setAttributeNS("http://www.w3.org/2000/xmlns/", 
         			"xmlns:"+schema.prefix, schema.namespace);
     	}
-        harvest(requestURL);
+        harvest(requestURL );
     }
     
     /**
@@ -339,7 +345,7 @@ public abstract class HarvesterVerb {
         }
         
         if (transform){
-            XSLTUtils xsltUtils = new XSLTUtils();
+            XSLTUtils xsltUtils = new XSLTUtils(this.metadataprefix);
             try {
                 in = xsltUtils.Transform(in);
             } catch (Exception ex) {

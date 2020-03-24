@@ -5,6 +5,7 @@
  */
 package com.ucuenca.pentaho.plugin.auxiliary;
 
+import com.ucuenca.pentaho.plugin.step.oai.OAILoaderDialog;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileWriter;
@@ -47,13 +48,27 @@ import org.xml.sax.SAXException;
  * @author joseph6x
  */
 public class XSLTUtils {
+    
+    private String filename = "";
+    private String namespace = "";
 
     private static final String TMP = "/tmp/";
+    
+    
+    public XSLTUtils (String metadataPrefix) {
+     if (metadataPrefix.compareTo(OAILoaderDialog.Format.MARCXML.getName()) == 0){
+      this.filename = "/MARCXML2OAI_DC.xslt";
+      this.namespace =  "http://www.loc.gov/MARC21/slim";
+     } else if (metadataPrefix.compareTo(OAILoaderDialog.Format.OAI_CERIF.getName()) == 0){
+       this.filename = "/CERIF2OAI_DC.xslt";
+       this.namespace =  "https://www.openaire.eu/cerif-profile/1.1/";
+     }
+    }
 
     public InputStream Transform(InputStream in) throws SAXException, ParserConfigurationException, IOException, XPathExpressionException, TransformerException, Exception {
         InputStream resourceAsStream = this.getClass().getResourceAsStream("/exe.jar_");
         String theString = IOUtils.toString(in);
-        String toString = IOUtils.toString(this.getClass().getResourceAsStream("/MARCXML2OAI_DC.xslt"));
+        String toString = IOUtils.toString(this.getClass().getResourceAsStream(filename));
         Files.copy(resourceAsStream, Paths.get(TMP + "exe.jar"), StandardCopyOption.REPLACE_EXISTING);
         wr(theString, "data.xml");
         wr(toString, "transformation.xslt");
@@ -90,7 +105,7 @@ public class XSLTUtils {
 
     public Node Marcxml2Oai_dc(Node n) {
         try {
-            InputStream resourceAsStream = this.getClass().getResourceAsStream("/MARCXML2OAI_DC.xslt");
+            InputStream resourceAsStream = this.getClass().getResourceAsStream(filename);
             StreamSource style = new StreamSource(resourceAsStream);
             String nodeToString = nodeToXML(n);
             String nodeToString2 = StreamSourceToXML(style);
@@ -164,6 +179,8 @@ public class XSLTUtils {
                         return "http://www.openarchives.org/OAI/2.0/";
                     case "marc":
                         return "http://www.loc.gov/MARC21/slim";
+                    case "oai_cerif_openaire":
+                        return "https://www.openaire.eu/cerif-profile/1.1/";
                     case "dc":
                         return "http://purl.org/dc/elements/1.1/";
                     case "aoi_dc":
@@ -189,7 +206,7 @@ public class XSLTUtils {
         Transformer transformer = transformerFactory.newTransformer(xslt);
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node item = nodeList.item(i);
-            renameNamespaceRecursive(item, "http://www.loc.gov/MARC21/slim");
+            renameNamespaceRecursive(item, this.namespace);
             String nodeToXML = nodeToXML(item);
             String ApplyXSLT = ApplyXSLT(nodeToXML, a);
 

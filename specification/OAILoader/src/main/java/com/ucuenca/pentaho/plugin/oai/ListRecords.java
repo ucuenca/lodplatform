@@ -52,8 +52,16 @@ public class ListRecords extends HarvesterVerb {
     public ListRecords(String baseURL, String from, String until,
             String set, String metadataPrefix, Schema... schemas)
             throws IOException, ParserConfigurationException, SAXException,
-            TransformerException {
-        super(getRequestURL(baseURL, from, until, set, metadataPrefix),metadataPrefix.compareTo(OAILoaderDialog.Format.MARCXML.getName()) == 0, schemas);
+            TransformerException { 
+        super(getRequestURL(baseURL, from, until, set, metadataPrefix), NeedTransform (metadataPrefix) , metadataPrefix, schemas);
+    }
+    
+    private static boolean NeedTransform (String metadataPrefix) {
+      if (metadataPrefix.compareTo(OAILoaderDialog.Format.MARCXML.getName()) == 0 || metadataPrefix.compareTo(OAILoaderDialog.Format.OAI_CERIF.getName())  == 0 )
+      { return true;
+      }
+       return false;
+  
     }
 
     /**
@@ -70,7 +78,7 @@ public class ListRecords extends HarvesterVerb {
     public ListRecords(String baseURL, String resumptionToken/*, String from*/, String metadataPrefix, Schema... schemas)
             throws IOException, ParserConfigurationException, SAXException,
             TransformerException {
-        super(getRequestURL(baseURL, resumptionToken/*, from*/),metadataPrefix.compareTo(OAILoaderDialog.Format.MARCXML.getName()) == 0, schemas);
+        super(getRequestURL(baseURL, resumptionToken/*, from*/), NeedTransform (metadataPrefix), metadataPrefix , schemas);
     }
 
     /**

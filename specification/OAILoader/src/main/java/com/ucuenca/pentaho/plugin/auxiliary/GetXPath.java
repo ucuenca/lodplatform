@@ -53,6 +53,8 @@ public class GetXPath {
 						GetXpathuketd_dc(nNode1);
 					}
 					else if (prefix.equals("oai_dc") || prefix.equals("marcxml")) {
+						GetXpathuketd_dc(nNode1); 
+					}else if (prefix.equals("oai_cerif_openaire")) {
 						GetXpathuketd_dc(nNode1);
 					}
 					else if (prefix.equals("didl")) {

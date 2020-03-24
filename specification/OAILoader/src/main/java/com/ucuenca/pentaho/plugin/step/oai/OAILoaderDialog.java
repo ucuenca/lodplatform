@@ -737,7 +737,7 @@ public class OAILoaderDialog extends BaseStepDialog implements
                 List <Schema> NewSchema = new ArrayList();
 
                 while (i.hasNext()) {
-                    Schema schema = i.next();
+                    Schema schema = i.next(); 
 
                     for (Format f : Format.values()) {
                         if (f.isState() && f.getName().equals(schema.prefix)) {
@@ -775,6 +775,7 @@ public class OAILoaderDialog extends BaseStepDialog implements
         UKETD_DC("uketd_dc", true),
         OAI_DC("oai_dc", true),
         MARCXML("marcxml", true),
+        OAI_CERIF("oai_cerif_openaire", true),
         DIM("dim", false),
         MARC("marc", false),
         ETDMS("etdms", false),
