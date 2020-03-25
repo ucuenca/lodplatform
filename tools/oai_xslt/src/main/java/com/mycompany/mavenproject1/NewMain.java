@@ -47,7 +47,7 @@ public class NewMain {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws TransformerException, IOException, MalformedURLException, ParserConfigurationException, SAXException, XPathExpressionException {
-        
+
         //"/home/cedia/tmp/MARCXML2OAI_DC.xslt"
         //"/home/cedia/tmp/c.xml"
         System.out.println(t(w(args[0]), w(args[1])));
@@ -77,6 +77,8 @@ public class NewMain {
                         return "http://www.openarchives.org/OAI/2.0/";
                     case "marc":
                         return "http://www.loc.gov/MARC21/slim";
+                    case "oai_cerif":
+                        return "https://www.openaire.eu/cerif-profile/1.1/";
                     case "dc":
                         return "http://purl.org/dc/elements/1.1/";
                     case "aoi_dc":
@@ -95,15 +97,14 @@ public class NewMain {
                 return null;
             }
         });
-        String expression = "/oai20:OAI-PMH/oai20:ListRecords/oai20:record/oai20:metadata/marc:record";
+        String expression = "/oai20:OAI-PMH/oai20:ListRecords/oai20:record/oai20:metadata/*";
         NodeList nodeList = (NodeList) xPath.compile(expression).evaluate(xmlDocument, XPathConstants.NODESET);
-                    TransformerFactory transformerFactory = TransformerFactory
-                    .newInstance();
+        TransformerFactory transformerFactory = TransformerFactory
+                .newInstance();
         Transformer transformer = transformerFactory.newTransformer(xslt);
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node item = nodeList.item(i);
 
-            
             DOMSource source = new DOMSource(item);
             StringWriter xmlOutWriter = new StringWriter();
             transformer.transform(source, new StreamResult(xmlOutWriter));
