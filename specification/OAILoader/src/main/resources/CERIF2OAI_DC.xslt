@@ -29,6 +29,7 @@
     
     
     <xsl:template match="oai_cerif:Person">
+    	<dc:type>Person</dc:type>
         <dc:Person> 
             <xsl:value-of select="@id"/>  
         </dc:Person>
@@ -38,7 +39,6 @@
         <dc:ScopusAuthorID> 
             <xsl:value-of select="oai_cerif:ScopusAuthorID" /> 
         </dc:ScopusAuthorID>
-
         <dc:FamilyNames>
             <xsl:value-of select="oai_cerif:PersonName/oai_cerif:FamilyNames" /> 
         </dc:FamilyNames>
@@ -46,17 +46,21 @@
             <xsl:value-of select="oai_cerif:PersonName/oai_cerif:FirstNames" /> 
         </dc:FirstNames>
         <dc:OrgUnit> 
-            <xsl:value-of select="oai_cerif:Affiliation/oai_cerif:OrgUnit/@id" /> 
+            OrgUnits_<xsl:value-of select="oai_cerif:Affiliation/oai_cerif:OrgUnit/@id" /> 
         </dc:OrgUnit>
+         <xsl:for-each select="oai_cerif:Affiliation/oai_cerif:OrgUnit">
+        	 <dc:OrgUnitName> <xsl:value-of select="oai_cerif:Name" /></dc:OrgUnitName>
+          </xsl:for-each>
         <xsl:for-each select="metadata/oai_cerif:Person/oai_cerif:Project">
             <dc:Project> 
-                <xsl:value-of select="@id" /> | <xsl:value-of select="oai_cerif:Title" /> 
+                Projects_<xsl:value-of select="@id" /> | <xsl:value-of select="oai_cerif:Title" /> 
             </dc:Project>
         </xsl:for-each>
     </xsl:template>
     
     
     <xsl:template match="oai_cerif:OrgUnit">
+    	<dc:type>OrgUnit</dc:type>
         <dc:OrgUnit>
             <xsl:value-of select="@id" /> 
         </dc:OrgUnit>
@@ -72,17 +76,31 @@
 
 
     <xsl:template match="oai_cerif:Project">
+    	<dc:type>Project</dc:type>
         <dc:Project> 
             <xsl:value-of select="@id" />  
         </dc:Project>
         <dc:Title> 
             <xsl:value-of select="oai_cerif:Title" />  
         </dc:Title>
-    </xsl:template> 
+        <dc:StartDate>
+        	 <xsl:value-of select="oai_cerif:StartDate" />
+        </dc:StartDate>
+        <dc:EndDate>
+        	 <xsl:value-of select="oai_cerif:EndDate" />
+        </dc:EndDate>
+       <xsl:for-each select="oai_cerif:Team/oai_cerif:PrincipalInvestigator">
+        	 <dc:Member>Persons_<xsl:value-of select="oai_cerif:Person/@id" />|<xsl:value-of select="oai_cerif:DisplayName"/></dc:Member>
+       </xsl:for-each>
+         <xsl:for-each select="oai_cerif:Team/oai_cerif:Member">
+        	 <dc:Member>Persons_<xsl:value-of select="oai_cerif:Person/@id" />|<xsl:value-of select="oai_cerif:DisplayName"/></dc:Member>
+       </xsl:for-each>
+      </xsl:template> 
    
    
    
     <xsl:template match="oai_cerif:Publication">
+    	<dc:type>Publication</dc:type>
         <xsl:for-each select="oai_cerif:Title">
             <dc:title> 
                 <xsl:value-of select="."/> 
@@ -107,11 +125,21 @@
             </dc:PartOf>
         </xsl:for-each>
 
-        <xsl:for-each select="oai_cerif:Project">
+         <xsl:for-each select="oai_cerif:Publishers">
+         	 <xsl:for-each select="oai_cerif:Publisher">
+            <dc:Publisher> 
+                <xsl:value-of select="oai_cerif:DisplayName"/> 
+            </dc:Publisher>
+        	</xsl:for-each>
+        </xsl:for-each>
+
+          <xsl:for-each select="oai_cerif:OriginatesFrom">
+          <xsl:for-each select="oai_cerif:Project">
             <dc:Project> 
-                <xsl:value-of select="@id" /> | <xsl:value-of select="oai_cerif:Title" /> 
+                Projects_<xsl:value-of select="@id" /> | <xsl:value-of select="oai_cerif:Title" /> 
             </dc:Project>
         </xsl:for-each>
+       </xsl:for-each>
 
         <xsl:for-each select="oai_cerif:URL">
             <dc:URL> 
@@ -127,7 +155,7 @@
 
         <xsl:for-each select="oai_cerif:Authors/oai_cerif:Author">
             <dc:Author> 
-                <xsl:value-of select="oai_cerif:Person/@id" />|<xsl:value-of select="oai_cerif:DisplayName"/> 
+                Persons_<xsl:value-of select="oai_cerif:Person/@id" />|<xsl:value-of select="oai_cerif:DisplayName"/> 
             </dc:Author>
         </xsl:for-each>
 
