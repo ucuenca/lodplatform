@@ -20,9 +20,9 @@
     </plugins>
   </build>
   <properties>
-    <pdiDirectory>/home/joe/REDI/Pentaho/data-integration</pdiDirectory>
+    <pdiDirectory>/home/joev/data-integration</pdiDirectory>
     <ucuenca.lod.version>${project.version}</ucuenca.lod.version>
-    <pentaho.kettle.version>5.1.preview.506</pentaho.kettle.version>
+    <pentaho.kettle.version>9.2.0.0-144</pentaho.kettle.version>
     <apache.jena.version>2.12.0</apache.jena.version>
     <h2.database.version>1.4.178</h2.database.version>
     <antidot.db2triples.version>1.0.3-SNAPSHOT</antidot.db2triples.version>
@@ -35,9 +35,9 @@
     <module>no-released-libs</module>
     <module>tools</module>
     <module>specification</module>
-    <module>modeling</module>
+    <!--<module>modeling</module>
     <module>generation</module>
     <module>publication</module>
-    <module>exploitation</module>
+    <module>exploitation</module>-->
   </modules>
 </project>

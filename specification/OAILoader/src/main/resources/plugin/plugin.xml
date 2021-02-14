@@ -25,6 +25,7 @@
     			<library name="lib/some-additional-jar.jar"/>
     		 -->
     		 
+    		 <library name="lib/xalan-2.7.0.jar"/>
     		 <library name="lib/commons-digester-1.7.jar"/>
     		 <library name="lib/misctools-0.0.1-SNAPSHOT.jar"/>
 		</libraries>
