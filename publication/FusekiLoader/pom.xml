@@ -17,7 +17,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <ver.jetty>8.1.14.v20131031</ver.jetty>
+        <ver.jetty>9.4.41.v20210516</ver.jetty>
         <ver.velocity>1.7</ver.velocity>
     </properties>
 
