@@ -595,7 +595,7 @@ public class OAILoaderData extends BaseStepData implements StepDataInterface {
 
         if (prueba.getChildNodes().getLength() == 1) {
             datos.add(prueba.getTextContent());
-            if (!prueba.getTagName().equals("metadata")) {
+            if (!prueba.getTagName().equals("metadata") && prueba.getTagName().contains(":")) {
                 StringTokenizer strobj1 = new StringTokenizer(
                         prueba.getTagName(), ":");
                 strobj1.nextToken();

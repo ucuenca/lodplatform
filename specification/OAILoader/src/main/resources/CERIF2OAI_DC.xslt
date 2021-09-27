@@ -80,6 +80,9 @@
         <dc:Project> 
             <xsl:value-of select="@id" />  
         </dc:Project>
+        <dc:Acronym> 
+            <xsl:value-of select="oai_cerif:Acronym" />  
+        </dc:Acronym>
         <dc:Title> 
             <xsl:value-of select="oai_cerif:Title" />  
         </dc:Title>
@@ -95,6 +98,14 @@
          <xsl:for-each select="oai_cerif:Team/oai_cerif:Member">
         	 <dc:Member>Persons_<xsl:value-of select="oai_cerif:Person/@id" />|<xsl:value-of select="oai_cerif:DisplayName"/></dc:Member>
        </xsl:for-each>
+       <xsl:for-each select="oai_cerif:Funded/oai_cerif:By">
+       <dc:FunderName> <xsl:value-of select="oai_cerif:DisplayName" /></dc:FunderName>
+       <dc:Funder> Org_<xsl:value-of select="oai_cerif:OrgUnit/@id" /> </dc:Funder>
+       </xsl:for-each>
+        <xsl:for-each select="oai_cerif:Funded/oai_cerif:As/oai_cerif:Funding/oai_cerif:PartOf/oai_cerif:Funding">
+       <dc:Funding> <xsl:value-of select="oai_cerif:Name" /></dc:Funding>
+       </xsl:for-each>
+
       </xsl:template> 
    
    
